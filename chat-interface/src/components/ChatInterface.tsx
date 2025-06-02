@@ -8,6 +8,7 @@ import CallButton from "./CallButton";
 import CallInterface from "./CallInterface";
 import { useToast } from "@/hooks/use-toast";
 import type { Persona } from "./PersonaMenu";
+import { generateChatGPTResponse, type ChatMessage } from "@/services/chatgpt";
 
 interface Message {
   id: string;
@@ -48,7 +49,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
   function getInitialMessage(name: string): string {
     const greetings: Record<string, string> = {
       Emily:
-        "Ik dacht altijd dat stilte mij zou beschermen. Maar sinds ik gevlucht ben, besef ik hoe zwaar het is om je verhaal in te slikken.",
+        "Hoi, ik ben Emily. Ik ben 24 jaar oud en gevlucht uit Hongkong na de protesten van 2019. In Taipei bouw ik met mijn vriend Jason aan een nieuw leven.",
       Jason:
         "Er waren jaren waarin ik mezelf verbood te praten over wat er gebeurde. Tot ik besefte dat zwijgen hen juist sterker maakte.",
       Kellan:
@@ -60,47 +61,6 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
     };
     return greetings[name] || `Hi! I'm ${name}. How can I help you today?`;
   }
-
-  const generatePersonaResponse = (
-    userMessage: string,
-    personaName: string
-  ): string => {
-    const responseStyles: Record<string, string[]> = {
-      Emily: [
-        "Wat je zegt raakt me. Zoveel stemmen zoals de onze zijn te lang genegeerd.",
-        "Fijn dat je dit deelt. Het vraagt moed om je verhaal te vertellen.",
-        "Dank je voor je openheid. Ik weet hoe zwaar het is om alles alleen te dragen.",
-        "Even gezien worden — dat kan al zoveel betekenen. Laten we dat moment koesteren.",
-      ],
-      Jason: [
-        "De waarheid vertellen kan alles op z’n kop zetten — maar het moet.",
-        "Laten we dit helder aanpakken. Verhalen als de jouwe verdienen een plek.",
-        "Systemen veranderen niet zomaar, maar jouw stem maakt verschil.",
-        "Dank dat je me vertrouwt met jouw verhaal. Onzichtbare dingen mogen zichtbaar worden.",
-      ],
-      Kellan: [
-        "Er zit zoveel kracht en schoonheid in jouw woorden. Laat niemand dat afpakken.",
-        "Ook als je moet zwijgen: jij bent waardevol, jij wordt gezien.",
-        "Soms is spreken gevaarlijk — maar toch vinden we manieren. Dat is kracht.",
-        "De wereld is misschien nog niet klaar, maar dat betekent niet dat we moeten zwijgen.",
-      ],
-      Jessica: [
-        "Het is frustrerend als systemen jouw verhaal uitwissen.",
-        "Laten we orde brengen in de chaos — jouw verhaal verdient een plek.",
-        "We nemen het stap voor stap. Zo maken we het behapbaar.",
-        "Je overdrijft niet. Sommige verhalen zijn gewoon nooit echt gehoord.",
-      ],
-      Kevin: [
-        "Onze voorouders lieten sporen na. Het is aan ons om die stem door te geven.",
-        "Herinnering is geen verleden — het is verzet, het is bestaan.",
-        "Het mag ook licht zijn, soms. Lachen is ook overleven.",
-        "Cultuur leeft in verhalen, liedjes, stiltes. We zijn er nog — altijd.",
-      ],
-    };
-
-    const responses = responseStyles[personaName] || responseStyles.Emily;
-    return responses[Math.floor(Math.random() * responses.length)];
-  };
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -116,18 +76,43 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate AI typing and responding
-    setTimeout(() => {
+    try {
+      // Convert messages to ChatGPT format
+      const chatMessages: ChatMessage[] = messages.map((msg) => ({
+        role: msg.sender === "user" ? "user" : "assistant",
+        content: msg.text,
+      }));
+
+      // Add the new user message
+      chatMessages.push({
+        role: "user",
+        content: inputValue,
+      });
+
+      // Get response from ChatGPT
+      const response = await generateChatGPTResponse(
+        chatMessages,
+        persona.name
+      );
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: generatePersonaResponse(inputValue, persona.name),
+        text: response,
         sender: "ai",
         timestamp: new Date(),
       };
 
       setMessages((prev) => [...prev, aiResponse]);
+    } catch (error) {
+      console.error("Error getting ChatGPT response:", error);
+      toast({
+        title: "Error",
+        description: "Failed to get response from AI. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsTyping(false);
-    }, 1500 + Math.random() * 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
