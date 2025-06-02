@@ -9,12 +9,14 @@ import CallInterface from "./CallInterface";
 import { useToast } from "@/hooks/use-toast";
 import type { Persona } from "./PersonaMenu";
 import { generateChatGPTResponse, type ChatMessage } from "@/services/chatgpt";
+import { PERSONA_AVATARS } from "@/config/avatars";
 
 interface Message {
   id: string;
   text: string;
   sender: "user" | "ai";
   timestamp: Date;
+  personaName: string;
 }
 
 interface ChatInterfaceProps {
@@ -29,6 +31,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
       text: getInitialMessage(persona.name),
       sender: "ai",
       timestamp: new Date(Date.now() - 300000),
+      personaName: persona.name,
     },
   ]);
 
@@ -70,6 +73,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
       text: inputValue,
       sender: "user",
       timestamp: new Date(),
+      personaName: persona.name,
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -100,6 +104,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
         text: response,
         sender: "ai",
         timestamp: new Date(),
+        personaName: persona.name,
       };
 
       setMessages((prev) => [...prev, aiResponse]);
@@ -158,7 +163,10 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <Avatar className="h-10 w-10 ring-2 ring-white/20">
-            <AvatarImage src="/placeholder.svg" alt={persona.name} />
+            <AvatarImage
+              src={PERSONA_AVATARS[persona.name]}
+              alt={persona.name}
+            />
             <AvatarFallback className="bg-white/20 text-white">
               {persona.name.substring(0, 2).toUpperCase()}
             </AvatarFallback>
@@ -180,7 +188,10 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
         {isTyping && (
           <div className="flex items-center space-x-2">
             <Avatar className="h-8 w-8">
-              <AvatarImage src="/placeholder.svg" alt={persona.name} />
+              <AvatarImage
+                src={PERSONA_AVATARS[persona.name]}
+                alt={persona.name}
+              />
               <AvatarFallback className="bg-purple-100 text-purple-600 text-xs">
                 {persona.name.substring(0, 2).toUpperCase()}
               </AvatarFallback>
