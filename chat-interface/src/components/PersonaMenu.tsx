@@ -1,6 +1,7 @@
 import { ArrowLeft, MessageCircle, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PERSONA_AVATARS } from "@/config/avatars";
 
 interface Persona {
   id: string;
@@ -55,9 +56,9 @@ const PersonaMenu = ({ onSelectPersona }: PersonaMenuProps) => {
         <div className="flex items-center space-x-3">
           <MessageCircle className="h-8 w-8" />
           <div>
-            <h1 className="font-semibold text-xl">Who will you talk to?</h1>
+            <h1 className="font-semibold text-xl">Met wie wil je praten?</h1>
             <p className="text-sm text-slate-200">
-              Select who you'd like to chat with
+              Selecteer met wie je wilt praten.
             </p>
           </div>
         </div>
@@ -74,10 +75,13 @@ const PersonaMenu = ({ onSelectPersona }: PersonaMenuProps) => {
           >
             <div className="flex items-center space-x-4 w-full">
               <div
-                className={`bg-gradient-to-r ${persona.color} p-3 rounded-full`}
+                className={`bg-gradient-to-r ${persona.color} p-0 rounded-full`}
               >
                 <Avatar className="h-12 w-12 ring-2 ring-white/20">
-                  <AvatarImage src="/placeholder.svg" alt={persona.name} />
+                  <AvatarImage
+                    src={PERSONA_AVATARS[persona.name]}
+                    alt={persona.name}
+                  />
                   <AvatarFallback className="bg-white/20 text-white font-semibold">
                     {persona.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
