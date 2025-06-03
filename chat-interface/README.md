@@ -32,7 +32,7 @@ Create a menu with multiple people/ai that you can go to. I need a back button o
 
 _Het prototype vanuit Loveable:_
 
-![Main menu](readme-images/choose-persona.png "Main menu")![Chat UI](readme-images/chat.png "Chat UI")![Call UI](/readme-images/call.png "Call UI")
+![Main menu](readme-images/choose-persona.png "Main menu")![Chat UI](readme-images/chat.png "Chat UI")![Call UI](readme-images/call.png "Call UI")
 
 Hierna ben ik verder gegaan in Cursor. Hierin heb ik ChatGPT integratie toegevoegd op een veilige manier. Ik heb Cursor gevraagd om de integratie te maken en daarna met ChatGPT zelf gekeken naar de veiligste manieren om mijn API KEY te gebruiken. Ook heb ik zelf avatars toegevoegd.
 
