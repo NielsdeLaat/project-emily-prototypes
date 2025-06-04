@@ -1,4 +1,4 @@
-# Project Emily Prototypes
+# Project Emily Prototype
 
 Een collectie van prototypes voor het project.
 

@@ -1,0 +1,59 @@
+body {
+  background-color: #fcfef1;
+  color: #2c2c2c;
+  font-family: "Crimson Pro", serif;
+  text-align: center;
+  padding: 40px;
+  margin: 0;
+}
+
+h1 {
+  font-family: "Noto Serif Display", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-stretch: 100%;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  color: #013927;
+}
+button.recording {
+  background-color: #013927 !important;
+}
+
+p {
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  line-height: 1.7;
+}
+
+button {
+  background-color: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 1rem 2.2rem;
+  font-size: 1rem;
+  font-family: "Crimson Pro", serif;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  margin-bottom: 2rem;
+}
+
+button:hover {
+  background-color: #444;
+  transform: scale(1.03);
+}
+
+audio {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 400px;
+}
+
+#introVideo {
+  max-width: 900px;
+  margin: 0 auto;
+  display: none; /* Wordt zichtbaar bij afspelen */
+  border-radius: 10px;
+}

@@ -1,8 +1,9 @@
 const OPENAI_API_KEY =
-  "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"; // ← OpenAI API key
+  "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"; // ← OpenAI API key
 const ELEVENLABS_API_KEY =
-  "sk_23cd58322242876b9aaed2e44af1a106846d2f7986aada08"; // ← ElevenLabs key
-const ELEVENLABS_VOICE_ID = "wzHM7XiyOTryKTfQNIpe"; // ← Stem ID
+  "sk_3134c18b726c2571910ba56b555881a7bf3692cc9facca8a"; // ← ElevenLabs key
+const ELEVENLABS_VOICE_ID = "SXBL9NbvTrjsJQYay2kT"; // ← Stem ID
+
 const OPENAI_PROJECT_ID = "proj_9oP0sqHXsriKbBtb1rIJV7gm"; // ← Project ID
 
 const video = document.getElementById("introVideo");
@@ -89,20 +90,21 @@ Je missie is om, als stem van een vluchteling, de wereld te informeren over jouw
 `;
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-      "OpenAI-Project": OPENAI_PROJECT_ID,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "gpt-4",
-      messages: [
-        { role: "system", content: systemPrompt.trim() },
-        { role: "user", content: prompt },
-      ],
-    }),
-  });
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${OPENAI_API_KEY}`,
+    "OpenAI-Project-Id": OPENAI_PROJECT_ID,
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    model: "gpt-4",
+    messages: [
+      { role: "system", content: systemPrompt.trim() },
+      { role: "user", content: prompt }
+    ]
+  })
+});
+
 
   const data = await response.json();
   if (data.error) {
