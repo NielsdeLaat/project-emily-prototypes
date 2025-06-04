@@ -3,7 +3,6 @@ const OPENAI_API_KEY =
 const ELEVENLABS_API_KEY =
   "sk_3134c18b726c2571910ba56b555881a7bf3692cc9facca8a"; // ← ElevenLabs key
 const ELEVENLABS_VOICE_ID = "SXBL9NbvTrjsJQYay2kT"; // ← Stem ID
-
 const OPENAI_PROJECT_ID = "proj_9oP0sqHXsriKbBtb1rIJV7gm"; // ← Project ID
 
 const video = document.getElementById("introVideo");
