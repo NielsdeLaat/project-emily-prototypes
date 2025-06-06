@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Globe</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8f6f0;
+            overflow: hidden;
+        }
+        #globeContainer {
+            width: 100vw;
+            height: 100vh;
+        }
+        #countryInfo {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div id="globeContainer"></div>
+    <div id="countryInfo"></div>
+
+    <script src="https://unpkg.com/three@0.150.1/build/three.min.js"></script>
+    <script src="https://unpkg.com/globe.gl@2.28.0/dist/globe.gl.min.js"></script>
+    <script>
+        // Minimalistic solid color globe with clear borders
+        const globe = Globe()
+            .globeMaterial(new THREE.MeshPhongMaterial({ color: '#bdbdbd', flatShading: true }))
+            .backgroundColor('#f8f6f0')
+            .showAtmosphere(false)
+            .width(window.innerWidth)
+            .height(window.innerHeight)
+            (document.getElementById('globeContainer'));
+
+        // Load country data
+        fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+            .then(res => res.json())
+            .then(countries => {
+                globe.polygonsData(countries.features)
+                    .polygonCapColor(() => '#bdbdbd') // all countries same color
+                    .polygonSideColor(() => '#bdbdbd')
+                    .polygonStrokeColor(() => '#222') // dark borders
+                    .polygonStrokeWidth(1.2)
+                    .polygonLabel(() => null) // no label
+                    .onPolygonHover(() => {}) // no hover effect
+                    .onPolygonClick(() => {}); // no click action
+            });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            globe.width(window.innerWidth)
+                .height(window.innerHeight);
+        });
+
+        // Set initial position and controls
+        globe.pointOfView({ altitude: 2.2 });
+        setTimeout(() => {
+            globe.controls().autoRotate = true;
+            globe.controls().autoRotateSpeed = 0.3;
+            globe.controls().enableZoom = true;
+            globe.controls().enablePan = false;
+        }, 500);
+    </script>
+</body>
+</html>
