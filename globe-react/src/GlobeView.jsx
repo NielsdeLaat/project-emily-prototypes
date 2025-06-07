@@ -22,7 +22,7 @@ export default function GlobeView() {
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12', // Use streets style as base
+      style: 'mapbox://styles/mapbox/streets-v12',
       projection: 'globe',
       zoom: 2.5,
       center: [1.6889271, 31.7091206],
@@ -47,30 +47,80 @@ export default function GlobeView() {
         "star-intensity": 0.1
       });
 
-      // Add country boundaries source
+      // Add main countries source
       map.current.addSource('countries', {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
       });
 
-      // Add country fills
+      // Add territories source
+      map.current.addSource('territories', {
+        type: 'vector',
+        url: 'mapbox://mapbox.country-boundaries-v1'
+      });
+
+      // Add main country fills
       map.current.addLayer({
         'id': 'country-fills',
         'type': 'fill',
         'source': 'countries',
         'source-layer': 'country_boundaries',
+        'filter': [
+          'all',
+          ['!=', ['get', 'name_en'], 'Taiwan'],
+          ['!=', ['get', 'name_en'], 'Hong Kong']
+        ],
         'paint': {
           'fill-color': '#e0e0e0',
           'fill-opacity': 1
         }
       });
 
-      // Add country borders
+      // Add territory fills
+      map.current.addLayer({
+        'id': 'territory-fills',
+        'type': 'fill',
+        'source': 'territories',
+        'source-layer': 'country_boundaries',
+        'filter': [
+          'any',
+          ['==', ['get', 'name_en'], 'Taiwan'],
+          ['==', ['get', 'name_en'], 'Hong Kong']
+        ],
+        'paint': {
+          'fill-color': '#e0e0e0',
+          'fill-opacity': 1
+        }
+      });
+
+      // Add main country borders
       map.current.addLayer({
         'id': 'country-borders',
         'type': 'line',
         'source': 'countries',
         'source-layer': 'country_boundaries',
+        'filter': [
+          'all',
+          ['!=', ['get', 'name_en'], 'Taiwan'],
+          ['!=', ['get', 'name_en'], 'Hong Kong']
+        ],
+        'paint': {
+          'line-color': '#000000',
+          'line-width': 1
+        }
+      });
+
+      // Add territory borders
+      map.current.addLayer({
+        'id': 'territory-borders',
+        'type': 'line',
+        'source': 'territories',
+        'source-layer': 'country_boundaries',
+        'filter': [
+          'any',
+          ['==', ['get', 'name_en'], 'Taiwan'],
+          ['==', ['get', 'name_en'], 'Hong Kong']
+        ],
         'paint': {
           'line-color': '#000000',
           'line-width': 1
@@ -83,12 +133,29 @@ export default function GlobeView() {
         'type': 'symbol',
         'source': 'countries',
         'source-layer': 'country_boundaries',
+        'filter': [
+          'all',
+          ['!=', ['get', 'name_en'], 'Taiwan'],
+          ['!=', ['get', 'name_en'], 'Hong Kong']
+        ],
         'layout': {
           'text-field': ['get', 'name_en'],
-          'text-size': 12,
+          'text-size': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            1.5, 12,
+            3, 0
+          ],
           'text-allow-overlap': false,
           'text-ignore-placement': false,
-          'text-anchor': 'center'
+          'text-anchor': 'center',
+          'visibility': [
+            'case',
+            ['>=', ['zoom'], 3],
+            'none',
+            'visible'
+          ]
         },
         'paint': {
           'text-color': '#000000',
@@ -97,28 +164,82 @@ export default function GlobeView() {
         }
       });
 
-      // Make the map interactive
-      map.current.on('click', 'country-fills', (e) => {
+      // Add territory labels
+      map.current.addLayer({
+        'id': 'territory-labels',
+        'type': 'symbol',
+        'source': 'territories',
+        'source-layer': 'country_boundaries',
+        'filter': [
+          'any',
+          ['==', ['get', 'name_en'], 'Taiwan'],
+          ['==', ['get', 'name_en'], 'Hong Kong']
+        ],
+        'layout': {
+          'text-field': ['get', 'name_en'],
+          'text-size': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            1.5, 12,
+            3, 0
+          ],
+          'text-allow-overlap': false,
+          'text-ignore-placement': false,
+          'text-anchor': 'center',
+          'visibility': [
+            'case',
+            ['>=', ['zoom'], 3],
+            'none',
+            'visible'
+          ]
+        },
+        'paint': {
+          'text-color': '#000000',
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 1
+        }
+      });
+
+      // Make the map interactive for both countries and territories
+      map.current.on('click', ['country-fills', 'territory-fills'], (e) => {
         if (e.features.length > 0) {
           const country = e.features[0];
           setSelectedCountry(country);
           
-          // Highlight the clicked country
-          map.current.setPaintProperty('country-fills', 'fill-color', [
-            'case',
-            ['==', ['get', 'name_en'], country.properties.name_en],
-            '#ffd700',
-            '#e0e0e0'
-          ]);
+          // Highlight the clicked country or territory
+          if (country.properties.name_en === 'Taiwan' || country.properties.name_en === 'Hong Kong') {
+            map.current.setPaintProperty('territory-fills', 'fill-color', [
+              'case',
+              ['==', ['get', 'name_en'], country.properties.name_en],
+              '#ffd700',
+              '#e0e0e0'
+            ]);
+          } else {
+            map.current.setPaintProperty('country-fills', 'fill-color', [
+              'case',
+              ['==', ['get', 'name_en'], country.properties.name_en],
+              '#ffd700',
+              '#e0e0e0'
+            ]);
+          }
+
+          // Ensure interaction controls remain enabled
+          map.current.scrollZoom.enable();
+          map.current.dragRotate.enable();
+          map.current.dragPan.enable();
+          
+          // Reset user interaction state
+          setUserInteracting(false);
         }
       });
 
-      // Change cursor on hover
-      map.current.on('mouseenter', 'country-fills', () => {
+      // Change cursor on hover for both countries and territories
+      map.current.on('mouseenter', ['country-fills', 'territory-fills'], () => {
         map.current.getCanvas().style.cursor = 'pointer';
       });
 
-      map.current.on('mouseleave', 'country-fills', () => {
+      map.current.on('mouseleave', ['country-fills', 'territory-fills'], () => {
         map.current.getCanvas().style.cursor = '';
       });
     });
@@ -165,11 +286,16 @@ export default function GlobeView() {
       }
     });
 
-    // Reset highlight when clicking outside a country
+    // Reset highlight and interaction state when clicking outside
     map.current.on('click', (e) => {
       if (!e.features || e.features.length === 0) {
         setSelectedCountry(null);
         map.current.setPaintProperty('country-fills', 'fill-color', '#e0e0e0');
+        map.current.setPaintProperty('territory-fills', 'fill-color', '#e0e0e0');
+        setUserInteracting(false);
+        map.current.scrollZoom.enable();
+        map.current.dragRotate.enable();
+        map.current.dragPan.enable();
       }
     });
 
