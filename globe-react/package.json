@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "globe-react",
   "private": true,
   "version": "0.0.0",
@@ -12,19 +11,12 @@
   "dependencies": {
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "mapbox-gl": "^3.1.2"
+    "mapbox-gl": "^3.1.2",
+    "react-globe.gl": "2.28.0",
+    "three": "0.150.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.1",
     "vite": "^5.0.0"
   }
 }
-=======
-  "dependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-globe.gl": "2.28.0",
-    "three": "0.150.1"
-  }
-} 
->>>>>>> f5055b8193c8d7887e59f6bd5801d22725b580e3
