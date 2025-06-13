@@ -12,5 +12,4 @@ const Index = ({ onClose }: IndexProps) => {
     </div>
   );
 };
-
 export default Index;

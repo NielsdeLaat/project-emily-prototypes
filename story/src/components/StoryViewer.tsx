@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { X, Flag, SkipForward, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "./ProgressBar";
-import { SubtitleEditor } from "./SubtitleEditor";
 
 interface StorySegment {
   id: number;
@@ -93,7 +92,6 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
   const [subtitles, setSubtitles] = useState(mockStoryData[0].subtitles);
-  const [isEditingSubtitles, setIsEditingSubtitles] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -166,12 +164,6 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
       setCurrentTime(0);
       setSubtitles(mockStoryData[currentSegment - 1].subtitles);
     }
-  };
-
-  const handleSubtitleUpdate = (index: number, newText: string) => {
-    const updatedSubtitles = [...subtitles];
-    updatedSubtitles[index].text = newText;
-    setSubtitles(updatedSubtitles);
   };
 
   const handleProgressBarClick = (segmentIndex: number) => {
@@ -255,10 +247,7 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
         {currentSubtitle && (
           <div className="px-6 pb-6">
             <div className="bg-black/70 rounded-lg px-4 py-3 backdrop-blur-sm">
-              <p
-                className="text-white text-center leading-relaxed cursor-pointer transition-colors hover:text-gray-300"
-                onClick={() => setIsEditingSubtitles(true)}
-              >
+              <p className="text-white text-center leading-relaxed">
                 {currentSubtitle.text}
               </p>
             </div>
@@ -277,15 +266,6 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
           </Button>
         </div>
       </div>
-
-      {/* Subtitle Editor Modal */}
-      {isEditingSubtitles && (
-        <SubtitleEditor
-          subtitles={subtitles}
-          onUpdate={handleSubtitleUpdate}
-          onClose={() => setIsEditingSubtitles(false)}
-        />
-      )}
     </div>
   );
 };
