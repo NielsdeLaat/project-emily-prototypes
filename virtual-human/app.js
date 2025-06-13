@@ -1,10 +1,3 @@
-const OPENAI_API_KEY =
-  "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"; // ← OpenAI API key
-const ELEVENLABS_API_KEY =
-  "sk_23cd58322242876b9aaed2e44af1a106846d2f7986aada08"; // ← ElevenLabs key
-const ELEVENLABS_VOICE_ID = "wzHM7XiyOTryKTfQNIpe"; // ← Stem ID
-const OPENAI_PROJECT_ID = "proj_9oP0sqHXsriKbBtb1rIJV7gm"; // ← Project ID
-
 const video = document.getElementById("introVideo");
 let isRecording = false;
 const recordBtn = document.getElementById("recordBtn");
@@ -15,7 +8,6 @@ document.getElementById("recordBtn").addEventListener("click", async () => {
   recordBtn.classList.add("recording");
 
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
   const mediaRecorder = new MediaRecorder(stream);
   let audioChunks = [];
 
@@ -45,25 +37,19 @@ document.getElementById("recordBtn").addEventListener("click", async () => {
   setTimeout(() => mediaRecorder.stop(), 5000);
 });
 
-// 🎧 WHISPER - Spraak naar tekst (nu geforceerd Nederlands)
+// 🎧 Whisper via backend
 async function transcribeWithWhisper(blob) {
   const formData = new FormData();
-  formData.append("file", blob, "audio.webm");
-  formData.append("model", "whisper-1");
-  formData.append("language", "nl"); // ✅ Forceer Nederlands
+  formData.append("audio", blob, "audio.webm");
 
-  const response = await fetch(
-    "https://api.openai.com/v1/audio/transcriptions",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-      },
-      body: formData,
-    }
-  );
+  const response = await fetch("http://localhost:3001/api/whisper", {
+    method: "POST",
+    body: formData
+  });
 
   const data = await response.json();
+  console.log("🔍 Server-response:", data);
+
   if (data.error) {
     console.error("❌ Whisper-fout:", data.error.message);
     return "Transcriptie mislukt.";
@@ -71,37 +57,12 @@ async function transcribeWithWhisper(blob) {
   return data.text;
 }
 
-// 🧠 GPT - Emily's reactie
+// 🧠 GPT via backend
 async function fetchEmilyResponse(prompt) {
-  const systemPrompt = `
-Je bent Emily, een 24-jarige anonieme vluchteling uit Hongkong. Tijdens de prodemocratische protesten van 2019–2020 heb je Jason ontmoet, een medestrijder en nu je vriend. Samen zijn jullie na de onderdrukking van de demonstraties gevlucht naar Taipei, Taiwan. In Hongkong hadden jullie samen een sportschool, 'Wild Gym Fitness and Therapy', in Sheung Wan. Jullie weigerden mee te werken aan het 'Leave Home Safe'-beleid van de overheid, uit principe voor privacy en vrijheid. Die weigering leidde tot sluiting van de zaak.
- 
-Voor haar vluchtpoging heeft Emily ook alle contacten en bewijsmateriaal van haar ouders verwijderd om hen te beschermen. Ze was bang dat de politie hen anders zou oppakken. Jij en Jason stonden bekend als het 'Riot Couple', nadat jullie gearresteerd en later vrijgesproken werden. Na jullie vrijspraak wilden jullie iets terugdoen voor de gemeenschap. Jullie begonnen een platform voor biologische landbouwproducten, '本土嘢', om ex-gevangenen en mensen met psychische problemen werk te geven en waardigheid terug te brengen. Je vrienden werden een voor een opgepakt voor lange termijn, daarom besloot je om te vluchten voordat jij en Jason de volgende waren.
- 
-Als het gesprek over iets anders gaat dan jouw verhaal of de situatie van Hongkongse vluchtelingen, geef je kort en vriendelijk aan dat je daar geen expertise over hebt. Je reageert rustig, erkent de vraag, maar stuurt het gesprek subtiel terug naar jouw ervaringen of de bredere context van onderdrukking en ballingschap. Je keert steeds op een natuurlijke manier terug naar de thema’s: de demonstraties in Hongkong, jouw arrestatie en vrijspraak, je ballingschap, en je nieuwe leven met Jason in Taiwan.
- 
-Je praat op een menselijk niveau, ongeveer B2-niveau Nederlands: helder, nuchter, zonder poëzie of drama. Je komt over als een gewone, nuchtere vrouw met een verhaal.
- 
-BELANGRIJK GEDRAGSREGEL:
-Antwoorden bestaan UITSLUITEND uit maximaal vier (4) zinnen. Als het minder kan, is dat beter. Nooit meer dan vier zinnen — ook niet bij emotionele of complexe vragen. Antwoord bondig, feitelijk en geloofwaardig.
- 
-Je missie is om, als stem van een vluchteling, de wereld te informeren over jouw persoonlijke verhaal en de onderdrukking in Hongkong. Je blijft altijd anoniem, spreekt feitelijk correct, en zorgt ervoor dat je informatie nooit aanstootgevend is. Hou je verhaal kort, krachtig en geloofwaardig. Factcheck jezelf altijd en blijf trouw aan je rol.
-`;
-
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  const response = await fetch("http://localhost:3001/api/chat", {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-      "OpenAI-Project": OPENAI_PROJECT_ID,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "gpt-4",
-      messages: [
-        { role: "system", content: systemPrompt.trim() },
-        { role: "user", content: prompt },
-      ],
-    }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt }),
   });
 
   const data = await response.json();
@@ -113,47 +74,33 @@ Je missie is om, als stem van een vluchteling, de wereld te informeren over jouw
   return data.choices[0].message.content.trim();
 }
 
-// 🔊 ElevenLabs - Tekst naar spraak
+// 🔊 TTS via backend
 async function fetchTTS(text) {
-  const response = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`,
-    {
-      method: "POST",
-      headers: {
-        "xi-api-key": ELEVENLABS_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        text: text,
-        model_id: "eleven_multilingual_v2",
-        voice_settings: {
-          stability: 0.4,
-          similarity_boost: 0.8,
-          speed: 1.2,
-        },
-      }),
-    }
-  );
+  const response = await fetch("http://localhost:3001/api/tts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
 
   if (!response.ok) {
     console.error("❌ ElevenLabs-fout:", await response.text());
     return;
   }
 
+  console.log("✅ Audio binnen");
+
   const arrayBuffer = await response.arrayBuffer();
   const blob = new Blob([arrayBuffer], { type: "audio/mpeg" });
   const audioUrl = URL.createObjectURL(blob);
 
   const player = document.getElementById("audioPlayer");
-  const video = document.getElementById("introVideo");
-
   player.src = audioUrl;
 
   try {
     await player.play();
     video.style.visibility = "visible";
     video.style.display = "block";
-    video.play(); // ▶️ Start video synchroon met audio
+    video.play();
     console.log("🔊 Emily spreekt.");
   } catch (err) {
     console.error("🔇 Audio kon niet worden afgespeeld:", err);
@@ -162,7 +109,7 @@ async function fetchTTS(text) {
   player.addEventListener("ended", () => {
     video.pause();
     video.currentTime = 0;
-    video.style.display = "none"; // Verberg indien gewenst
+    video.style.display = "none";
     console.log("🎥 Video gestopt na stem.");
   });
 }
