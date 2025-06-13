@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { X, Flag, SkipForward } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { X, Flag, SkipForward, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "./ProgressBar";
 import { SubtitleEditor } from "./SubtitleEditor";
@@ -7,6 +7,7 @@ import { SubtitleEditor } from "./SubtitleEditor";
 interface StorySegment {
   id: number;
   title: string;
+  videoUrl: string;
   subtitles: Array<{
     startTime: number;
     endTime: number;
@@ -18,20 +19,21 @@ const mockStoryData: StorySegment[] = [
   {
     id: 1,
     title: "Hong Kong",
+    videoUrl: "/videos/hongkong.mp4",
     subtitles: [
       {
         startTime: 0,
-        endTime: 10,
+        endTime: 3,
         text: "Hong Kong, a vibrant city with a rich history.",
       },
       {
-        startTime: 10,
-        endTime: 20,
+        startTime: 3,
+        endTime: 6,
         text: "A place where East meets West, tradition meets modernity.",
       },
       {
-        startTime: 20,
-        endTime: 30,
+        startTime: 6,
+        endTime: 11,
         text: "A city that has faced many challenges but remains resilient.",
       },
     ],
@@ -39,20 +41,21 @@ const mockStoryData: StorySegment[] = [
   {
     id: 2,
     title: "Demonstrations",
+    videoUrl: "/videos/demonstrations.mp4",
     subtitles: [
       {
         startTime: 0,
-        endTime: 10,
+        endTime: 6,
         text: "The streets filled with voices demanding change.",
       },
       {
-        startTime: 10,
-        endTime: 20,
+        startTime: 6,
+        endTime: 12,
         text: "Peaceful protests showing the power of unity.",
       },
       {
-        startTime: 20,
-        endTime: 30,
+        startTime: 12,
+        endTime: 17,
         text: "A movement that captured the world's attention.",
       },
     ],
@@ -60,20 +63,21 @@ const mockStoryData: StorySegment[] = [
   {
     id: 3,
     title: "Police Response",
+    videoUrl: "/videos/police.mp4",
     subtitles: [
       {
         startTime: 0,
-        endTime: 10,
+        endTime: 5,
         text: "The authorities' response to the protests.",
       },
       {
-        startTime: 10,
-        endTime: 20,
+        startTime: 5,
+        endTime: 10,
         text: "Tensions rising as the situation escalated.",
       },
       {
-        startTime: 20,
-        endTime: 30,
+        startTime: 10,
+        endTime: 14,
         text: "A complex situation that affected many lives.",
       },
     ],
@@ -87,13 +91,66 @@ interface StoryViewerProps {
 export const StoryViewer = ({ onClose }: StoryViewerProps) => {
   const [currentSegment, setCurrentSegment] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
   const [subtitles, setSubtitles] = useState(mockStoryData[0].subtitles);
   const [isEditingSubtitles, setIsEditingSubtitles] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const currentStory = mockStoryData[currentSegment];
   const currentSubtitle = subtitles.find(
     (sub) => currentTime >= sub.startTime && currentTime <= sub.endTime
   );
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      // Start muted to allow autoplay
+      videoRef.current.muted = true;
+      const playPromise = videoRef.current.play();
+
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+          })
+          .catch(() => {
+            setIsPlaying(false);
+          });
+      }
+    }
+  }, [currentSegment]);
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setVideoDuration(videoRef.current.duration);
+    }
+  };
+
+  const handleVideoEnd = () => {
+    if (currentSegment < mockStoryData.length - 1) {
+      handleNext();
+    }
+  };
+
+  const handlePlayClick = async () => {
+    if (videoRef.current) {
+      try {
+        // Try to unmute when user interacts
+        videoRef.current.muted = false;
+        await videoRef.current.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.error("Error playing video:", error);
+      }
+    }
+  };
 
   const handleNext = () => {
     if (currentSegment < mockStoryData.length - 1) {
@@ -117,20 +174,46 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
     setSubtitles(updatedSubtitles);
   };
 
+  const handleProgressBarClick = (segmentIndex: number) => {
+    setCurrentSegment(segmentIndex);
+    setCurrentTime(0);
+    setSubtitles(mockStoryData[segmentIndex].subtitles);
+  };
+
+  const handleVideoClick = () => {
+    if (!isPlaying) {
+      handlePlayClick();
+    } else {
+      handleNext();
+    }
+  };
+
   return (
     <div className="relative w-full h-screen bg-black overflow-hidden">
-      {/* Content Placeholder */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-center text-white/70">
-          <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
-            <div className="w-0 h-0 border-l-[8px] border-l-white/70 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent ml-1"></div>
+      {/* Video Player */}
+      <video
+        ref={videoRef}
+        src={currentStory.videoUrl}
+        className="absolute inset-0 w-full h-full object-cover"
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        onEnded={handleVideoEnd}
+        onClick={handleVideoClick}
+        playsInline
+        muted
+      />
+
+      {/* Play Button Overlay */}
+      {!isPlaying && (
+        <div
+          className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer"
+          onClick={handlePlayClick}
+        >
+          <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm">
+            <Play className="w-10 h-10 text-white" />
           </div>
-          <p className="text-sm">Story Content</p>
-          <p className="text-xs text-white/50 mt-2">
-            Tap left/right to navigate
-          </p>
         </div>
-      </div>
+      )}
 
       {/* Top Overlay */}
       <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/60 to-transparent">
@@ -139,7 +222,8 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
           <ProgressBar
             segments={mockStoryData.length}
             currentSegment={currentSegment}
-            progress={0}
+            progress={videoDuration > 0 ? currentTime / videoDuration : 0}
+            onSegmentClick={handleProgressBarClick}
           />
         </div>
 
