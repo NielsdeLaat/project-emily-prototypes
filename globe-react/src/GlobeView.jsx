@@ -11,12 +11,39 @@ export default function GlobeView() {
   const animationFrameId = useRef(null);
 
   // Mapbox configuration
-  const secondsPerRevolution = 60; // Faster rotation
+  const secondsPerRevolution = 60;
   const maxSpinZoom = 5;
   const slowSpinZoom = 3;
 
+  // Shared layer styles
+  const sharedLabelStyle = {
+    'text-field': ['get', 'name_en'],
+    'text-size': [
+      'interpolate',
+      ['linear'],
+      ['zoom'],
+      1.5, 12,
+      3, 0
+    ],
+    'text-allow-overlap': false,
+    'text-ignore-placement': false,
+    'text-anchor': 'center',
+    'visibility': [
+      'case',
+      ['>=', ['zoom'], 3],
+      'none',
+      'visible'
+    ]
+  };
+
+  const enableMapControls = () => {
+    map.current.scrollZoom.enable();
+    map.current.dragRotate.enable();
+    map.current.dragPan.enable();
+  };
+
   useEffect(() => {
-    if (map.current) return; // initialize map only once
+    if (map.current) return;
 
     mapboxgl.accessToken = 'pk.eyJ1Ijoic3RldmllZ3JpZmZpbmRlc2lnbiIsImEiOiJja24waTQzeHYwbndvMnZtbnFrYXV3ZjdjIn0.zhhJzykz0VYq7RQWBJxh7A';
     
@@ -47,14 +74,8 @@ export default function GlobeView() {
         "star-intensity": 0.1
       });
 
-      // Add main countries source
-      map.current.addSource('countries', {
-        type: 'vector',
-        url: 'mapbox://mapbox.country-boundaries-v1'
-      });
-
-      // Add territories source
-      map.current.addSource('territories', {
+      // Add single source for all boundaries
+      map.current.addSource('boundaries', {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
       });
@@ -63,7 +84,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'country-fills',
         'type': 'fill',
-        'source': 'countries',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'all',
@@ -80,7 +101,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'territory-fills',
         'type': 'fill',
-        'source': 'territories',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'any',
@@ -97,7 +118,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'country-borders',
         'type': 'line',
-        'source': 'countries',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'all',
@@ -114,7 +135,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'territory-borders',
         'type': 'line',
-        'source': 'territories',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'any',
@@ -131,32 +152,14 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'country-labels',
         'type': 'symbol',
-        'source': 'countries',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'all',
           ['!=', ['get', 'name_en'], 'Taiwan'],
           ['!=', ['get', 'name_en'], 'Hong Kong']
         ],
-        'layout': {
-          'text-field': ['get', 'name_en'],
-          'text-size': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            1.5, 12,
-            3, 0
-          ],
-          'text-allow-overlap': false,
-          'text-ignore-placement': false,
-          'text-anchor': 'center',
-          'visibility': [
-            'case',
-            ['>=', ['zoom'], 3],
-            'none',
-            'visible'
-          ]
-        },
+        'layout': sharedLabelStyle,
         'paint': {
           'text-color': '#000000',
           'text-halo-color': '#ffffff',
@@ -168,32 +171,14 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'territory-labels',
         'type': 'symbol',
-        'source': 'territories',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'any',
           ['==', ['get', 'name_en'], 'Taiwan'],
           ['==', ['get', 'name_en'], 'Hong Kong']
         ],
-        'layout': {
-          'text-field': ['get', 'name_en'],
-          'text-size': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            1.5, 12,
-            3, 0
-          ],
-          'text-allow-overlap': false,
-          'text-ignore-placement': false,
-          'text-anchor': 'center',
-          'visibility': [
-            'case',
-            ['>=', ['zoom'], 3],
-            'none',
-            'visible'
-          ]
-        },
+        'layout': sharedLabelStyle,
         'paint': {
           'text-color': '#000000',
           'text-halo-color': '#ffffff',
@@ -224,12 +209,7 @@ export default function GlobeView() {
             ]);
           }
 
-          // Ensure interaction controls remain enabled
-          map.current.scrollZoom.enable();
-          map.current.dragRotate.enable();
-          map.current.dragPan.enable();
-          
-          // Reset user interaction state
+          enableMapControls();
           setUserInteracting(false);
         }
       });
@@ -244,7 +224,14 @@ export default function GlobeView() {
       });
     });
 
-    // Event listeners for user interaction
+    // Combined event handler for all interaction end events
+    const handleInteractionEnd = () => {
+      setUserInteracting(false);
+      if (spinEnabled) {
+        spinGlobe();
+      }
+    };
+
     map.current.on('mousedown', () => {
       setUserInteracting(true);
       if (!spinEnabled) {
@@ -252,32 +239,8 @@ export default function GlobeView() {
       }
     });
 
-    map.current.on('mouseup', () => {
-      setUserInteracting(false);
-      if (spinEnabled) {
-        spinGlobe();
-      }
-    });
-
-    map.current.on('dragend', () => {
-      setUserInteracting(false);
-      if (spinEnabled) {
-        spinGlobe();
-      }
-    });
-
-    map.current.on('pitchend', () => {
-      setUserInteracting(false);
-      if (spinEnabled) {
-        spinGlobe();
-      }
-    });
-
-    map.current.on('rotateend', () => {
-      setUserInteracting(false);
-      if (spinEnabled) {
-        spinGlobe();
-      }
+    ['mouseup', 'dragend', 'pitchend', 'rotateend'].forEach(event => {
+      map.current.on(event, handleInteractionEnd);
     });
 
     map.current.on('moveend', () => {
@@ -293,9 +256,7 @@ export default function GlobeView() {
         map.current.setPaintProperty('country-fills', 'fill-color', '#e0e0e0');
         map.current.setPaintProperty('territory-fills', 'fill-color', '#e0e0e0');
         setUserInteracting(false);
-        map.current.scrollZoom.enable();
-        map.current.dragRotate.enable();
-        map.current.dragPan.enable();
+        enableMapControls();
       }
     });
 
@@ -326,12 +287,11 @@ export default function GlobeView() {
       const center = map.current.getCenter();
       center.lng -= distancePerSecond;
       
-      // Use requestAnimationFrame for smoother animation
       const animate = () => {
         map.current.easeTo({
           center,
           duration: 1000,
-          easing: (t) => t, // Linear easing for smoother motion
+          easing: (t) => t,
           essential: true
         });
         animationFrameId.current = requestAnimationFrame(animate);
