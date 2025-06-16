@@ -2,21 +2,146 @@ import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
+// Import images
+import ablikimImg from './img/Ablikim.png';
+import emilyImg from './img/Emily.png';
+import carlosImg from './img/Carlos.png';
+import barryImg from './img/Barry.png';
+import tyroneImg from './img/Tyrone.png';
+import eunjuImg from './img/Eunju_Kim.png';
+import kikonyogoImg from './img/Kikonyogo_Kivumbi.png';
+
+// Categories for filtering
+const categories = {
+  religious: { label: "Religious Persecution", icon: "⛪" },
+  lgbtq: { label: "LGBTQ+ Rights", icon: "🏳️‍🌈" },
+  racism: { label: "Racial Discrimination", icon: "✊" },
+  political: { label: "Political Oppression", icon: "🗳️" },
+  gender: { label: "Gender Rights", icon: "♀️" },
+  refugee: { label: "Refugee Status", icon: "🏃" }
+};
+
+// Story data with locations and categories
+const sidebarItems = [
+  {
+    id: 1,
+    title: "Ablikim",
+    description: "Zijn geloof werd verboden, zijn arbeid gestolen, zijn identiteit uitgewist , toch wist hij te ontsnappen.",
+    image: ablikimImg,
+    location: {
+      name: "Xinjiang Village",
+      coordinates: [87.6177, 43.7928], // Urumqi, Xinjiang
+      country: "China"
+    },
+    categories: ["religious", "political"]
+  },
+  {
+    id: 2,
+    title: "Emily",
+    description: "Gewapend met een stem en een masker trotseerde ze traangas en stilte — en vond vrijheid in het vertellen.",
+    image: emilyImg,
+    location: {
+      name: "Hong Kong",
+      coordinates: [114.1694, 22.3193], // Hong Kong Central
+      country: "Hong Kong"
+    },
+    categories: ["political", "gender"]
+  },
+  {
+    id: 3,
+    title: "Carlos",
+    description: "Hij groeide op tussen grenzen, van landen, culturen en verwachtingen, en vocht zich vrij met zijn blik op waardigheid.",
+    image: carlosImg,
+    location: {
+      name: "Mexico City",
+      coordinates: [-99.1332, 19.4326], // Mexico City Center
+      country: "Mexico"
+    },
+    categories: ["refugee", "racism"]
+  },
+  {
+    id: 4,
+    title: "Barry",
+    description: "Verlaten, verkracht en verguisd, maar nog altijd vechtend voor zichzelf, zijn gezin en zijn waarheid.",
+    image: barryImg,
+    location: {
+      name: "Bujumbura",
+      coordinates: [29.3618, -3.3731], // Bujumbura Center
+      country: "Burundi"
+    },
+    categories: ["lgbtq", "political"]
+  },
+  {
+    id: 5,
+    title: "Tyrone",
+    description: "Gejaagd om zijn bestaan, door staten en straten, bleef hij vechten voor een plek waar hij gewoon mocht zijn.",
+    image: tyroneImg,
+    location: {
+      name: "Kampala",
+      coordinates: [32.5825, 0.3476], // Kampala Center
+      country: "Uganda"
+    },
+    categories: ["lgbtq", "refugee"]
+  },
+  {
+    id: 6,
+    title: "Eunju Kim",
+    description: "Ze trotseerde dood, vrieskou en verraad , voor een maaltijd, een stem, en uiteindelijk een leven in vrijheid.",
+    image: eunjuImg,
+    location: {
+      name: "Eundok",
+      coordinates: [129.3274, 41.8142], // Eundok, North Hamgyong
+      country: "North Korea"
+    },
+    categories: ["political", "gender"]
+  },
+  {
+    id: 7,
+    title: "Kikonyogo Kivumbi",
+    description: "Geverfd als vijand vanwege liefde, verloor hij zijn werk, zijn veiligheid en bijna zijn leven , maar niet zijn stem.",
+    image: kikonyogoImg,
+    location: {
+      name: "Kampala",
+      coordinates: [32.5825, 0.3476], // Kampala Center
+      country: "Uganda"
+    },
+    categories: ["lgbtq", "political"]
+  }
+];
+
 export default function GlobeView() {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [spinEnabled, setSpinEnabled] = useState(true);
-  const [userInteracting, setUserInteracting] = useState(false);
   const [selectedCountry, setSelectedCountry] = useState(null);
-  const animationFrameId = useRef(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+  const [filteredStories, setFilteredStories] = useState(sidebarItems);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [hoveredMarker, setHoveredMarker] = useState(null);
 
-  // Mapbox configuration
-  const secondsPerRevolution = 60; // Faster rotation
-  const maxSpinZoom = 5;
-  const slowSpinZoom = 3;
+  // Filter stories based on selected country and categories
+  const filterStories = (country, categories) => {
+    return sidebarItems.filter(item => {
+      const matchesCountry = !country || item.location.country === country;
+      const matchesCategories = categories.length === 0 || 
+        categories.every(cat => item.categories.includes(cat));
+      return matchesCountry && matchesCategories;
+    });
+  };
+
+  // Handle category selection
+  const toggleCategory = (category) => {
+    setSelectedCategories(prev => {
+      const newCategories = prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category];
+      setFilteredStories(filterStories(selectedLocation, newCategories));
+      return newCategories;
+    });
+  };
 
   useEffect(() => {
-    if (map.current) return; // initialize map only once
+    if (map.current) return;
 
     mapboxgl.accessToken = 'pk.eyJ1Ijoic3RldmllZ3JpZmZpbmRlc2lnbiIsImEiOiJja24waTQzeHYwbndvMnZtbnFrYXV3ZjdjIn0.zhhJzykz0VYq7RQWBJxh7A';
     
@@ -24,16 +149,19 @@ export default function GlobeView() {
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
       projection: 'globe',
-      zoom: 2.5,
-      center: [1.6889271, 31.7091206],
-      minZoom: 1.5,
-      maxZoom: 10,
-      dragRotate: true,
+      zoom: 2,
+      center: [0, 20], // Adjusted center to better show all locations
+      minZoom: 1,
+      maxZoom: 15,
+      dragRotate: false, // Disabled rotation to prevent coordinate distortion
       dragPan: true,
       scrollZoom: {
         speed: 0.2,
         smooth: true
-      }
+      },
+      renderWorldCopies: true,
+      pitch: 0, // Ensure map is flat
+      bearing: 0 // Ensure map is oriented north
     });
 
     map.current.on('style.load', () => {
@@ -47,14 +175,112 @@ export default function GlobeView() {
         "star-intensity": 0.1
       });
 
-      // Add main countries source
-      map.current.addSource('countries', {
-        type: 'vector',
-        url: 'mapbox://mapbox.country-boundaries-v1'
+      // Add markers for each story
+      sidebarItems.forEach(story => {
+        const el = document.createElement('div');
+        el.className = 'marker';
+        el.style.width = '30px';
+        el.style.height = '30px';
+        el.style.backgroundImage = `url(${story.image})`;
+        el.style.backgroundSize = 'cover';
+        el.style.borderRadius = '50%';
+        el.style.border = '2px solid white';
+        el.style.cursor = 'pointer';
+        el.style.transition = 'transform 0.2s ease';
+        el.style.position = 'relative';
+
+        // Create popup content
+        const popupContent = document.createElement('div');
+        popupContent.style.padding = '15px';
+        popupContent.style.maxWidth = '300px';
+        popupContent.style.backgroundColor = 'white';
+        popupContent.style.borderRadius = '8px';
+        popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        
+        // Add image
+        const img = document.createElement('img');
+        img.src = story.image;
+        img.style.width = '100%';
+        img.style.height = '200px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '4px';
+        img.style.marginBottom = '10px';
+        popupContent.appendChild(img);
+
+        // Add title
+        const title = document.createElement('h3');
+        title.textContent = story.title;
+        title.style.margin = '0 0 8px 0';
+        title.style.color = '#333';
+        title.style.fontSize = '18px';
+        popupContent.appendChild(title);
+
+        // Add description
+        const desc = document.createElement('p');
+        desc.textContent = story.description;
+        desc.style.margin = '0 0 10px 0';
+        desc.style.color = '#666';
+        desc.style.fontSize = '14px';
+        desc.style.lineHeight = '1.4';
+        popupContent.appendChild(desc);
+
+        // Add categories
+        const categoriesDiv = document.createElement('div');
+        categoriesDiv.style.display = 'flex';
+        categoriesDiv.style.gap = '5px';
+        categoriesDiv.style.flexWrap = 'wrap';
+        
+        story.categories.forEach(cat => {
+          const catSpan = document.createElement('span');
+          catSpan.style.background = '#f0f0f0';
+          catSpan.style.padding = '4px 8px';
+          catSpan.style.borderRadius = '4px';
+          catSpan.style.fontSize = '12px';
+          catSpan.style.display = 'flex';
+          catSpan.style.alignItems = 'center';
+          catSpan.style.gap = '4px';
+          catSpan.innerHTML = `${categories[cat].icon} ${categories[cat].label}`;
+          categoriesDiv.appendChild(catSpan);
+        });
+        
+        popupContent.appendChild(categoriesDiv);
+
+        const marker = new mapboxgl.Marker({
+          element: el,
+          anchor: 'bottom',
+          offset: [0, -15]
+        })
+          .setLngLat(story.location.coordinates)
+          .setPopup(new mapboxgl.Popup({ 
+            offset: 25,
+            closeButton: false,
+            closeOnClick: false,
+            anchor: 'top',
+            className: 'custom-popup'
+          }).setDOMContent(popupContent))
+          .addTo(map.current);
+
+        // Add hover effects
+        el.addEventListener('mouseenter', () => {
+          el.style.transform = 'scale(1.2)';
+          setHoveredMarker(story.id);
+          marker.getPopup().addTo(map.current);
+        });
+
+        el.addEventListener('mouseleave', () => {
+          el.style.transform = 'scale(1)';
+          setHoveredMarker(null);
+          marker.getPopup().remove();
+        });
+
+        el.addEventListener('click', () => {
+          setSelectedLocation(story.location.country);
+          setFilteredStories(filterStories(story.location.country, selectedCategories));
+        });
       });
 
-      // Add territories source
-      map.current.addSource('territories', {
+      // Add single source for all boundaries
+      map.current.addSource('boundaries', {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
       });
@@ -63,7 +289,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'country-fills',
         'type': 'fill',
-        'source': 'countries',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'all',
@@ -80,7 +306,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'territory-fills',
         'type': 'fill',
-        'source': 'territories',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'any',
@@ -97,7 +323,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'country-borders',
         'type': 'line',
-        'source': 'countries',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'all',
@@ -114,7 +340,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'territory-borders',
         'type': 'line',
-        'source': 'territories',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'any',
@@ -131,7 +357,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'country-labels',
         'type': 'symbol',
-        'source': 'countries',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'all',
@@ -168,7 +394,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'territory-labels',
         'type': 'symbol',
-        'source': 'territories',
+        'source': 'boundaries',
         'source-layer': 'country_boundaries',
         'filter': [
           'any',
@@ -206,6 +432,10 @@ export default function GlobeView() {
         if (e.features.length > 0) {
           const country = e.features[0];
           setSelectedCountry(country);
+          setSelectedLocation(country.properties.name_en);
+          setFilteredStories(sidebarItems.filter(item => 
+            item.location.country === country.properties.name_en
+          ));
           
           // Highlight the clicked country or territory
           if (country.properties.name_en === 'Taiwan' || country.properties.name_en === 'Hong Kong') {
@@ -223,14 +453,6 @@ export default function GlobeView() {
               '#e0e0e0'
             ]);
           }
-
-          // Ensure interaction controls remain enabled
-          map.current.scrollZoom.enable();
-          map.current.dragRotate.enable();
-          map.current.dragPan.enable();
-          
-          // Reset user interaction state
-          setUserInteracting(false);
         }
       });
 
@@ -244,163 +466,158 @@ export default function GlobeView() {
       });
     });
 
-    // Event listeners for user interaction
-    map.current.on('mousedown', () => {
-      setUserInteracting(true);
-      if (!spinEnabled) {
-        map.current.stop();
-      }
-    });
-
-    map.current.on('mouseup', () => {
-      setUserInteracting(false);
-      if (spinEnabled) {
-        spinGlobe();
-      }
-    });
-
-    map.current.on('dragend', () => {
-      setUserInteracting(false);
-      if (spinEnabled) {
-        spinGlobe();
-      }
-    });
-
-    map.current.on('pitchend', () => {
-      setUserInteracting(false);
-      if (spinEnabled) {
-        spinGlobe();
-      }
-    });
-
-    map.current.on('rotateend', () => {
-      setUserInteracting(false);
-      if (spinEnabled) {
-        spinGlobe();
-      }
-    });
-
-    map.current.on('moveend', () => {
-      if (spinEnabled && !userInteracting) {
-        spinGlobe();
-      }
-    });
-
-    // Reset highlight and interaction state when clicking outside
-    map.current.on('click', (e) => {
-      if (!e.features || e.features.length === 0) {
-        setSelectedCountry(null);
-        map.current.setPaintProperty('country-fills', 'fill-color', '#e0e0e0');
-        map.current.setPaintProperty('territory-fills', 'fill-color', '#e0e0e0');
-        setUserInteracting(false);
-        map.current.scrollZoom.enable();
-        map.current.dragRotate.enable();
-        map.current.dragPan.enable();
-      }
-    });
-
-    // Start spinning
-    spinGlobe();
-
     return () => {
       if (map.current) {
         map.current.remove();
         map.current = null;
       }
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
-      }
     };
   }, []);
 
-  const spinGlobe = () => {
-    if (!map.current) return;
-
-    const zoom = map.current.getZoom();
-    if (spinEnabled && !userInteracting && zoom < maxSpinZoom) {
-      let distancePerSecond = 360 / secondsPerRevolution;
-      if (zoom > slowSpinZoom) {
-        const zoomDif = (maxSpinZoom - zoom) / (maxSpinZoom - slowSpinZoom);
-        distancePerSecond *= zoomDif;
-      }
-      const center = map.current.getCenter();
-      center.lng -= distancePerSecond;
-      
-      // Use requestAnimationFrame for smoother animation
-      const animate = () => {
-        map.current.easeTo({
-          center,
-          duration: 1000,
-          easing: (t) => t, // Linear easing for smoother motion
-          essential: true
-        });
-        animationFrameId.current = requestAnimationFrame(animate);
-      };
-      
-      if (!animationFrameId.current) {
-        animationFrameId.current = requestAnimationFrame(animate);
-      }
-    } else if (animationFrameId.current) {
-      cancelAnimationFrame(animationFrameId.current);
-      animationFrameId.current = null;
-    }
-  };
-
-  const toggleSpin = () => {
-    setSpinEnabled(!spinEnabled);
-    if (!spinEnabled) {
-      spinGlobe();
-    } else if (map.current) {
-      map.current.stop();
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
-        animationFrameId.current = null;
-      }
-    }
-  };
-
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
-      <div ref={mapContainer} style={{ position: 'absolute', top: 0, bottom: 0, width: '100%' }} />
-      <button
-        onClick={toggleSpin}
-        style={{
-          font: "bold 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif",
-          backgroundColor: '#3386c0',
-          color: '#fff',
-          position: 'absolute',
-          top: 20,
-          left: '50%',
-          zIndex: 1,
-          border: 'none',
-          width: 200,
-          marginLeft: -100,
-          display: 'block',
-          cursor: 'pointer',
-          padding: '10px 20px',
-          borderRadius: 3
-        }}
-        onMouseOver={(e) => e.target.style.backgroundColor = '#4ea0da'}
-        onMouseOut={(e) => e.target.style.backgroundColor = '#3386c0'}
-      >
-        {spinEnabled ? 'Pause rotation' : 'Start rotation'}
-      </button>
-      {selectedCountry && (
-        <div style={{
-          position: 'absolute',
-          bottom: 20,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          backgroundColor: 'rgba(0,0,0,0.7)',
-          color: 'white',
-          padding: '10px 20px',
-          borderRadius: 5,
-          fontFamily: 'Arial, sans-serif',
-          zIndex: 1
+    <div style={{ position: 'relative', width: '100vw', height: '100vh', display: 'flex' }}>
+      <div ref={mapContainer} style={{ position: 'relative', width: '70%', height: '100%' }} />
+      
+      {/* Sidebar */}
+      <div style={{
+        width: '30%',
+        height: '100%',
+        backgroundColor: '#ffffff',
+        boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
+        overflowY: 'auto',
+        padding: '30px'
+      }}>
+        {/* Filter Section */}
+        <div style={{ 
+          marginBottom: '20px',
+          padding: '15px',
+          backgroundColor: '#f8f9fa',
+          borderRadius: '12px',
+          transition: 'all 0.3s ease'
         }}>
-          {selectedCountry.properties.name_en}
+          <div 
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              cursor: 'pointer',
+              marginBottom: isFilterOpen ? '15px' : '0'
+            }}
+          >
+            <h3 style={{ margin: 0, color: '#333' }}>Filters</h3>
+            <span style={{ fontSize: '20px' }}>{isFilterOpen ? '▼' : '▶'}</span>
+          </div>
+          
+          {isFilterOpen && (
+            <div style={{ 
+              maxHeight: '300px',
+              overflowY: 'auto',
+              transition: 'max-height 0.3s ease'
+            }}>
+              <div style={{ marginBottom: '15px' }}>
+                <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Categories</h4>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {Object.entries(categories).map(([key, { label, icon }]) => (
+                    <button
+                      key={key}
+                      onClick={() => toggleCategory(key)}
+                      style={{
+                        padding: '6px 12px',
+                        backgroundColor: selectedCategories.includes(key) ? '#3386c0' : '#e0e0e0',
+                        color: selectedCategories.includes(key) ? 'white' : '#333',
+                        border: 'none',
+                        borderRadius: '20px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '5px'
+                      }}
+                    >
+                      <span>{icon}</span>
+                      <span>{label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Stories List */}
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: 'column', 
+          gap: '30px',
+          maxWidth: '90%',
+          margin: '0 auto'
+        }}>
+          {filteredStories.map((item) => (
+            <div
+              key={item.id}
+              style={{
+                backgroundColor: '#f8f9fa',
+                borderRadius: '12px',
+                padding: '15px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                aspectRatio: '1',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+            >
+              <div style={{ flex: '1', position: 'relative', marginBottom: '12px' }}>
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    borderRadius: '8px'
+                  }}
+                />
+              </div>
+              <h3 style={{ 
+                margin: '0 0 6px 0', 
+                color: '#333',
+                fontSize: '16px',
+                lineHeight: '1.2',
+                padding: '0 4px'
+              }}>{item.title}</h3>
+              <p style={{ 
+                margin: '0 0 8px 0', 
+                color: '#666', 
+                fontSize: '13px',
+                lineHeight: '1.3',
+                display: '-webkit-box',
+                WebkitLineClamp: '2',
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                padding: '0 4px'
+              }}>{item.description}</p>
+              <div style={{ 
+                display: 'flex', 
+                gap: '5px',
+                padding: '0 4px'
+              }}>
+                {item.categories.map(cat => (
+                  <span key={cat} style={{
+                    background: '#e0e0e0',
+                    padding: '2px 6px',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '3px'
+                  }}>
+                    {categories[cat].icon} {categories[cat].label}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 } 
