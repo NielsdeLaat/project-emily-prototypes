@@ -1,102 +1,29 @@
 import React, { useState, useRef, useEffect } from "react";
-import { X, Flag, SkipForward, Play } from "lucide-react";
+import { X, Flag, SkipForward, Play, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "./ProgressBar";
-
-interface StorySegment {
-  id: number;
-  title: string;
-  videoUrl: string;
-  subtitles: Array<{
-    startTime: number;
-    endTime: number;
-    text: string;
-  }>;
-}
-
-const mockStoryData: StorySegment[] = [
-  {
-    id: 1,
-    title: "Hong Kong",
-    videoUrl: "/videos/hongkong.mp4",
-    subtitles: [
-      {
-        startTime: 0,
-        endTime: 3,
-        text: "Hong Kong, a vibrant city with a rich history.",
-      },
-      {
-        startTime: 3,
-        endTime: 6,
-        text: "A place where East meets West, tradition meets modernity.",
-      },
-      {
-        startTime: 6,
-        endTime: 11,
-        text: "A city that has faced many challenges but remains resilient.",
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Demonstrations",
-    videoUrl: "/videos/demonstrations.mp4",
-    subtitles: [
-      {
-        startTime: 0,
-        endTime: 6,
-        text: "The streets filled with voices demanding change.",
-      },
-      {
-        startTime: 6,
-        endTime: 12,
-        text: "Peaceful protests showing the power of unity.",
-      },
-      {
-        startTime: 12,
-        endTime: 17,
-        text: "A movement that captured the world's attention.",
-      },
-    ],
-  },
-  {
-    id: 3,
-    title: "Police Response",
-    videoUrl: "/videos/police.mp4",
-    subtitles: [
-      {
-        startTime: 0,
-        endTime: 5,
-        text: "The authorities' response to the protests.",
-      },
-      {
-        startTime: 5,
-        endTime: 10,
-        text: "Tensions rising as the situation escalated.",
-      },
-      {
-        startTime: 10,
-        endTime: 14,
-        text: "A complex situation that affected many lives.",
-      },
-    ],
-  },
-];
+import { stories, StorySegment } from "@/data/stories";
 
 interface StoryViewerProps {
   onClose: () => void;
+  storyId: number;
+  onBack: () => void;
 }
 
-export const StoryViewer = ({ onClose }: StoryViewerProps) => {
+export const StoryViewer = ({ onClose, storyId, onBack }: StoryViewerProps) => {
   const [currentSegment, setCurrentSegment] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
-  const [subtitles, setSubtitles] = useState(mockStoryData[0].subtitles);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const currentStory = mockStoryData[currentSegment];
-  const currentSubtitle = subtitles.find(
+  const story = stories.find((s) => s.id === storyId);
+  if (!story) {
+    return null;
+  }
+
+  const currentStory = story.segments[currentSegment];
+  const currentSubtitle = currentStory.subtitles.find(
     (sub) => currentTime >= sub.startTime && currentTime <= sub.endTime
   );
 
@@ -132,7 +59,7 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
   };
 
   const handleVideoEnd = () => {
-    if (currentSegment < mockStoryData.length - 1) {
+    if (currentSegment < story.segments.length - 1) {
       handleNext();
     }
   };
@@ -151,10 +78,9 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
   };
 
   const handleNext = () => {
-    if (currentSegment < mockStoryData.length - 1) {
+    if (currentSegment < story.segments.length - 1) {
       setCurrentSegment((prev) => prev + 1);
       setCurrentTime(0);
-      setSubtitles(mockStoryData[currentSegment + 1].subtitles);
     }
   };
 
@@ -162,14 +88,12 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
     if (currentSegment > 0) {
       setCurrentSegment((prev) => prev - 1);
       setCurrentTime(0);
-      setSubtitles(mockStoryData[currentSegment - 1].subtitles);
     }
   };
 
   const handleProgressBarClick = (segmentIndex: number) => {
     setCurrentSegment(segmentIndex);
     setCurrentTime(0);
-    setSubtitles(mockStoryData[segmentIndex].subtitles);
   };
 
   const handleVideoClick = () => {
@@ -212,7 +136,7 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
         {/* Progress Bar */}
         <div className="pt-12 pb-4 px-4">
           <ProgressBar
-            segments={mockStoryData.length}
+            segments={story.segments.length}
             currentSegment={currentSegment}
             progress={videoDuration > 0 ? currentTime / videoDuration : 0}
             onSegmentClick={handleProgressBarClick}
@@ -222,12 +146,25 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
         {/* Header */}
         <div className="flex items-center justify-between px-4 pb-6">
           <div className="flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onBack}
+              className="text-white hover:bg-white/20 rounded-full w-8 h-8 p-0"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
             <div className="w-8 h-8 rounded-full bg-red-600/80 flex items-center justify-center">
               <Flag className="w-4 h-4 text-white" />
             </div>
-            <h1 className="text-white font-medium text-lg tracking-wide">
-              {currentStory.title}
-            </h1>
+            <div className="flex flex-col">
+              <h2 className="text-white/60 text-sm tracking-wide">
+                {story.title}
+              </h2>
+              <h1 className="text-white font-medium text-lg tracking-wide">
+                {currentStory.title}
+              </h1>
+            </div>
           </div>
 
           <Button
@@ -259,7 +196,7 @@ export const StoryViewer = ({ onClose }: StoryViewerProps) => {
           <Button
             onClick={handleNext}
             className="bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full px-4 py-2 backdrop-blur-sm transition-all duration-200"
-            disabled={currentSegment >= mockStoryData.length - 1}
+            disabled={currentSegment >= story.segments.length - 1}
           >
             <span className="mr-2 text-sm font-medium">Skip</span>
             <SkipForward className="w-4 h-4" />
