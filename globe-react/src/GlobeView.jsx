@@ -175,109 +175,107 @@ export default function GlobeView() {
         "star-intensity": 0.1
       });
 
-      // Add markers for each story
-      sidebarItems.forEach(story => {
-        const el = document.createElement('div');
-        el.className = 'marker';
-        el.style.width = '30px';
-        el.style.height = '30px';
-        el.style.backgroundImage = `url(${story.image})`;
-        el.style.backgroundSize = 'cover';
-        el.style.borderRadius = '50%';
-        el.style.border = '2px solid white';
-        el.style.cursor = 'pointer';
-        el.style.transition = 'transform 0.2s ease';
-        el.style.position = 'relative';
+sidebarItems.forEach(story => {
+  const el = document.createElement('div');
+  el.className = 'marker';
 
-        // Create popup content
-        const popupContent = document.createElement('div');
-        popupContent.style.padding = '15px';
-        popupContent.style.maxWidth = '300px';
-        popupContent.style.backgroundColor = 'white';
-        popupContent.style.borderRadius = '8px';
-        popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-        
-        // Add image
-        const img = document.createElement('img');
-        img.src = story.image;
-        img.style.width = '100%';
-        img.style.height = '200px';
-        img.style.objectFit = 'cover';
-        img.style.borderRadius = '4px';
-        img.style.marginBottom = '10px';
-        popupContent.appendChild(img);
+  // Inner element dat je visueel gaat schalen
+  const inner = document.createElement('div');
+  inner.style.width = '30px';
+  inner.style.height = '30px';
+  inner.style.backgroundImage = `url(${story.image})`;
+  inner.style.backgroundSize = 'cover';
+  inner.style.borderRadius = '50%';
+  inner.style.border = '2px solid white';
+  inner.style.cursor = 'pointer';
+  inner.style.transition = 'transform 0.2s ease';
 
-        // Add title
-        const title = document.createElement('h3');
-        title.textContent = story.title;
-        title.style.margin = '0 0 8px 0';
-        title.style.color = '#333';
-        title.style.fontSize = '18px';
-        popupContent.appendChild(title);
+  el.appendChild(inner);
 
-        // Add description
-        const desc = document.createElement('p');
-        desc.textContent = story.description;
-        desc.style.margin = '0 0 10px 0';
-        desc.style.color = '#666';
-        desc.style.fontSize = '14px';
-        desc.style.lineHeight = '1.4';
-        popupContent.appendChild(desc);
+  // Create popup content
+  const popupContent = document.createElement('div');
+  popupContent.style.padding = '15px';
+  popupContent.style.maxWidth = '300px';
+  popupContent.style.backgroundColor = 'white';
+  popupContent.style.borderRadius = '8px';
+  popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
 
-        // Add categories
-        const categoriesDiv = document.createElement('div');
-        categoriesDiv.style.display = 'flex';
-        categoriesDiv.style.gap = '5px';
-        categoriesDiv.style.flexWrap = 'wrap';
-        
-        story.categories.forEach(cat => {
-          const catSpan = document.createElement('span');
-          catSpan.style.background = '#f0f0f0';
-          catSpan.style.padding = '4px 8px';
-          catSpan.style.borderRadius = '4px';
-          catSpan.style.fontSize = '12px';
-          catSpan.style.display = 'flex';
-          catSpan.style.alignItems = 'center';
-          catSpan.style.gap = '4px';
-          catSpan.innerHTML = `${categories[cat].icon} ${categories[cat].label}`;
-          categoriesDiv.appendChild(catSpan);
-        });
-        
-        popupContent.appendChild(categoriesDiv);
+  const img = document.createElement('img');
+  img.src = story.image;
+  img.style.width = '100%';
+  img.style.height = '200px';
+  img.style.objectFit = 'cover';
+  img.style.borderRadius = '4px';
+  img.style.marginBottom = '10px';
+  popupContent.appendChild(img);
 
-        const marker = new mapboxgl.Marker({
-          element: el,
-          anchor: 'bottom',
-          offset: [0, -15]
-        })
-          .setLngLat(story.location.coordinates)
-          .setPopup(new mapboxgl.Popup({ 
-            offset: 25,
-            closeButton: false,
-            closeOnClick: false,
-            anchor: 'top',
-            className: 'custom-popup'
-          }).setDOMContent(popupContent))
-          .addTo(map.current);
+  const title = document.createElement('h3');
+  title.textContent = story.title;
+  title.style.margin = '0 0 8px 0';
+  title.style.color = '#333';
+  title.style.fontSize = '18px';
+  popupContent.appendChild(title);
 
-        // Add hover effects
-        el.addEventListener('mouseenter', () => {
-          el.style.transform = 'scale(1.2)';
-          setHoveredMarker(story.id);
-          marker.getPopup().addTo(map.current);
-        });
+  const desc = document.createElement('p');
+  desc.textContent = story.description;
+  desc.style.margin = '0 0 10px 0';
+  desc.style.color = '#666';
+  desc.style.fontSize = '14px';
+  desc.style.lineHeight = '1.4';
+  popupContent.appendChild(desc);
 
-        el.addEventListener('mouseleave', () => {
-          el.style.transform = 'scale(1)';
-          setHoveredMarker(null);
-          marker.getPopup().remove();
-        });
+  const categoriesDiv = document.createElement('div');
+  categoriesDiv.style.display = 'flex';
+  categoriesDiv.style.gap = '5px';
+  categoriesDiv.style.flexWrap = 'wrap';
 
-        el.addEventListener('click', () => {
-          setSelectedLocation(story.location.country);
-          setFilteredStories(filterStories(story.location.country, selectedCategories));
-        });
-      });
+  story.categories.forEach(cat => {
+    const catSpan = document.createElement('span');
+    catSpan.style.background = '#f0f0f0';
+    catSpan.style.padding = '4px 8px';
+    catSpan.style.borderRadius = '4px';
+    catSpan.style.fontSize = '12px';
+    catSpan.style.display = 'flex';
+    catSpan.style.alignItems = 'center';
+    catSpan.style.gap = '4px';
+    catSpan.innerHTML = `${categories[cat].icon} ${categories[cat].label}`;
+    categoriesDiv.appendChild(catSpan);
+  });
+
+  popupContent.appendChild(categoriesDiv);
+
+  const marker = new mapboxgl.Marker({
+    element: el,
+    anchor: 'center'
+  })
+    .setLngLat(story.location.coordinates)
+    .setPopup(new mapboxgl.Popup({
+      offset: 25,
+      closeButton: false,
+      closeOnClick: false,
+      anchor: 'top',
+      className: 'custom-popup'
+    }).setDOMContent(popupContent))
+    .addTo(map.current);
+
+  el.addEventListener('mouseenter', () => {
+    inner.style.transform = 'scale(1.2)';
+    setHoveredMarker(story.id);
+    marker.getPopup().addTo(map.current);
+  });
+
+  el.addEventListener('mouseleave', () => {
+    inner.style.transform = 'scale(1)';
+    setHoveredMarker(null);
+    marker.getPopup().remove();
+  });
+
+  el.addEventListener('click', () => {
+    setSelectedLocation(story.location.country);
+    setFilteredStories(filterStories(story.location.country, selectedCategories));
+  });
+});
+
 
       // Add single source for all boundaries
       map.current.addSource('boundaries', {
