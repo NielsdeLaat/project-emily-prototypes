@@ -148,7 +148,7 @@ export default function GlobeView() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
-      projection: 'mercator',
+      projection: 'globe',
       zoom: 2,
       center: [0, 20], // Adjusted center to better show all locations
       minZoom: 1,
