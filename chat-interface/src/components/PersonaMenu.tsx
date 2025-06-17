@@ -2,6 +2,7 @@ import { ArrowLeft, MessageCircle, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PERSONA_AVATARS } from "@/config/avatars";
+import InfoDialog from "./InfoDialog";
 
 interface Persona {
   id: string;
@@ -53,14 +54,17 @@ const PersonaMenu = ({ onSelectPersona }: PersonaMenuProps) => {
     <div className="flex flex-col h-screen max-w-md mx-auto bg-white shadow-2xl">
       {/* Header */}
       <div className="bg-gradient-to-r from-slate-600 to-slate-700 text-white p-4">
-        <div className="flex items-center space-x-3">
-          <MessageCircle className="h-8 w-8" />
-          <div>
-            <h1 className="font-semibold text-xl">Met wie wil je praten?</h1>
-            <p className="text-sm text-slate-200">
-              Selecteer met wie je wilt praten.
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <MessageCircle className="h-8 w-8" />
+            <div>
+              <h1 className="font-semibold text-xl">Met wie wil je praten?</h1>
+              <p className="text-sm text-slate-200">
+                Selecteer met wie je wilt praten.
+              </p>
+            </div>
           </div>
+          <InfoDialog />
         </div>
       </div>
 
