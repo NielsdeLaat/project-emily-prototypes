@@ -54,10 +54,23 @@ const PersonaMenu = ({ onSelectPersona }: PersonaMenuProps) => {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-600 to-slate-700 text-white p-4">
+      <div className="bg-gradient-to-r from-slate-600 to-slate-700 text-white p-4 relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <MessageCircle className="h-8 w-8" />
+            {/* Back Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() =>
+                window.open(
+                  "https://project-emily-prototypes-flame.vercel.app/",
+                  "_blank"
+                )
+              }
+              className="text-white hover:bg-white/20 rounded-full w-10 h-10 p-0 mr-2"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </Button>
             <div>
               <h1 className="font-semibold text-xl">Met wie wil je praten?</h1>
               <p className="text-sm text-slate-200">
