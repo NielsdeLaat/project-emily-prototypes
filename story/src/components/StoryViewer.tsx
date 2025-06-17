@@ -61,6 +61,9 @@ export const StoryViewer = ({ onClose, storyId, onBack }: StoryViewerProps) => {
   const handleVideoEnd = () => {
     if (currentSegment < story.segments.length - 1) {
       handleNext();
+    } else {
+      // Open chat interface in new window when story completes
+      window.open("https://project-emily-chat-interface.vercel.app/", "_blank");
     }
   };
 
@@ -78,10 +81,8 @@ export const StoryViewer = ({ onClose, storyId, onBack }: StoryViewerProps) => {
   };
 
   const handleNext = () => {
-    if (currentSegment < story.segments.length - 1) {
-      setCurrentSegment((prev) => prev + 1);
-      setCurrentTime(0);
-    }
+    // Skip button only opens chat interface
+    window.open("https://project-emily-chat-interface.vercel.app/", "_blank");
   };
 
   const handlePrevious = () => {
@@ -100,7 +101,11 @@ export const StoryViewer = ({ onClose, storyId, onBack }: StoryViewerProps) => {
     if (!isPlaying) {
       handlePlayClick();
     } else {
-      handleNext();
+      // Only advance to next segment when clicking video
+      if (currentSegment < story.segments.length - 1) {
+        setCurrentSegment((prev) => prev + 1);
+        setCurrentTime(0);
+      }
     }
   };
 
@@ -146,14 +151,6 @@ export const StoryViewer = ({ onClose, storyId, onBack }: StoryViewerProps) => {
         {/* Header */}
         <div className="flex items-center justify-between px-4 pb-6">
           <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onBack}
-              className="text-white hover:bg-white/20 rounded-full w-8 h-8 p-0"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
             <div className="w-8 h-8 rounded-full bg-red-600/80 flex items-center justify-center">
               <Flag className="w-4 h-4 text-white" />
             </div>
@@ -196,7 +193,6 @@ export const StoryViewer = ({ onClose, storyId, onBack }: StoryViewerProps) => {
           <Button
             onClick={handleNext}
             className="bg-white/20 hover:bg-white/30 text-white border border-white/30 rounded-full px-4 py-2 backdrop-blur-sm transition-all duration-200"
-            disabled={currentSegment >= story.segments.length - 1}
           >
             <span className="mr-2 text-sm font-medium">Skip</span>
             <SkipForward className="w-4 h-4" />
