@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { initializeProgress, markAsVisited } from './utils/progressUtils';
+import ProgressOverview from './components/ProgressOverview';
 
 // Import images
 import ablikimImg from './img/Ablikim.png';
@@ -118,6 +120,9 @@ export default function GlobeView() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [hoveredMarker, setHoveredMarker] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [userProgress, setUserProgress] = useState(() => initializeProgress());
 
   // Filter stories based on selected country and categories
   const filterStories = (country, categories) => {
@@ -140,6 +145,25 @@ export default function GlobeView() {
     });
   };
 
+  // Add reset progress function
+  const handleResetProgress = () => {
+    if (window.confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+      localStorage.removeItem('userProgress');
+      setUserProgress({ visitedIds: [] });
+      
+      // Reset marker appearances
+      const markers = document.querySelectorAll('.marker');
+      markers.forEach(marker => {
+        const inner = marker.querySelector('div');
+        if (inner) {
+          inner.style.border = '2px solid white';
+          inner.style.filter = 'none';
+          inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        }
+      });
+    }
+  };
+
   useEffect(() => {
     if (map.current) return;
 
@@ -150,18 +174,18 @@ export default function GlobeView() {
       style: 'mapbox://styles/mapbox/streets-v12',
       projection: 'globe',
       zoom: 2,
-      center: [0, 20], // Adjusted center to better show all locations
+      center: [0, 20],
       minZoom: 1,
       maxZoom: 15,
-      dragRotate: false, // Disabled rotation to prevent coordinate distortion
+      dragRotate: false,
       dragPan: true,
       scrollZoom: {
         speed: 0.2,
         smooth: true
       },
       renderWorldCopies: true,
-      pitch: 0, // Ensure map is flat
-      bearing: 0 // Ensure map is oriented north
+      pitch: 0,
+      bearing: 0
     });
 
     map.current.on('style.load', () => {
@@ -175,107 +199,146 @@ export default function GlobeView() {
         "star-intensity": 0.1
       });
 
-sidebarItems.forEach(story => {
-  const el = document.createElement('div');
-  el.className = 'marker';
+      sidebarItems.forEach(story => {
+        const el = document.createElement('div');
+        el.className = 'marker';
 
-  // Inner element dat je visueel gaat schalen
-  const inner = document.createElement('div');
-  inner.style.width = '30px';
-  inner.style.height = '30px';
-  inner.style.backgroundImage = `url(${story.image})`;
-  inner.style.backgroundSize = 'cover';
-  inner.style.borderRadius = '50%';
-  inner.style.border = '2px solid white';
-  inner.style.cursor = 'pointer';
-  inner.style.transition = 'transform 0.2s ease';
+        const inner = document.createElement('div');
+        inner.style.width = '30px';
+        inner.style.height = '30px';
+        inner.style.backgroundImage = `url(${story.image})`;
+        inner.style.backgroundSize = 'cover';
+        inner.style.borderRadius = '50%';
+        inner.style.cursor = 'pointer';
+        inner.style.transition = 'all 0.3s ease';
+        
+        // Add visited state visual indicator
+        if (userProgress.visitedIds.includes(story.id)) {
+          inner.style.border = '2px solid rgba(76, 175, 80, 0.3)';
+          inner.style.filter = 'grayscale(80%) brightness(0.8)';
+          inner.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
+        } else {
+          inner.style.border = '2px solid white';
+          inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        }
 
-  el.appendChild(inner);
+        el.appendChild(inner);
 
-  // Create popup content
-  const popupContent = document.createElement('div');
-  popupContent.style.padding = '15px';
-  popupContent.style.maxWidth = '300px';
-  popupContent.style.backgroundColor = 'white';
-  popupContent.style.borderRadius = '8px';
-  popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        // Create popup content
+        const popupContent = document.createElement('div');
+        popupContent.style.padding = '15px';
+        popupContent.style.maxWidth = '300px';
+        popupContent.style.backgroundColor = 'white';
+        popupContent.style.borderRadius = '8px';
+        popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
 
-  const img = document.createElement('img');
-  img.src = story.image;
-  img.style.width = '100%';
-  img.style.height = '200px';
-  img.style.objectFit = 'cover';
-  img.style.borderRadius = '4px';
-  img.style.marginBottom = '10px';
-  popupContent.appendChild(img);
+        const img = document.createElement('img');
+        img.src = story.image;
+        img.style.width = '100%';
+        img.style.height = '200px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '4px';
+        img.style.marginBottom = '10px';
+        popupContent.appendChild(img);
 
-  const title = document.createElement('h3');
-  title.textContent = story.title;
-  title.style.margin = '0 0 8px 0';
-  title.style.color = '#333';
-  title.style.fontSize = '18px';
-  popupContent.appendChild(title);
+        const title = document.createElement('h3');
+        title.textContent = story.title;
+        title.style.margin = '0 0 8px 0';
+        title.style.color = '#333';
+        title.style.fontSize = '18px';
+        popupContent.appendChild(title);
 
-  const desc = document.createElement('p');
-  desc.textContent = story.description;
-  desc.style.margin = '0 0 10px 0';
-  desc.style.color = '#666';
-  desc.style.fontSize = '14px';
-  desc.style.lineHeight = '1.4';
-  popupContent.appendChild(desc);
+        const desc = document.createElement('p');
+        desc.textContent = story.description;
+        desc.style.margin = '0 0 10px 0';
+        desc.style.color = '#666';
+        desc.style.fontSize = '14px';
+        desc.style.lineHeight = '1.4';
+        popupContent.appendChild(desc);
 
-  const categoriesDiv = document.createElement('div');
-  categoriesDiv.style.display = 'flex';
-  categoriesDiv.style.gap = '5px';
-  categoriesDiv.style.flexWrap = 'wrap';
+        const categoriesDiv = document.createElement('div');
+        categoriesDiv.style.display = 'flex';
+        categoriesDiv.style.gap = '5px';
+        categoriesDiv.style.flexWrap = 'wrap';
 
-  story.categories.forEach(cat => {
-    const catSpan = document.createElement('span');
-    catSpan.style.background = '#f0f0f0';
-    catSpan.style.padding = '4px 8px';
-    catSpan.style.borderRadius = '4px';
-    catSpan.style.fontSize = '12px';
-    catSpan.style.display = 'flex';
-    catSpan.style.alignItems = 'center';
-    catSpan.style.gap = '4px';
-    catSpan.innerHTML = `${categories[cat].icon} ${categories[cat].label}`;
-    categoriesDiv.appendChild(catSpan);
-  });
+        story.categories.forEach(cat => {
+          const catSpan = document.createElement('span');
+          catSpan.style.background = '#f0f0f0';
+          catSpan.style.padding = '4px 8px';
+          catSpan.style.borderRadius = '4px';
+          catSpan.style.fontSize = '12px';
+          catSpan.style.display = 'flex';
+          catSpan.style.alignItems = 'center';
+          catSpan.style.gap = '4px';
+          catSpan.innerHTML = `${categories[cat].icon} ${categories[cat].label}`;
+          categoriesDiv.appendChild(catSpan);
+        });
 
-  popupContent.appendChild(categoriesDiv);
+        popupContent.appendChild(categoriesDiv);
 
-  const marker = new mapboxgl.Marker({
-    element: el,
-    anchor: 'center'
-  })
-    .setLngLat(story.location.coordinates)
-    .setPopup(new mapboxgl.Popup({
-      offset: 25,
-      closeButton: false,
-      closeOnClick: false,
-      anchor: 'top',
-      className: 'custom-popup'
-    }).setDOMContent(popupContent))
-    .addTo(map.current);
+        const marker = new mapboxgl.Marker({
+          element: el,
+          anchor: 'center'
+        })
+          .setLngLat(story.location.coordinates)
+          .setPopup(new mapboxgl.Popup({
+            offset: 25,
+            closeButton: false,
+            closeOnClick: false,
+            anchor: 'top',
+            className: 'custom-popup'
+          }).setDOMContent(popupContent))
+          .addTo(map.current);
 
-  el.addEventListener('mouseenter', () => {
-    inner.style.transform = 'scale(1.2)';
-    setHoveredMarker(story.id);
-    marker.getPopup().addTo(map.current);
-  });
+        // Create click handler with proper state access
+        const handleMarkerClick = () => {
+          // Force sidebar open
+          setIsSidebarOpen(true);
+          
+          // Set location and filter stories
+          setSelectedLocation(story.location.country);
+          setFilteredStories(filterStories(story.location.country, selectedCategories));
+          
+          // Handle visited state
+          if (!userProgress.visitedIds.includes(story.id)) {
+            const newProgress = markAsVisited(story.id);
+            setUserProgress(newProgress);
+            
+            // Update marker appearance
+            inner.style.border = '2px solid rgba(76, 175, 80, 0.3)';
+            inner.style.filter = 'grayscale(80%) brightness(0.8)';
+            inner.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
+          }
+        };
 
-  el.addEventListener('mouseleave', () => {
-    inner.style.transform = 'scale(1)';
-    setHoveredMarker(null);
-    marker.getPopup().remove();
-  });
+        // Add click event listener
+        el.addEventListener('click', handleMarkerClick);
 
-  el.addEventListener('click', () => {
-    setSelectedLocation(story.location.country);
-    setFilteredStories(filterStories(story.location.country, selectedCategories));
-  });
-});
+        // Add hover events
+        el.addEventListener('mouseenter', () => {
+          if (userProgress.visitedIds.includes(story.id)) {
+            inner.style.transform = 'scale(1.1)';
+            inner.style.filter = 'grayscale(50%) brightness(0.9)';
+          } else {
+            inner.style.transform = 'scale(1.2)';
+            inner.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+          }
+          setHoveredMarker(story.id);
+          marker.getPopup().addTo(map.current);
+        });
 
+        el.addEventListener('mouseleave', () => {
+          if (userProgress.visitedIds.includes(story.id)) {
+            inner.style.transform = 'scale(1)';
+            inner.style.filter = 'grayscale(80%) brightness(0.8)';
+          } else {
+            inner.style.transform = 'scale(1)';
+            inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+          }
+          setHoveredMarker(null);
+          marker.getPopup().remove();
+        });
+      });
 
       // Add single source for all boundaries
       map.current.addSource('boundaries', {
@@ -472,148 +535,332 @@ sidebarItems.forEach(story => {
     };
   }, []);
 
+  // Add effect to handle map resize when sidebar toggles
+  useEffect(() => {
+    if (map.current) {
+      // Add a small delay to ensure the container has finished transitioning
+      setTimeout(() => {
+        map.current.resize();
+      }, 300);
+    }
+  }, [isSidebarOpen]);
+
   return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh', display: 'flex' }}>
-      <div ref={mapContainer} style={{ position: 'relative', width: '70%', height: '100%' }} />
-      
-      {/* Sidebar */}
-      <div style={{
-        width: '30%',
-        height: '100%',
-        backgroundColor: '#ffffff',
-        boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
-        overflowY: 'auto',
-        padding: '30px'
-      }}>
-        {/* Filter Section */}
-        <div style={{ 
-          marginBottom: '20px',
-          padding: '15px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '12px',
-          transition: 'all 0.3s ease'
+    <div style={{ 
+      position: 'fixed', 
+      top: 0, 
+      left: 0, 
+      right: 0, 
+      bottom: 0, 
+      margin: 0, 
+      padding: 0, 
+      overflow: 'hidden' 
+    }}>
+      {/* Map Container */}
+      <div 
+        ref={mapContainer} 
+        style={{ 
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: isSidebarOpen ? 'calc(100% - 30%)' : '100%',
+          height: '100%',
+          transition: 'width 0.3s ease-in-out'
+        }} 
+      />
+
+      {/* Profile Button */}
+      <button
+        onClick={() => setIsProfileOpen(true)}
+        style={{
+          position: 'absolute',
+          left: '20px',
+          top: '20px',
+          zIndex: 1000,
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          backgroundColor: '#ffffff',
+          border: 'none',
+          boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '20px'
+        }}
+      >
+        🥇
+      </button>
+
+      {/* Profile Overlay with Progress */}
+      {isProfileOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000
         }}>
-          <div 
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              cursor: 'pointer',
-              marginBottom: isFilterOpen ? '15px' : '0'
-            }}
-          >
-            <h3 style={{ margin: 0, color: '#333' }}>Filters</h3>
-            <span style={{ fontSize: '20px' }}>{isFilterOpen ? '▼' : '▶'}</span>
-          </div>
-          
-          {isFilterOpen && (
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            padding: '30px',
+            width: '500px',
+            maxWidth: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            position: 'relative',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
+          }}>
+            <button
+              onClick={() => setIsProfileOpen(false)}
+              style={{
+                position: 'absolute',
+                right: '15px',
+                top: '15px',
+                border: 'none',
+                background: 'none',
+                fontSize: '20px',
+                cursor: 'pointer',
+                padding: '5px'
+              }}
+            >
+              ✕
+            </button>
+            <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Your Journey Progress</h2>
+            
+            {/* Reset Progress Button */}
             <div style={{ 
-              maxHeight: '300px',
-              overflowY: 'auto',
-              transition: 'max-height 0.3s ease'
+              marginBottom: '20px',
+              display: 'flex',
+              justifyContent: 'flex-end' 
             }}>
-              <div style={{ marginBottom: '15px' }}>
-                <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Categories</h4>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {Object.entries(categories).map(([key, { label, icon }]) => (
-                    <button
-                      key={key}
-                      onClick={() => toggleCategory(key)}
-                      style={{
-                        padding: '6px 12px',
-                        backgroundColor: selectedCategories.includes(key) ? '#3386c0' : '#e0e0e0',
-                        color: selectedCategories.includes(key) ? 'white' : '#333',
-                        border: 'none',
-                        borderRadius: '20px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px'
-                      }}
-                    >
-                      <span>{icon}</span>
-                      <span>{label}</span>
-                    </button>
+              <button
+                onClick={handleResetProgress}
+                style={{
+                  backgroundColor: '#ff4444',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#ff6666'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#ff4444'}
+              >
+                <span>🔄</span> Reset Progress
+              </button>
+            </div>
+
+            <ProgressOverview userProgress={userProgress} sidebarItems={sidebarItems} />
+          </div>
+        </div>
+      )}
+      
+      {/* Sidebar Container with Integrated Tab */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        right: isSidebarOpen ? '0' : '-30%',
+        height: '100%',
+        width: '30%',
+        display: 'flex',
+        transition: 'right 0.3s ease-in-out',
+        zIndex: 999
+      }}>
+        {/* Tab Button */}
+        <div
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          style={{
+            position: 'absolute',
+            left: '-40px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '40px',
+            height: '100px',
+            backgroundColor: '#ffffff',
+            boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
+            borderRadius: '8px 0 0 8px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+        >
+          <div style={{
+            transform: `rotate(${isSidebarOpen ? 0 : 180}deg)`,
+            transition: 'transform 0.3s ease-in-out',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '8px'
+          }}>
+            <span style={{
+              writingMode: 'vertical-rl',
+              textOrientation: 'mixed',
+              transform: 'rotate(180deg)',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              color: '#666'
+            }}>
+              Stories
+            </span>
+            <span style={{ fontSize: '12px' }}>
+              {isSidebarOpen ? '▶' : '◀'}
+            </span>
+          </div>
+        </div>
+
+        {/* Sidebar Content */}
+        <div style={{
+          flex: 1,
+          backgroundColor: '#ffffff',
+          boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
+          overflowY: 'auto',
+          padding: '30px'
+        }}>
+          {/* Filter Section */}
+          <div style={{ 
+            marginBottom: '20px',
+            padding: '15px',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '12px',
+            transition: 'all 0.3s ease'
+          }}>
+            <div 
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                cursor: 'pointer',
+                marginBottom: isFilterOpen ? '15px' : '0'
+              }}
+            >
+              <h3 style={{ margin: 0, color: '#333' }}>Filters</h3>
+              <span style={{ fontSize: '20px' }}>{isFilterOpen ? '▼' : '▶'}</span>
+            </div>
+            
+            {isFilterOpen && (
+              <div style={{ 
+                maxHeight: '300px',
+                overflowY: 'auto',
+                transition: 'max-height 0.3s ease'
+              }}>
+                <div style={{ marginBottom: '15px' }}>
+                  <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Categories</h4>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {Object.entries(categories).map(([key, { label, icon }]) => (
+                      <button
+                        key={key}
+                        onClick={() => toggleCategory(key)}
+                        style={{
+                          padding: '6px 12px',
+                          backgroundColor: selectedCategories.includes(key) ? '#3386c0' : '#e0e0e0',
+                          color: selectedCategories.includes(key) ? 'white' : '#333',
+                          border: 'none',
+                          borderRadius: '20px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px'
+                        }}
+                      >
+                        <span>{icon}</span>
+                        <span>{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Stories List */}
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '30px',
+            maxWidth: '90%',
+            margin: '0 auto'
+          }}>
+            {filteredStories.map((item) => (
+              <div
+                key={item.id}
+                style={{
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '12px',
+                  padding: '15px',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                  aspectRatio: '1',
+                  display: 'flex',
+                  flexDirection: 'column'
+                }}
+              >
+                <div style={{ flex: '1', position: 'relative', marginBottom: '12px' }}>
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: '8px'
+                    }}
+                  />
+                </div>
+                <h3 style={{ 
+                  margin: '0 0 6px 0', 
+                  color: '#333',
+                  fontSize: '16px',
+                  lineHeight: '1.2',
+                  padding: '0 4px'
+                }}>{item.title}</h3>
+                <p style={{ 
+                  margin: '0 0 8px 0', 
+                  color: '#666', 
+                  fontSize: '13px',
+                  lineHeight: '1.3',
+                  display: '-webkit-box',
+                  WebkitLineClamp: '2',
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  padding: '0 4px'
+                }}>{item.description}</p>
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '5px',
+                  padding: '0 4px'
+                }}>
+                  {item.categories.map(cat => (
+                    <span key={cat} style={{
+                      background: '#e0e0e0',
+                      padding: '2px 6px',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '3px'
+                    }}>
+                      {categories[cat].icon} {categories[cat].label}
+                    </span>
                   ))}
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-
-        {/* Stories List */}
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: '30px',
-          maxWidth: '90%',
-          margin: '0 auto'
-        }}>
-          {filteredStories.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                backgroundColor: '#f8f9fa',
-                borderRadius: '12px',
-                padding: '15px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                aspectRatio: '1',
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-            >
-              <div style={{ flex: '1', position: 'relative', marginBottom: '12px' }}>
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    borderRadius: '8px'
-                  }}
-                />
-              </div>
-              <h3 style={{ 
-                margin: '0 0 6px 0', 
-                color: '#333',
-                fontSize: '16px',
-                lineHeight: '1.2',
-                padding: '0 4px'
-              }}>{item.title}</h3>
-              <p style={{ 
-                margin: '0 0 8px 0', 
-                color: '#666', 
-                fontSize: '13px',
-                lineHeight: '1.3',
-                display: '-webkit-box',
-                WebkitLineClamp: '2',
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                padding: '0 4px'
-              }}>{item.description}</p>
-              <div style={{ 
-                display: 'flex', 
-                gap: '5px',
-                padding: '0 4px'
-              }}>
-                {item.categories.map(cat => (
-                  <span key={cat} style={{
-                    background: '#e0e0e0',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '3px'
-                  }}>
-                    {categories[cat].icon} {categories[cat].label}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
