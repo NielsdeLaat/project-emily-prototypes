@@ -153,7 +153,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="bg-emilyBlue text-white p-4 flex items-center justify-between">
+      <div className="bg-emilyBlue text-white p-4 flex items-center justify-between shadow-[0_4px_6px_-1px_rgba(0,0,0,0.2)] relative z-10">
         <div className="flex items-center space-x-3">
           <Button
             onClick={onBack}
