@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { initializeProgress, markAsVisited } from './utils/progressUtils';
+import ProgressOverview from './components/ProgressOverview';
 
 // Import images
 import ablikimImg from './img/Ablikim.png';
@@ -118,6 +120,25 @@ export default function GlobeView() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [hoveredMarker, setHoveredMarker] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [userProgress, setUserProgress] = useState(() => initializeProgress());
+  const [expandedStory, setExpandedStory] = useState(null);
+  const [selectedStory, setSelectedStory] = useState(null);
+
+  // Mock data for expanded content
+  const mockExpandedContent = {
+    text: "Hier volgt een uitgebreid verhaal over de ervaringen en uitdagingen die deze persoon heeft doorgemaakt. Het verhaal gaat dieper in op de persoonlijke reis, de obstakels die overwonnen zijn, en de hoop voor de toekomst. Door deze verhalen te delen, creëren we begrip en verbinding tussen verschillende culturen en ervaringen.\n\nDe impact van deze gebeurtenissen reikt verder dan alleen het persoonlijke verhaal. Het laat zien hoe maatschappelijke structuren en systemen mensen kunnen beïnvloeden, maar ook hoe veerkracht en vastberadenheid kunnen leiden tot positieve verandering.\n\nDoor het delen van deze verhalen hopen we anderen te inspireren en bewustwording te creëren over belangrijke maatschappelijke kwesties. Elk verhaal is een stap richting meer begrip en empathie in onze samenleving.",
+    age: {
+      1: 42,
+      2: 23,
+      3: 29,
+      4: 31,
+      5: 15,
+      6: 27,
+      7: 38
+    }
+  };
 
   // Filter stories based on selected country and categories
   const filterStories = (country, categories) => {
@@ -140,6 +161,25 @@ export default function GlobeView() {
     });
   };
 
+  // Add reset progress function
+  const handleResetProgress = () => {
+    if (window.confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+      localStorage.removeItem('userProgress');
+      setUserProgress({ visitedIds: [] });
+      
+      // Reset marker appearances
+      const markers = document.querySelectorAll('.marker');
+      markers.forEach(marker => {
+        const inner = marker.querySelector('div');
+        if (inner) {
+          inner.style.border = '2px solid white';
+          inner.style.filter = 'none';
+          inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        }
+      });
+    }
+  };
+
   useEffect(() => {
     if (map.current) return;
 
@@ -150,18 +190,18 @@ export default function GlobeView() {
       style: 'mapbox://styles/mapbox/streets-v12',
       projection: 'globe',
       zoom: 2,
-      center: [0, 20], // Adjusted center to better show all locations
+      center: [0, 20],
       minZoom: 1,
       maxZoom: 15,
-      dragRotate: false, // Disabled rotation to prevent coordinate distortion
+      dragRotate: false,
       dragPan: true,
       scrollZoom: {
         speed: 0.2,
         smooth: true
       },
       renderWorldCopies: true,
-      pitch: 0, // Ensure map is flat
-      bearing: 0 // Ensure map is oriented north
+      pitch: 0,
+      bearing: 0
     });
 
     map.current.on('style.load', () => {
@@ -175,19 +215,30 @@ export default function GlobeView() {
         "star-intensity": 0.1
       });
 
-      // Add markers for each story
       sidebarItems.forEach(story => {
         const el = document.createElement('div');
         el.className = 'marker';
-        el.style.width = '30px';
-        el.style.height = '30px';
-        el.style.backgroundImage = `url(${story.image})`;
-        el.style.backgroundSize = 'cover';
-        el.style.borderRadius = '50%';
-        el.style.border = '2px solid white';
-        el.style.cursor = 'pointer';
-        el.style.transition = 'transform 0.2s ease';
-        el.style.position = 'relative';
+
+        const inner = document.createElement('div');
+        inner.style.width = '30px';
+        inner.style.height = '30px';
+        inner.style.backgroundImage = `url(${story.image})`;
+        inner.style.backgroundSize = 'cover';
+        inner.style.borderRadius = '50%';
+        inner.style.cursor = 'pointer';
+        inner.style.transition = 'all 0.3s ease';
+        
+        // Add visited state visual indicator
+        if (userProgress.visitedIds.includes(story.id)) {
+          inner.style.border = '2px solid rgba(76, 175, 80, 0.3)';
+          inner.style.filter = 'grayscale(80%) brightness(0.8)';
+          inner.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
+        } else {
+          inner.style.border = '2px solid white';
+          inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        }
+
+        el.appendChild(inner);
 
         // Create popup content
         const popupContent = document.createElement('div');
@@ -196,8 +247,7 @@ export default function GlobeView() {
         popupContent.style.backgroundColor = 'white';
         popupContent.style.borderRadius = '8px';
         popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-        
-        // Add image
+
         const img = document.createElement('img');
         img.src = story.image;
         img.style.width = '100%';
@@ -207,7 +257,6 @@ export default function GlobeView() {
         img.style.marginBottom = '10px';
         popupContent.appendChild(img);
 
-        // Add title
         const title = document.createElement('h3');
         title.textContent = story.title;
         title.style.margin = '0 0 8px 0';
@@ -215,7 +264,6 @@ export default function GlobeView() {
         title.style.fontSize = '18px';
         popupContent.appendChild(title);
 
-        // Add description
         const desc = document.createElement('p');
         desc.textContent = story.description;
         desc.style.margin = '0 0 10px 0';
@@ -224,12 +272,11 @@ export default function GlobeView() {
         desc.style.lineHeight = '1.4';
         popupContent.appendChild(desc);
 
-        // Add categories
         const categoriesDiv = document.createElement('div');
         categoriesDiv.style.display = 'flex';
         categoriesDiv.style.gap = '5px';
         categoriesDiv.style.flexWrap = 'wrap';
-        
+
         story.categories.forEach(cat => {
           const catSpan = document.createElement('span');
           catSpan.style.background = '#f0f0f0';
@@ -242,16 +289,15 @@ export default function GlobeView() {
           catSpan.innerHTML = `${categories[cat].icon} ${categories[cat].label}`;
           categoriesDiv.appendChild(catSpan);
         });
-        
+
         popupContent.appendChild(categoriesDiv);
 
         const marker = new mapboxgl.Marker({
           element: el,
-          anchor: 'bottom',
-          offset: [0, -15]
+          anchor: 'center'
         })
           .setLngLat(story.location.coordinates)
-          .setPopup(new mapboxgl.Popup({ 
+          .setPopup(new mapboxgl.Popup({
             offset: 25,
             closeButton: false,
             closeOnClick: false,
@@ -260,22 +306,42 @@ export default function GlobeView() {
           }).setDOMContent(popupContent))
           .addTo(map.current);
 
-        // Add hover effects
+        // Create click handler with proper state access
+        const handleMarkerClick = () => {
+          // Force sidebar open
+          setIsSidebarOpen(true);
+          
+          // Set location and filter stories
+          setSelectedLocation(story.location.country);
+          setFilteredStories(filterStories(story.location.country, selectedCategories));
+        };
+
+        // Add click event listener
+        el.addEventListener('click', handleMarkerClick);
+
+        // Add hover events
         el.addEventListener('mouseenter', () => {
-          el.style.transform = 'scale(1.2)';
+          if (userProgress.visitedIds.includes(story.id)) {
+            inner.style.transform = 'scale(1.1)';
+            inner.style.filter = 'grayscale(50%) brightness(0.9)';
+          } else {
+            inner.style.transform = 'scale(1.2)';
+            inner.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+          }
           setHoveredMarker(story.id);
           marker.getPopup().addTo(map.current);
         });
 
         el.addEventListener('mouseleave', () => {
-          el.style.transform = 'scale(1)';
+          if (userProgress.visitedIds.includes(story.id)) {
+            inner.style.transform = 'scale(1)';
+            inner.style.filter = 'grayscale(80%) brightness(0.8)';
+          } else {
+            inner.style.transform = 'scale(1)';
+            inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+          }
           setHoveredMarker(null);
           marker.getPopup().remove();
-        });
-
-        el.addEventListener('click', () => {
-          setSelectedLocation(story.location.country);
-          setFilteredStories(filterStories(story.location.country, selectedCategories));
         });
       });
 
@@ -474,148 +540,516 @@ export default function GlobeView() {
     };
   }, []);
 
-  return (
-    <div style={{ position: 'relative', width: '100vw', height: '100vh', display: 'flex' }}>
-      <div ref={mapContainer} style={{ position: 'relative', width: '70%', height: '100%' }} />
-      
-      {/* Sidebar */}
-      <div style={{
-        width: '30%',
-        height: '100%',
-        backgroundColor: '#ffffff',
-        boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
-        overflowY: 'auto',
-        padding: '30px'
-      }}>
-        {/* Filter Section */}
-        <div style={{ 
-          marginBottom: '20px',
-          padding: '15px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '12px',
-          transition: 'all 0.3s ease'
-        }}>
-          <div 
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              cursor: 'pointer',
-              marginBottom: isFilterOpen ? '15px' : '0'
-            }}
-          >
-            <h3 style={{ margin: 0, color: '#333' }}>Filters</h3>
-            <span style={{ fontSize: '20px' }}>{isFilterOpen ? '▼' : '▶'}</span>
-          </div>
-          
-          {isFilterOpen && (
-            <div style={{ 
-              maxHeight: '300px',
-              overflowY: 'auto',
-              transition: 'max-height 0.3s ease'
-            }}>
-              <div style={{ marginBottom: '15px' }}>
-                <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Categories</h4>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {Object.entries(categories).map(([key, { label, icon }]) => (
-                    <button
-                      key={key}
-                      onClick={() => toggleCategory(key)}
-                      style={{
-                        padding: '6px 12px',
-                        backgroundColor: selectedCategories.includes(key) ? '#3386c0' : '#e0e0e0',
-                        color: selectedCategories.includes(key) ? 'white' : '#333',
-                        border: 'none',
-                        borderRadius: '20px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px'
-                      }}
-                    >
-                      <span>{icon}</span>
-                      <span>{label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+  // Add effect to handle map resize when sidebar toggles
+  useEffect(() => {
+    if (map.current) {
+      // Add a small delay to ensure the container has finished transitioning
+      setTimeout(() => {
+        map.current.resize();
+      }, 300);
+    }
+  }, [isSidebarOpen]);
 
-        {/* Stories List */}
-        <div style={{ 
-          display: 'flex', 
-          flexDirection: 'column', 
-          gap: '30px',
-          maxWidth: '90%',
-          margin: '0 auto'
+  return (
+    <div style={{ 
+      position: 'fixed', 
+      top: 0, 
+      left: 0, 
+      right: 0, 
+      bottom: 0, 
+      margin: 0, 
+      padding: 0, 
+      overflow: 'hidden' 
+    }}>
+      {/* Map Container */}
+      <div 
+        ref={mapContainer} 
+        style={{ 
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: isSidebarOpen ? 'calc(100% - 30%)' : '100%',
+          height: '100%',
+          transition: 'width 0.3s ease-in-out'
+        }} 
+      />
+
+      {/* Profile Button */}
+      <button
+        onClick={() => setIsProfileOpen(true)}
+        style={{
+          position: 'absolute',
+          left: '20px',
+          top: '20px',
+          zIndex: 1000,
+          width: '40px',
+          height: '40px',
+          borderRadius: '50%',
+          backgroundColor: '#ffffff',
+          border: 'none',
+          boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '20px'
+        }}
+      >
+        🥇
+      </button>
+
+      {/* Profile Overlay with Progress */}
+      {isProfileOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000
         }}>
-          {filteredStories.map((item) => (
-            <div
-              key={item.id}
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '12px',
+            padding: '30px',
+            width: '500px',
+            maxWidth: '90%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            position: 'relative',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
+          }}>
+            <button
+              onClick={() => setIsProfileOpen(false)}
               style={{
-                backgroundColor: '#f8f9fa',
-                borderRadius: '12px',
-                padding: '15px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                aspectRatio: '1',
-                display: 'flex',
-                flexDirection: 'column'
+                position: 'absolute',
+                right: '15px',
+                top: '15px',
+                border: 'none',
+                background: 'none',
+                fontSize: '20px',
+                cursor: 'pointer',
+                padding: '5px'
               }}
             >
-              <div style={{ flex: '1', position: 'relative', marginBottom: '12px' }}>
+              ✕
+            </button>
+            <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Your Journey Progress</h2>
+            
+            {/* Reset Progress Button */}
+            <div style={{ 
+              marginBottom: '20px',
+              display: 'flex',
+              justifyContent: 'flex-end' 
+            }}>
+              <button
+                onClick={handleResetProgress}
+                style={{
+                  backgroundColor: '#ff4444',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#ff6666'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#ff4444'}
+              >
+                <span>🔄</span> Reset Progress
+              </button>
+            </div>
+
+            <ProgressOverview userProgress={userProgress} sidebarItems={sidebarItems} />
+          </div>
+        </div>
+      )}
+      
+      {/* Sidebar Container with Integrated Tab */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        right: isSidebarOpen ? '0' : '-30%',
+        height: '100%',
+        width: '30%',
+        display: 'flex',
+        transition: 'right 0.3s ease-in-out',
+        zIndex: 999
+      }}>
+        {/* Tab Button */}
+        <div
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          style={{
+            position: 'absolute',
+            left: '-40px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: '40px',
+            height: '100px',
+            backgroundColor: '#ffffff',
+            boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
+            borderRadius: '8px 0 0 8px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+        >
+          <div style={{
+            transform: `rotate(${isSidebarOpen ? 0 : 180}deg)`,
+            transition: 'transform 0.3s ease-in-out',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '8px'
+          }}>
+            <span style={{
+              writingMode: 'vertical-rl',
+              textOrientation: 'mixed',
+              transform: 'rotate(180deg)',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              color: '#666'
+            }}>
+              Stories
+            </span>
+            <span style={{ fontSize: '12px' }}>
+              {isSidebarOpen ? '▶' : '◀'}
+            </span>
+          </div>
+        </div>
+
+        {/* Sidebar Content */}
+        <div style={{
+          flex: 1,
+          backgroundColor: '#ffffff',
+          boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
+          overflowY: 'auto',
+          padding: '30px'
+        }}>
+          {selectedStory ? (
+            // Detailed Story View
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '20px'
+            }}>
+              {/* Back Button */}
+              <button
+                onClick={() => setSelectedStory(null)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  color: '#666',
+                  padding: '0',
+                  marginBottom: '10px'
+                }}
+              >
+                ← Terug naar overzicht
+              </button>
+
+              {/* Location */}
+              <div style={{
+                color: '#666',
+                fontSize: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                <span>📍</span>
+                <span>{selectedStory.location.name}, {selectedStory.location.country}</span>
+              </div>
+
+              {/* Hero Image */}
+              <div style={{ 
+                position: 'relative', 
+                width: '100%',
+                height: '250px',
+                borderRadius: '12px',
+                overflow: 'hidden'
+              }}>
                 <img
-                  src={item.image}
-                  alt={item.title}
+                  src={selectedStory.image}
+                  alt={selectedStory.title}
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
-                    borderRadius: '8px'
+                    objectFit: 'cover'
                   }}
                 />
               </div>
-              <h3 style={{ 
-                margin: '0 0 6px 0', 
-                color: '#333',
-                fontSize: '16px',
-                lineHeight: '1.2',
-                padding: '0 4px'
-              }}>{item.title}</h3>
-              <p style={{ 
-                margin: '0 0 8px 0', 
-                color: '#666', 
-                fontSize: '13px',
-                lineHeight: '1.3',
-                display: '-webkit-box',
-                WebkitLineClamp: '2',
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                padding: '0 4px'
-              }}>{item.description}</p>
+
+              {/* Name and Age */}
+              <div style={{
+                fontWeight: 'bold',
+                fontSize: '24px',
+                color: '#333'
+              }}>
+                {selectedStory.title}, {mockExpandedContent.age[selectedStory.id]}
+              </div>
+
+              {/* Categories */}
               <div style={{ 
                 display: 'flex', 
-                gap: '5px',
-                padding: '0 4px'
+                gap: '8px',
+                flexWrap: 'wrap'
               }}>
-                {item.categories.map(cat => (
+                {selectedStory.categories.map(cat => (
                   <span key={cat} style={{
-                    background: '#e0e0e0',
-                    padding: '2px 6px',
-                    borderRadius: '4px',
-                    fontSize: '12px',
+                    background: '#f0f0f0',
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    fontSize: '13px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '3px'
+                    gap: '6px',
+                    color: '#555'
                   }}>
                     {categories[cat].icon} {categories[cat].label}
                   </span>
                 ))}
               </div>
+
+              {/* Chat Button - Moved up */}
+              <button
+                onClick={() => {
+                  // Handle visited state when chat button is clicked
+                  if (!userProgress.visitedIds.includes(selectedStory.id)) {
+                    const newProgress = markAsVisited(selectedStory.id);
+                    setUserProgress(newProgress);
+                    
+                    // Find and update the marker's appearance
+                    const markerElement = document.querySelector(`.marker img[alt="${selectedStory.title}"]`);
+                    if (markerElement) {
+                      markerElement.style.border = '2px solid rgba(76, 175, 80, 0.3)';
+                      markerElement.style.filter = 'grayscale(80%) brightness(0.8)';
+                      markerElement.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
+                    }
+                  }
+                }}
+                style={{
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginTop: '4px',
+                  marginBottom: '16px',
+                  transition: 'background-color 0.2s ease'
+                }}
+                onMouseOver={(e) => e.target.style.backgroundColor = '#45a049'}
+                onMouseOut={(e) => e.target.style.backgroundColor = '#4CAF50'}
+              >
+                <span>💬</span> Chat met {selectedStory.title}
+              </button>
+
+              {/* Story Content */}
+              <div style={{
+                color: '#444',
+                fontSize: '15px',
+                lineHeight: '1.6'
+              }}>
+                <p style={{ margin: '0 0 16px 0' }}>{selectedStory.description}</p>
+                {mockExpandedContent.text.split('\n\n').map((paragraph, index) => (
+                  <p key={index} style={{ margin: '0 0 16px 0' }}>{paragraph}</p>
+                ))}
+              </div>
             </div>
-          ))}
+          ) : (
+            // Stories List View
+            <>
+              {/* Filter Section */}
+              <div style={{ 
+                marginBottom: '20px',
+                padding: '15px',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '12px',
+                transition: 'all 0.3s ease'
+              }}>
+                <div 
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    marginBottom: isFilterOpen ? '15px' : '0'
+                  }}
+                >
+                  <h3 style={{ margin: 0, color: '#333' }}>Filters</h3>
+                  <span style={{ fontSize: '20px' }}>{isFilterOpen ? '▼' : '▶'}</span>
+                </div>
+                
+                {isFilterOpen && (
+                  <div style={{ 
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    transition: 'max-height 0.3s ease'
+                  }}>
+                    <div style={{ marginBottom: '15px' }}>
+                      <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Categories</h4>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                        {Object.entries(categories).map(([key, { label, icon }]) => (
+                          <button
+                            key={key}
+                            onClick={() => toggleCategory(key)}
+                            style={{
+                              padding: '6px 12px',
+                              backgroundColor: selectedCategories.includes(key) ? '#3386c0' : '#e0e0e0',
+                              color: selectedCategories.includes(key) ? 'white' : '#333',
+                              border: 'none',
+                              borderRadius: '20px',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '5px'
+                            }}
+                          >
+                            <span>{icon}</span>
+                            <span>{label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Stories List */}
+              <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                gap: '30px',
+                maxWidth: '90%',
+                margin: '0 auto'
+              }}>
+                {filteredStories.map((item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      backgroundColor: '#ffffff',
+                      borderRadius: '12px',
+                      padding: '15px',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px'
+                    }}
+                  >
+                    {/* Location */}
+                    <div style={{
+                      color: '#666',
+                      fontSize: '13px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      <span>📍</span>
+                      <span>{item.location.name}, {item.location.country}</span>
+                    </div>
+
+                    {/* Image */}
+                    <div style={{ position: 'relative', aspectRatio: '16/9' }}>
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          borderRadius: '8px'
+                        }}
+                      />
+                    </div>
+
+                    {/* Name and Age */}
+                    <div style={{
+                      fontWeight: 'bold',
+                      fontSize: '16px',
+                      color: '#333'
+                    }}>
+                      {item.title}, {mockExpandedContent.age[item.id]}
+                    </div>
+
+                    {/* Description */}
+                    <p style={{ 
+                      margin: '0',
+                      color: '#666', 
+                      fontSize: '14px',
+                      lineHeight: '1.4',
+                      display: '-webkit-box',
+                      WebkitLineClamp: '2',
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
+                    }}>
+                      {item.description}
+                    </p>
+
+                    {/* Categories */}
+                    <div style={{ 
+                      display: 'flex', 
+                      gap: '6px',
+                      flexWrap: 'wrap'
+                    }}>
+                      {item.categories.map(cat => (
+                        <span key={cat} style={{
+                          background: '#f0f0f0',
+                          padding: '4px 8px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          color: '#555'
+                        }}>
+                          {categories[cat].icon} {categories[cat].label}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Read More Button */}
+                    <button
+                      onClick={() => setSelectedStory(item)}
+                      style={{
+                        backgroundColor: '#3386c0',
+                        color: 'white',
+                        border: 'none',
+                        padding: '8px 16px',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        transition: 'background-color 0.2s ease'
+                      }}
+                      onMouseOver={(e) => e.target.style.backgroundColor = '#2776b0'}
+                      onMouseOut={(e) => e.target.style.backgroundColor = '#3386c0'}
+                    >
+                      Lees meer...
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>
