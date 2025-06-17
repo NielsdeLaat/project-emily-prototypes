@@ -93,9 +93,16 @@ const App = () => {
         {!showPhone && (
           <div className="fixed inset-0 flex items-center justify-center">
             <div className="max-w-2xl w-full p-8">
-              <h1 className="text-4xl font-bold text-center mb-12 text-white">
-                Choose a Story
-              </h1>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-8 text-balance text-center">
+                <p className="text-lg leading-relaxed text-white/90">
+                  Met dit prototype kan je een aantal verhalen testen die horen
+                  bij verschillende persona's. Met het menu hieronder kan je
+                  testen wel verhaal je wilt bekijken.
+                </p>
+              </div>
+              {/* <h1 className="text-4xl font-bold text-center mb-12 text-white">
+                Welk verhaal wil je zien?
+              </h1> */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {stories.map((story) => (
                   <Button
