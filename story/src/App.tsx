@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { stories } from "@/data/stories";
@@ -48,6 +48,40 @@ const App = () => {
     handleShow();
   };
 
+  // Add click handler for clicks outside the phone window
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (showPhone && !isAnimating) {
+        const container = document.querySelector(".mobile-viewport-container");
+        const viewport = document.querySelector(".mobile-viewport");
+        if (container && viewport) {
+          const rect = container.getBoundingClientRect();
+          const viewportRect = viewport.getBoundingClientRect();
+          const isClickOutside = !(
+            e.clientX >= rect.left &&
+            e.clientX <= rect.right &&
+            e.clientY >= rect.top &&
+            e.clientY <= rect.bottom
+          );
+          const isClickOutsideViewport = !(
+            e.clientX >= viewportRect.left &&
+            e.clientX <= viewportRect.right &&
+            e.clientY >= viewportRect.top &&
+            e.clientY <= viewportRect.bottom
+          );
+          if (isClickOutside || isClickOutsideViewport) {
+            handleClose();
+          }
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showPhone, isAnimating]);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -67,7 +101,7 @@ const App = () => {
                   <Button
                     key={story.id}
                     onClick={() => handleStorySelect(story.id)}
-                    className="h-40 text-lg font-medium bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:shadow-xl"
+                    className="h-40 text-lg text-balance font-medium bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:shadow-xl"
                   >
                     {story.title}
                   </Button>
@@ -83,6 +117,12 @@ const App = () => {
             showPhone ? "slide-in" : "slide-out"
           }`}
           style={{ display: isAnimating || showPhone ? "flex" : "none" }}
+          onClick={(e) => {
+            // Only close if clicking the container itself, not its children
+            if (e.target === e.currentTarget) {
+              handleClose();
+            }
+          }}
         >
           <div className="mobile-viewport">
             <BrowserRouter>

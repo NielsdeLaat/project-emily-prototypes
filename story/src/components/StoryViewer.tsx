@@ -146,14 +146,6 @@ export const StoryViewer = ({ onClose, storyId, onBack }: StoryViewerProps) => {
         {/* Header */}
         <div className="flex items-center justify-between px-4 pb-6">
           <div className="flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onBack}
-              className="text-white hover:bg-white/20 rounded-full w-8 h-8 p-0"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
             <div className="w-8 h-8 rounded-full bg-red-600/80 flex items-center justify-center">
               <Flag className="w-4 h-4 text-white" />
             </div>
