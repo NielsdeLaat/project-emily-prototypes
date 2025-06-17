@@ -27,9 +27,9 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
     <motion.div
       initial={{ opacity: 1 }}
       animate={{ opacity: isVisible ? 1 : 0 }}
-      className="fixed inset-0 bg-gradient-to-br from-purple-50 to-pink-50 z-50 flex items-center justify-center"
+      className="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-50 z-50 flex items-center justify-center"
     >
-      <div className="h-screen max-w-md mx-auto w-full bg-white shadow-2xl">
+      <div className="h-full w-full bg-white">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4">

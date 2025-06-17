@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import ChatInterface from "../components/ChatInterface";
 import PersonaMenu from "../components/PersonaMenu";
@@ -16,7 +15,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+    <div className="h-full bg-gradient-to-br from-purple-50 to-pink-50">
       {selectedPersona ? (
         <ChatInterface persona={selectedPersona} onBack={handleBack} />
       ) : (
