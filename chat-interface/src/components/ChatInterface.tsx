@@ -153,9 +153,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div
-        className={`bg-gradient-to-r ${persona.color} text-white p-4 flex items-center justify-between`}
-      >
+      <div className="bg-emilyBlue text-white p-4 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Button
             onClick={onBack}
@@ -229,7 +227,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
           />
           <Button
             onClick={handleSendMessage}
-            className={`rounded-full bg-gradient-to-r ${persona.color} hover:opacity-90 transition-all duration-200`}
+            className="rounded-full bg-emilyBlue hover:opacity-90 transition-all duration-200"
             size="icon"
           >
             <Send className="h-4 w-4" />

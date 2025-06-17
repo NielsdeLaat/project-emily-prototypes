@@ -54,7 +54,7 @@ const PersonaMenu = ({ onSelectPersona }: PersonaMenuProps) => {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-600 to-slate-700 text-white p-4 relative">
+      <div className="bg-emilyBlue text-white p-4 relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             {/* Back Button */}

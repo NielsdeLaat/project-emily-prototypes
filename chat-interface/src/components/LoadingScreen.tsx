@@ -32,7 +32,7 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
       <div className="h-full w-full bg-white">
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white p-4">
+          <div className="bg-emilyBlue text-white p-4">
             <h1 className="font-semibold text-lg text-center">StoryChat</h1>
           </div>
 
@@ -55,7 +55,7 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
                   transition={{ duration: 0.3 }}
                   className="w-16 h-16 mb-6"
                 >
-                  <div className="w-full h-full rounded-full border-4 border-purple-500 border-t-transparent animate-spin" />
+                  <div className="w-full h-full rounded-full border-4 border-emilyBlue border-t-transparent animate-spin" />
                 </motion.div>
               ) : (
                 <motion.div
@@ -66,7 +66,7 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
                 >
                   <Button
                     onClick={handleContinue}
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:opacity-90 transition-all duration-200"
+                    className="bg-emilyBlue text-white hover:opacity-90 transition-all duration-200"
                   >
                     Ik begrijp het
                   </Button>
