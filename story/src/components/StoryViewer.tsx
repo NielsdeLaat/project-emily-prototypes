@@ -60,7 +60,9 @@ export const StoryViewer = ({ onClose, storyId, onBack }: StoryViewerProps) => {
 
   const handleVideoEnd = () => {
     if (currentSegment < story.segments.length - 1) {
-      handleNext();
+      // Play next video segment
+      setCurrentSegment((prev) => prev + 1);
+      setCurrentTime(0);
     } else {
       // Open chat interface in new window when story completes
       window.open("https://project-emily-chat-interface.vercel.app/", "_blank");
@@ -81,7 +83,7 @@ export const StoryViewer = ({ onClose, storyId, onBack }: StoryViewerProps) => {
   };
 
   const handleNext = () => {
-    // Skip button only opens chat interface
+    // Open chat interface in new window when story completes
     window.open("https://project-emily-chat-interface.vercel.app/", "_blank");
   };
 
