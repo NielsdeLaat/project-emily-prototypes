@@ -10,6 +10,7 @@ import LoadingScreen from "./components/LoadingScreen";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { SUCCESS_MESSAGES } from "@/config/constants";
 
 const queryClient = new QueryClient();
 
@@ -20,8 +21,8 @@ const App = () => {
   const handleResetChats = () => {
     localStorage.removeItem("chat_history");
     toast({
-      title: "Chat history cleared",
-      description: "All chat histories have been reset.",
+      title: SUCCESS_MESSAGES.CHAT_HISTORY_CLEARED,
+      description: SUCCESS_MESSAGES.CHAT_HISTORY_RESET,
     });
     // Force a reload to update the UI
     window.location.reload();

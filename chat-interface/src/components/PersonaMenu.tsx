@@ -1,54 +1,15 @@
-import { ArrowLeft, MessageCircle, User } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PERSONA_AVATARS } from "@/config/avatars";
+import { PERSONAS } from "@/config/personas";
 import InfoDialog from "./InfoDialog";
 import { getLastMessage } from "@/services/chatHistory";
-
-interface Persona {
-  id: string;
-  name: string;
-  description: string;
-  avatar?: string;
-  color: string;
-}
+import type { Persona } from "@/types/chat";
 
 interface PersonaMenuProps {
   onSelectPersona: (persona: Persona) => void;
 }
-
-const personas: Persona[] = [
-  {
-    id: "emily",
-    name: "Emily",
-    description: "Start een gesprek!",
-    color: "from-purple-500 to-pink-500",
-  },
-  {
-    id: "jason",
-    name: "Jason",
-    description: "Start een gesprek!",
-    color: "from-blue-500 to-cyan-500",
-  },
-  {
-    id: "kellan",
-    name: "Kellan",
-    description: "Start een gesprek!",
-    color: "from-green-500 to-emerald-500",
-  },
-  {
-    id: "jessica",
-    name: "Jessica",
-    description: "Start een gesprek!",
-    color: "from-orange-500 to-red-500",
-  },
-  {
-    id: "kevin",
-    name: "Kevin",
-    description: "Start een gesprek!",
-    color: "from-indigo-500 to-purple-500",
-  },
-];
 
 const PersonaMenu = ({ onSelectPersona }: PersonaMenuProps) => {
   return (
@@ -84,7 +45,7 @@ const PersonaMenu = ({ onSelectPersona }: PersonaMenuProps) => {
 
       {/* Personas List */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
-        {personas.map((persona) => {
+        {PERSONAS.map((persona) => {
           const lastMessage = getLastMessage(persona.id);
           return (
             <Button
@@ -125,4 +86,3 @@ const PersonaMenu = ({ onSelectPersona }: PersonaMenuProps) => {
 };
 
 export default PersonaMenu;
-export type { Persona };

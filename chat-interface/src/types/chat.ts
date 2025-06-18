@@ -5,3 +5,39 @@ export interface Message {
   timestamp: Date;
   personaName: string;
 }
+
+export interface Persona {
+  id: string;
+  name: string;
+  description: string;
+  avatar?: string;
+  color: string;
+}
+
+export interface ChatMessage {
+  role: "user" | "assistant" | "system";
+  content: string;
+}
+
+export interface ChatState {
+  messages: Message[];
+  inputValue: string;
+  isTyping: boolean;
+  isInCall: boolean;
+  showExampleQuestions: boolean;
+  isClosing: boolean;
+  exampleQuestions: string[];
+  isLoadingQuestions: boolean;
+  questionsError: boolean;
+  // Note: lastGeneratedHistoryHash is tracked internally for optimization
+  // Example questions are only regenerated when chat history changes
+}
+
+export interface ChatActions {
+  sendMessage: (text: string) => Promise<void>;
+  setInputValue: (value: string) => void;
+  toggleExampleQuestions: () => Promise<void>;
+  selectExampleQuestion: (question: string) => void;
+  startCall: () => void;
+  endCall: () => void;
+}
