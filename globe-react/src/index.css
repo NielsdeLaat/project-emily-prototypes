@@ -1,11 +1,39 @@
-body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background-color: #f8f6f0;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply m-0 p-0 overflow-hidden bg-[#f8f6f0] font-sans;
+  }
+
+  #root {
+    @apply w-screen h-screen;
+  }
 }
 
-#root {
-  width: 100vw;
-  height: 100vh;
+@layer components {
+  .button-base {
+    @apply bg-emily-blue text-white font-medium px-4 py-2 rounded hover:bg-emily-blue/90 transition-all duration-300;
+  }
+
+  .story-card {
+    @apply bg-white p-4 rounded shadow-md mb-4 transition-all duration-300 ease-in-out;
+  }
+
+  .filter-section {
+    @apply mt-6 p-4 bg-gray-50 rounded transition-all duration-300 ease-in-out;
+  }
+
+  .chat-section {
+    @apply fixed bottom-0 left-0 right-0 bg-white p-4 shadow-lg transition-all duration-300 ease-in-out;
+  }
+
+  .read-more-button {
+    @apply w-full bg-emily-blue text-white px-4 py-2 rounded hover:bg-emily-blue/90 transition-all duration-300 mt-2;
+  }
+
+  .filter-button {
+    @apply px-3 py-1 rounded bg-gray-200 hover:bg-emily-blue hover:text-white transition-all duration-300;
+  }
 }

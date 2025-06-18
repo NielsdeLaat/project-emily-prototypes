@@ -22,77 +22,46 @@ export default function ProgressOverview({ userProgress, sidebarItems }) {
   const overallProgress = (visitedStories / totalStories) * 100;
 
   return (
-    <div style={{
-      padding: '20px',
-      backgroundColor: '#ffffff',
-      borderRadius: '12px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-    }}>
+    <div className="p-5 bg-white rounded-xl shadow-md">
       {/* Overall Progress */}
-      <div style={{ marginBottom: '20px' }}>
-        <h3 style={{ marginTop: 0 }}>Overall Progress</h3>
-        <div style={{ 
-          height: '8px', 
-          backgroundColor: '#e0e0e0', 
-          borderRadius: '4px',
-          overflow: 'hidden'
-        }}>
-          <div style={{
-            width: `${overallProgress}%`,
-            height: '100%',
-            backgroundColor: '#4CAF50',
-            transition: 'width 0.3s ease'
-          }} />
+      <div className="mb-5">
+        <h3 className="mt-0 font-semibold">Overall Progress</h3>
+        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-emily-blue transition-all duration-300"
+            style={{ width: `${overallProgress}%` }}
+          />
         </div>
-        <p style={{ textAlign: 'center', margin: '5px 0' }}>
+        <p className="text-center my-1">
           {visitedStories} / {totalStories} Stories Discovered
         </p>
       </div>
 
       {/* Continent Progress */}
-      <div style={{ marginBottom: '20px' }}>
-        <h3>Continents Explored</h3>
+      <div className="mb-5">
+        <h3 className="font-semibold">Continents Explored</h3>
         {Object.entries(continentProgress).map(([continent, progress]) => (
-          <div key={continent} style={{ marginBottom: '15px' }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '5px'
-            }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div key={continent} className="mb-4">
+            <div className="flex justify-between items-center mb-1">
+              <span className="flex items-center gap-2">
                 <span>{CONTINENT_EMOJIS[continent]}</span>
                 <span>{continent}</span>
               </span>
-              <span style={{ 
-                backgroundColor: progress.percentage === 100 ? '#4CAF50' : '#e0e0e0',
-                color: progress.percentage === 100 ? 'white' : 'black',
-                padding: '2px 8px',
-                borderRadius: '10px',
-                fontSize: '12px'
-              }}>
+              <span className={`px-2 py-0.5 rounded-full text-xs ${
+                progress.percentage === 100 
+                  ? 'bg-emily-blue text-white' 
+                  : 'bg-gray-200 text-gray-700'
+              }`}>
                 {progress.percentage === 100 ? '🌟 Explored!' : `${Math.round(progress.percentage)}%`}
               </span>
             </div>
-            <div style={{ 
-              height: '6px', 
-              backgroundColor: '#e0e0e0', 
-              borderRadius: '3px',
-              overflow: 'hidden',
-              marginBottom: '5px'
-            }}>
-              <div style={{
-                width: `${progress.percentage}%`,
-                height: '100%',
-                backgroundColor: '#9C27B0',
-                transition: 'width 0.3s ease'
-              }} />
+            <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden mb-1">
+              <div
+                className="h-full bg-emily-blue transition-all duration-300"
+                style={{ width: `${progress.percentage}%` }}
+              />
             </div>
-            <div style={{ 
-              fontSize: '12px', 
-              color: '#666',
-              paddingLeft: '4px'
-            }}>
+            <div className="text-xs text-gray-600 pl-1">
               {progress.visited} / {progress.total} stories • {progress.countries.length} {progress.countries.length === 1 ? 'country' : 'countries'}
             </div>
           </div>
@@ -100,39 +69,25 @@ export default function ProgressOverview({ userProgress, sidebarItems }) {
       </div>
 
       {/* Country Progress */}
-      <div style={{ marginBottom: '20px' }}>
-        <h3>Countries Explored</h3>
+      <div className="mb-5">
+        <h3 className="font-semibold">Countries Explored</h3>
         {Object.entries(countryProgress).map(([country, progress]) => (
-          <div key={country} style={{ marginBottom: '10px' }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '5px'
-            }}>
+          <div key={country} className="mb-3">
+            <div className="flex justify-between items-center mb-1">
               <span>{country}</span>
-              <span style={{ 
-                backgroundColor: progress.percentage === 100 ? '#4CAF50' : '#e0e0e0',
-                color: progress.percentage === 100 ? 'white' : 'black',
-                padding: '2px 8px',
-                borderRadius: '10px',
-                fontSize: '12px'
-              }}>
+              <span className={`px-2 py-0.5 rounded-full text-xs ${
+                progress.percentage === 100 
+                  ? 'bg-emily-blue text-white' 
+                  : 'bg-gray-200 text-gray-700'
+              }`}>
                 {progress.percentage === 100 ? '🏆 Complete!' : `${Math.round(progress.percentage)}%`}
               </span>
             </div>
-            <div style={{ 
-              height: '6px', 
-              backgroundColor: '#e0e0e0', 
-              borderRadius: '3px',
-              overflow: 'hidden'
-            }}>
-              <div style={{
-                width: `${progress.percentage}%`,
-                height: '100%',
-                backgroundColor: '#2196F3',
-                transition: 'width 0.3s ease'
-              }} />
+            <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-emily-blue transition-all duration-300"
+                style={{ width: `${progress.percentage}%` }}
+              />
             </div>
           </div>
         ))}
@@ -140,38 +95,24 @@ export default function ProgressOverview({ userProgress, sidebarItems }) {
 
       {/* Category Progress */}
       <div>
-        <h3>Categories Discovered</h3>
+        <h3 className="font-semibold">Categories Discovered</h3>
         {Object.entries(categoryProgress).map(([category, progress]) => (
-          <div key={category} style={{ marginBottom: '10px' }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '5px'
-            }}>
+          <div key={category} className="mb-3">
+            <div className="flex justify-between items-center mb-1">
               <span>{category}</span>
-              <span style={{ 
-                backgroundColor: progress.percentage === 100 ? '#4CAF50' : '#e0e0e0',
-                color: progress.percentage === 100 ? 'white' : 'black',
-                padding: '2px 8px',
-                borderRadius: '10px',
-                fontSize: '12px'
-              }}>
+              <span className={`px-2 py-0.5 rounded-full text-xs ${
+                progress.percentage === 100 
+                  ? 'bg-emily-blue text-white' 
+                  : 'bg-gray-200 text-gray-700'
+              }`}>
                 {progress.percentage === 100 ? '🎯 Mastered!' : `${Math.round(progress.percentage)}%`}
               </span>
             </div>
-            <div style={{ 
-              height: '6px', 
-              backgroundColor: '#e0e0e0', 
-              borderRadius: '3px',
-              overflow: 'hidden'
-            }}>
-              <div style={{
-                width: `${progress.percentage}%`,
-                height: '100%',
-                backgroundColor: '#FF9800',
-                transition: 'width 0.3s ease'
-              }} />
+            <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-emily-blue transition-all duration-300"
+                style={{ width: `${progress.percentage}%` }}
+              />
             </div>
           </div>
         ))}
