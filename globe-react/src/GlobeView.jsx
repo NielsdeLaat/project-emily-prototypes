@@ -215,6 +215,64 @@ export default function GlobeView() {
         "star-intensity": 0.1
       });
 
+      // Add country boundaries with thinner lines
+      map.current.addSource('countries', {
+        type: 'vector',
+        url: 'mapbox://mapbox.country-boundaries-v1'
+      });
+
+      map.current.addLayer({
+        'id': 'country-fills',
+        'type': 'fill',
+        'source': 'countries',
+        'source-layer': 'country_boundaries',
+        'paint': {
+          'fill-color': '#e0e0e0',
+          'fill-opacity': 0.4
+        }
+      });
+
+      map.current.addLayer({
+        'id': 'country-borders',
+        'type': 'line',
+        'source': 'countries',
+        'source-layer': 'country_boundaries',
+        'paint': {
+          'line-color': '#000000',
+          'line-width': 0.5  // Thin lines but in black
+        }
+      });
+
+      // Add territory boundaries with thinner lines
+      map.current.addSource('territories', {
+        type: 'vector',
+        url: 'mapbox://mapbox.country-boundaries-v1'
+      });
+
+      map.current.addLayer({
+        'id': 'territory-fills',
+        'type': 'fill',
+        'source': 'territories',
+        'source-layer': 'country_boundaries',
+        'filter': ['==', 'mapbox:is_territory', true],
+        'paint': {
+          'fill-color': '#e0e0e0',
+          'fill-opacity': 0.4
+        }
+      });
+
+      map.current.addLayer({
+        'id': 'territory-borders',
+        'type': 'line',
+        'source': 'territories',
+        'source-layer': 'country_boundaries',
+        'filter': ['==', 'mapbox:is_territory', true],
+        'paint': {
+          'line-color': '#000000',
+          'line-width': 0.5  // Thin lines but in black
+        }
+      });
+
       sidebarItems.forEach(story => {
         const el = document.createElement('div');
         el.className = 'marker';
@@ -240,7 +298,7 @@ export default function GlobeView() {
 
         el.appendChild(inner);
 
-        // Create popup content
+        // Create popup content with more information
         const popupContent = document.createElement('div');
         popupContent.style.padding = '15px';
         popupContent.style.maxWidth = '300px';
@@ -248,6 +306,15 @@ export default function GlobeView() {
         popupContent.style.borderRadius = '8px';
         popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
 
+        // Name and Age
+        const title = document.createElement('h3');
+        title.textContent = `${story.title}, ${mockExpandedContent.age[story.id]}`;
+        title.style.margin = '0 0 8px 0';
+        title.style.color = '#333';
+        title.style.fontSize = '18px';
+        popupContent.appendChild(title);
+
+        // Image
         const img = document.createElement('img');
         img.src = story.image;
         img.style.width = '100%';
@@ -257,13 +324,18 @@ export default function GlobeView() {
         img.style.marginBottom = '10px';
         popupContent.appendChild(img);
 
-        const title = document.createElement('h3');
-        title.textContent = story.title;
-        title.style.margin = '0 0 8px 0';
-        title.style.color = '#333';
-        title.style.fontSize = '18px';
-        popupContent.appendChild(title);
+        // Location
+        const location = document.createElement('div');
+        location.style.color = '#666';
+        location.style.fontSize = '13px';
+        location.style.display = 'flex';
+        location.style.alignItems = 'center';
+        location.style.gap = '4px';
+        location.style.marginBottom = '10px';
+        location.innerHTML = `<span>📍</span> ${story.location.name}, ${story.location.country}`;
+        popupContent.appendChild(location);
 
+        // Description
         const desc = document.createElement('p');
         desc.textContent = story.description;
         desc.style.margin = '0 0 10px 0';
@@ -271,7 +343,8 @@ export default function GlobeView() {
         desc.style.fontSize = '14px';
         desc.style.lineHeight = '1.4';
         popupContent.appendChild(desc);
-
+        
+        // Categories
         const categoriesDiv = document.createElement('div');
         categoriesDiv.style.display = 'flex';
         categoriesDiv.style.gap = '5px';
@@ -314,6 +387,9 @@ export default function GlobeView() {
           // Set location and filter stories
           setSelectedLocation(story.location.country);
           setFilteredStories(filterStories(story.location.country, selectedCategories));
+          
+          // Directly show the detailed view
+          setSelectedStory(story);
         };
 
         // Add click event listener
@@ -345,85 +421,11 @@ export default function GlobeView() {
         });
       });
 
-      // Add single source for all boundaries
-      map.current.addSource('boundaries', {
-        type: 'vector',
-        url: 'mapbox://mapbox.country-boundaries-v1'
-      });
-
-      // Add main country fills
-      map.current.addLayer({
-        'id': 'country-fills',
-        'type': 'fill',
-        'source': 'boundaries',
-        'source-layer': 'country_boundaries',
-        'filter': [
-          'all',
-          ['!=', ['get', 'name_en'], 'Taiwan'],
-          ['!=', ['get', 'name_en'], 'Hong Kong']
-        ],
-        'paint': {
-          'fill-color': '#e0e0e0',
-          'fill-opacity': 1
-        }
-      });
-
-      // Add territory fills
-      map.current.addLayer({
-        'id': 'territory-fills',
-        'type': 'fill',
-        'source': 'boundaries',
-        'source-layer': 'country_boundaries',
-        'filter': [
-          'any',
-          ['==', ['get', 'name_en'], 'Taiwan'],
-          ['==', ['get', 'name_en'], 'Hong Kong']
-        ],
-        'paint': {
-          'fill-color': '#e0e0e0',
-          'fill-opacity': 1
-        }
-      });
-
-      // Add main country borders
-      map.current.addLayer({
-        'id': 'country-borders',
-        'type': 'line',
-        'source': 'boundaries',
-        'source-layer': 'country_boundaries',
-        'filter': [
-          'all',
-          ['!=', ['get', 'name_en'], 'Taiwan'],
-          ['!=', ['get', 'name_en'], 'Hong Kong']
-        ],
-        'paint': {
-          'line-color': '#000000',
-          'line-width': 1
-        }
-      });
-
-      // Add territory borders
-      map.current.addLayer({
-        'id': 'territory-borders',
-        'type': 'line',
-        'source': 'boundaries',
-        'source-layer': 'country_boundaries',
-        'filter': [
-          'any',
-          ['==', ['get', 'name_en'], 'Taiwan'],
-          ['==', ['get', 'name_en'], 'Hong Kong']
-        ],
-        'paint': {
-          'line-color': '#000000',
-          'line-width': 1
-        }
-      });
-
       // Add country labels
       map.current.addLayer({
         'id': 'country-labels',
         'type': 'symbol',
-        'source': 'boundaries',
+        'source': 'countries',
         'source-layer': 'country_boundaries',
         'filter': [
           'all',
@@ -460,7 +462,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'territory-labels',
         'type': 'symbol',
-        'source': 'boundaries',
+        'source': 'territories',
         'source-layer': 'country_boundaries',
         'filter': [
           'any',
@@ -598,76 +600,40 @@ export default function GlobeView() {
         🥇
       </button>
 
-      {/* Profile Overlay with Progress */}
+      {/* Profile Modal */}
       {isProfileOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 2000
-        }}>
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '12px',
-            padding: '30px',
-            width: '500px',
-            maxWidth: '90%',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            position: 'relative',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-          }}>
-            <button
-              onClick={() => setIsProfileOpen(false)}
-              style={{
-                position: 'absolute',
-                right: '15px',
-                top: '15px',
-                border: 'none',
-                background: 'none',
-                fontSize: '20px',
-                cursor: 'pointer',
-                padding: '5px'
-              }}
-            >
-              ✕
-            </button>
-            <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Your Journey Progress</h2>
-            
-            {/* Reset Progress Button */}
-            <div style={{ 
-              marginBottom: '20px',
-              display: 'flex',
-              justifyContent: 'flex-end' 
-            }}>
-              <button
-                onClick={handleResetProgress}
-                style={{
-                  backgroundColor: '#ff4444',
-                  color: 'white',
-                  border: 'none',
-                  padding: '8px 16px',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'background-color 0.2s ease'
-                }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#ff6666'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#ff4444'}
-              >
-                <span>🔄</span> Reset Progress
-              </button>
-            </div>
-
+        <div
+          onClick={(e) => {
+            // Close modal when clicking outside
+            if (e.target === e.currentTarget) {
+              setIsProfileOpen(false);
+            }
+          }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '12px',
+              maxWidth: '600px',
+              width: '90%',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+          >
             <ProgressOverview userProgress={userProgress} sidebarItems={sidebarItems} />
           </div>
         </div>
@@ -878,6 +844,38 @@ export default function GlobeView() {
           ) : (
             // Stories List View
             <>
+              {/* Location Header with Back Option */}
+              {selectedLocation && (
+                <div style={{
+                  marginBottom: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  <button
+                    onClick={() => {
+                      setSelectedLocation(null);
+                      setFilteredStories(sidebarItems);
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#666',
+                      padding: '8px 0'
+                    }}
+                  >
+                    <span>←</span>
+                    <span>Alle verhalen</span>
+                  </button>
+                  <span style={{ color: '#666' }}>|</span>
+                  <span style={{ color: '#333', fontWeight: 'bold' }}>{selectedLocation}</span>
+                </div>
+              )}
+
               {/* Filter Section */}
               <div style={{ 
                 marginBottom: '20px',
@@ -906,6 +904,35 @@ export default function GlobeView() {
                     overflowY: 'auto',
                     transition: 'max-height 0.3s ease'
                   }}>
+                    {/* Show All Stories Button */}
+                    {selectedLocation && (
+                      <button
+                        onClick={() => {
+                          setSelectedLocation(null);
+                          setFilteredStories(sidebarItems);
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          backgroundColor: '#3386c0',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          marginBottom: '15px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '8px',
+                          transition: 'background-color 0.2s ease'
+                        }}
+                        onMouseOver={(e) => e.target.style.backgroundColor = '#2776b0'}
+                        onMouseOut={(e) => e.target.style.backgroundColor = '#3386c0'}
+                      >
+                        <span>🌍</span> Toon alle verhalen
+                      </button>
+                    )}
+
                     <div style={{ marginBottom: '15px' }}>
                       <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Categories</h4>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
