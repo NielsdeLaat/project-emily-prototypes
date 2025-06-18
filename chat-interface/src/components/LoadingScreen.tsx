@@ -13,7 +13,7 @@ const LoadingScreen = ({ onLoadingComplete }: LoadingScreenProps) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000); // Show loading animation for 2 seconds
+    }, 1000); // Show loading animation for 1 second
 
     return () => clearTimeout(timer);
   }, []);

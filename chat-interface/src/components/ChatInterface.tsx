@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, ArrowLeft } from "lucide-react";
+import { Send, ArrowLeft, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -37,6 +37,8 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isInCall, setIsInCall] = useState(false);
+  const [showExampleQuestions, setShowExampleQuestions] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -68,6 +70,70 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
     return greetings[name] || `Hi! I'm ${name}. How can I help you today?`;
   }
 
+  // Example questions based on persona
+  const getExampleQuestions = (personaName: string): string[] => {
+    const questions: Record<string, string[]> = {
+      Emily: [
+        "Kun je me vertellen over je ervaringen in Hongkong?",
+        "Hoe voelde je je toen je moest vluchten?",
+        "Wat mis je het meest van je thuisland?",
+        "Hoe bouw je een nieuw leven op in Taipei?",
+      ],
+      Jason: [
+        "Waarom besloot je om te stoppen met zwijgen?",
+        "Wat heeft je geholpen om je stem te vinden?",
+        "Hoe ga je om met mensen die je verhaal niet begrijpen?",
+        "Wat hoop je dat anderen leren van jouw ervaring?",
+      ],
+      Kellan: [
+        "Hoe was het om jezelf te verbergen voor anderen?",
+        "Wanneer voelde je dat je jezelf kon zijn?",
+        "Wat betekent het voor jou om je 'echte stem' te hebben?",
+        "Hoe steun je anderen die in dezelfde situatie zitten?",
+      ],
+      Jessica: [
+        "Waarom denk je dat ze je verhaal geheim wilden houden?",
+        "Wat motiveerde je om toch te spreken?",
+        "Hoe reageerden mensen op je verhaal?",
+        "Wat zou je anderen adviseren in vergelijkbare situaties?",
+      ],
+      Kevin: [
+        "Welke verhalen van je opa herinner je je het meest?",
+        "Waarom zijn deze verhalen zo belangrijk voor je?",
+        "Hoe probeer je de herinneringen levend te houden?",
+        "Wat betekent het voor je om je stem te gebruiken?",
+      ],
+    };
+
+    return (
+      questions[personaName] || [
+        "Kun je me meer over jezelf vertellen?",
+        "Wat is je grootste uitdaging geweest?",
+        "Hoe ga je om met moeilijke situaties?",
+        "Wat hoop je voor de toekomst?",
+      ]
+    );
+  };
+
+  const handleExampleQuestionClick = (question: string) => {
+    setInputValue(question);
+    setShowExampleQuestions(false);
+  };
+
+  const handleToggleExampleQuestions = () => {
+    if (showExampleQuestions) {
+      // Start closing animation
+      setIsClosing(true);
+      // Hide after animation completes
+      setTimeout(() => {
+        setShowExampleQuestions(false);
+        setIsClosing(false);
+      }, 300);
+    } else {
+      setShowExampleQuestions(true);
+    }
+  };
+
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
@@ -86,13 +152,14 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
     try {
       // Convert messages to ChatGPT format
       const chatMessages = messages.map((msg) => ({
-        role: msg.sender === "user" ? "user" : "assistant",
+        role:
+          msg.sender === "user" ? ("user" as const) : ("assistant" as const),
         content: msg.text,
       }));
 
       // Add the new user message
       chatMessages.push({
-        role: "user",
+        role: "user" as const,
         content: inputValue,
       });
 
@@ -217,6 +284,51 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
 
       {/* Input */}
       <div className="p-4 bg-white border-t border-gray-200">
+        {/* Example Questions */}
+        {showExampleQuestions && (
+          <div
+            className={`mb-8 overflow-hidden ${
+              isClosing ? "closing-animation" : ""
+            }`}
+            style={{
+              animation: isClosing
+                ? "slideUpFadeOut 0.3s ease-in forwards"
+                : "slideDownFadeIn 0.3s ease-out forwards",
+            }}
+          >
+            <p className="text-sm text-gray-600 mb-2 font-medium">
+              Voorbeeld vragen:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {getExampleQuestions(persona.name).map((question, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleExampleQuestionClick(question)}
+                  className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-full hover:bg-gray-100 hover:border-gray-400 transition-colors duration-200 text-gray-700"
+                  style={{
+                    animation: isClosing
+                      ? `slideOutToRight 0.3s ease-in ${
+                          (getExampleQuestions(persona.name).length -
+                            1 -
+                            index) *
+                          0.05
+                        }s forwards`
+                      : `slideInFromLeft 0.4s ease-out ${
+                          index * 0.05
+                        }s forwards`,
+                    opacity: isClosing ? 1 : 0,
+                    transform: isClosing
+                      ? "translateX(0)"
+                      : "translateX(-10px)",
+                  }}
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="flex space-x-2">
           <Input
             value={inputValue}
@@ -225,6 +337,15 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
             placeholder="Type a message..."
             className="flex-1 rounded-full border-gray-300 focus:border-purple-500 focus:ring-purple-500"
           />
+          <Button
+            onClick={handleToggleExampleQuestions}
+            variant="outline"
+            size="icon"
+            className="rounded-full border-gray-300 hover:bg-gray-50"
+            title="Show example questions"
+          >
+            <Lightbulb className="h-4 w-4 text-gray-600" />
+          </Button>
           <Button
             onClick={handleSendMessage}
             className="rounded-full bg-emilyBlue hover:opacity-90 transition-all duration-200"
