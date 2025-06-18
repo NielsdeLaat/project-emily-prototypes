@@ -97,5 +97,90 @@
 
   body {
     @apply bg-background text-foreground;
+    background-image: url("/images/temp-bg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
   }
+}
+
+/* Mobile viewport styles */
+.mobile-viewport {
+  width: 383px;
+  height: 834px;
+  margin: 0;
+  background: white;
+  border-radius: 50px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+}
+
+.mobile-viewport-container {
+  width: 433px;
+  height: 874px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  z-index: 50;
+}
+
+.mobile-viewport-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/images/iphone-14.png");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.mobile-viewport > * {
+  width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    transform: translate(-50%, 100%);
+  }
+  to {
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translate(-50%, 0);
+  }
+  to {
+    transform: translate(-50%, 100%);
+  }
+}
+
+.mobile-viewport-container.slide-in {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.mobile-viewport-container.slide-out {
+  animation: slideOut 0.3s ease-in forwards;
 }

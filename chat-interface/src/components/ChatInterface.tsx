@@ -8,16 +8,10 @@ import CallButton from "./CallButton";
 import CallInterface from "./CallInterface";
 import { useToast } from "@/hooks/use-toast";
 import type { Persona } from "./PersonaMenu";
-import { generateChatGPTResponse, type ChatMessage } from "@/services/chatgpt";
+import { generateChatGPTResponse } from "@/services/chatgpt";
 import { PERSONA_AVATARS } from "@/config/avatars";
-
-interface Message {
-  id: string;
-  text: string;
-  sender: "user" | "ai";
-  timestamp: Date;
-  personaName: string;
-}
+import { saveChatHistory, getChatHistory } from "@/services/chatHistory";
+import type { Message } from "@/types/chat";
 
 interface ChatInterfaceProps {
   persona: Persona;
@@ -25,15 +19,20 @@ interface ChatInterfaceProps {
 }
 
 const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      text: getInitialMessage(persona.name),
-      sender: "ai",
-      timestamp: new Date(Date.now() - 300000),
-      personaName: persona.name,
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const history = getChatHistory(persona.id);
+    if (history.length > 0) return history;
+
+    return [
+      {
+        id: "1",
+        text: getInitialMessage(persona.name),
+        sender: "ai",
+        timestamp: new Date(Date.now() - 300000),
+        personaName: persona.name,
+      },
+    ];
+  });
 
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -48,6 +47,10 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    saveChatHistory(persona.id, messages);
+  }, [messages, persona.id]);
 
   function getInitialMessage(name: string): string {
     const greetings: Record<string, string> = {
@@ -82,7 +85,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
 
     try {
       // Convert messages to ChatGPT format
-      const chatMessages: ChatMessage[] = messages.map((msg) => ({
+      const chatMessages = messages.map((msg) => ({
         role: msg.sender === "user" ? "user" : "assistant",
         content: msg.text,
       }));
@@ -148,11 +151,9 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
   }
 
   return (
-    <div className="flex flex-col h-screen max-w-md mx-auto bg-white shadow-2xl">
+    <div className="flex flex-col h-full bg-white">
       {/* Header */}
-      <div
-        className={`bg-gradient-to-r ${persona.color} text-white p-4 flex items-center justify-between`}
-      >
+      <div className="bg-emilyBlue text-white p-4 flex items-center justify-between shadow-[0_4px_6px_-1px_rgba(0,0,0,0.2)] relative z-10">
         <div className="flex items-center space-x-3">
           <Button
             onClick={onBack}
@@ -226,7 +227,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
           />
           <Button
             onClick={handleSendMessage}
-            className={`rounded-full bg-gradient-to-r ${persona.color} hover:opacity-90 transition-all duration-200`}
+            className="rounded-full bg-emilyBlue hover:opacity-90 transition-all duration-200"
             size="icon"
           >
             <Send className="h-4 w-4" />
