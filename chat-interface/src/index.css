@@ -186,7 +186,7 @@
   to {
     opacity: 1;
     transform: translateY(0);
-    max-height: 200px;
+    max-height: 400px;
   }
 }
 
@@ -205,7 +205,7 @@
   from {
     opacity: 1;
     transform: translateY(0);
-    max-height: 200px;
+    max-height: 400px;
   }
   to {
     opacity: 0;
@@ -231,4 +231,32 @@
 
 .mobile-viewport-container.slide-out {
   animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Custom scrollbar for example questions */
+.example-questions-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.example-questions-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.example-questions-scroll::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 2px;
+}
+
+.example-questions-scroll::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Hide scrollbar for example questions */
+.overflow-y-auto::-webkit-scrollbar {
+  display: none;
+}
+
+.overflow-y-auto {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

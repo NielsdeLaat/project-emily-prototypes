@@ -8,7 +8,10 @@ import CallButton from "./CallButton";
 import CallInterface from "./CallInterface";
 import { useToast } from "@/hooks/use-toast";
 import type { Persona } from "./PersonaMenu";
-import { generateChatGPTResponse } from "@/services/chatgpt";
+import {
+  generateChatGPTResponse,
+  generateExampleQuestions,
+} from "@/services/chatgpt";
 import { PERSONA_AVATARS } from "@/config/avatars";
 import { saveChatHistory, getChatHistory } from "@/services/chatHistory";
 import type { Message } from "@/types/chat";
@@ -39,6 +42,9 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
   const [isInCall, setIsInCall] = useState(false);
   const [showExampleQuestions, setShowExampleQuestions] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
+  const [exampleQuestions, setExampleQuestions] = useState<string[]>([]);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
+  const [questionsError, setQuestionsError] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -70,49 +76,35 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
     return greetings[name] || `Hi! I'm ${name}. How can I help you today?`;
   }
 
-  // Example questions based on persona
-  const getExampleQuestions = (personaName: string): string[] => {
-    const questions: Record<string, string[]> = {
-      Emily: [
-        "Kun je me vertellen over je ervaringen in Hongkong?",
-        "Hoe voelde je je toen je moest vluchten?",
-        "Wat mis je het meest van je thuisland?",
-        "Hoe bouw je een nieuw leven op in Taipei?",
-      ],
-      Jason: [
-        "Waarom besloot je om te stoppen met zwijgen?",
-        "Wat heeft je geholpen om je stem te vinden?",
-        "Hoe ga je om met mensen die je verhaal niet begrijpen?",
-        "Wat hoop je dat anderen leren van jouw ervaring?",
-      ],
-      Kellan: [
-        "Hoe was het om jezelf te verbergen voor anderen?",
-        "Wanneer voelde je dat je jezelf kon zijn?",
-        "Wat betekent het voor jou om je 'echte stem' te hebben?",
-        "Hoe steun je anderen die in dezelfde situatie zitten?",
-      ],
-      Jessica: [
-        "Waarom denk je dat ze je verhaal geheim wilden houden?",
-        "Wat motiveerde je om toch te spreken?",
-        "Hoe reageerden mensen op je verhaal?",
-        "Wat zou je anderen adviseren in vergelijkbare situaties?",
-      ],
-      Kevin: [
-        "Welke verhalen van je opa herinner je je het meest?",
-        "Waarom zijn deze verhalen zo belangrijk voor je?",
-        "Hoe probeer je de herinneringen levend te houden?",
-        "Wat betekent het voor je om je stem te gebruiken?",
-      ],
-    };
+  // Load AI-generated example questions
+  const loadExampleQuestions = async () => {
+    setIsLoadingQuestions(true);
+    setQuestionsError(false);
+    setExampleQuestions([]); // Clear existing questions to force regeneration
 
-    return (
-      questions[personaName] || [
-        "Kun je me meer over jezelf vertellen?",
-        "Wat is je grootste uitdaging geweest?",
-        "Hoe ga je om met moeilijke situaties?",
-        "Wat hoop je voor de toekomst?",
-      ]
-    );
+    try {
+      // Convert messages to ChatGPT format
+      const chatMessages = messages.map((msg) => ({
+        role:
+          msg.sender === "user" ? ("user" as const) : ("assistant" as const),
+        content: msg.text,
+      }));
+
+      const questions = await generateExampleQuestions(
+        chatMessages,
+        persona.name
+      );
+      if (questions.length > 0) {
+        setExampleQuestions(questions);
+      } else {
+        setQuestionsError(true);
+      }
+    } catch (error) {
+      console.error("Error loading example questions:", error);
+      setQuestionsError(true);
+    } finally {
+      setIsLoadingQuestions(false);
+    }
   };
 
   const handleExampleQuestionClick = (question: string) => {
@@ -120,7 +112,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
     setShowExampleQuestions(false);
   };
 
-  const handleToggleExampleQuestions = () => {
+  const handleToggleExampleQuestions = async () => {
     if (showExampleQuestions) {
       // Start closing animation
       setIsClosing(true);
@@ -131,6 +123,8 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
       }, 300);
     } else {
       setShowExampleQuestions(true);
+      // Always regenerate questions when opened
+      await loadExampleQuestions();
     }
   };
 
@@ -178,6 +172,11 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
       };
 
       setMessages((prev) => [...prev, aiResponse]);
+
+      // Regenerate example questions after new response
+      if (showExampleQuestions) {
+        await loadExampleQuestions();
+      }
     } catch (error) {
       console.error("Error getting ChatGPT response:", error);
       toast({
@@ -218,7 +217,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
   }
 
   return (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-white relative">
       {/* Header */}
       <div className="bg-emilyBlue text-white p-4 flex items-center justify-between shadow-[0_4px_6px_-1px_rgba(0,0,0,0.2)] relative z-10">
         <div className="flex items-center space-x-3">
@@ -282,54 +281,65 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="p-4 bg-white border-t border-gray-200">
-        {/* Example Questions */}
-        {showExampleQuestions && (
-          <div
-            className={`mb-8 overflow-hidden ${
-              isClosing ? "closing-animation" : ""
-            }`}
-            style={{
-              animation: isClosing
-                ? "slideUpFadeOut 0.3s ease-in forwards"
-                : "slideDownFadeIn 0.3s ease-out forwards",
-            }}
-          >
-            <p className="text-sm text-gray-600 mb-2 font-medium">
-              Voorbeeld vragen:
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {getExampleQuestions(persona.name).map((question, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleExampleQuestionClick(question)}
-                  className="px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-full hover:bg-gray-100 hover:border-gray-400 transition-colors duration-200 text-gray-700"
-                  style={{
-                    animation: isClosing
-                      ? `slideOutToRight 0.3s ease-in ${
-                          (getExampleQuestions(persona.name).length -
-                            1 -
-                            index) *
-                          0.05
-                        }s forwards`
-                      : `slideInFromLeft 0.4s ease-out ${
-                          index * 0.05
-                        }s forwards`,
-                    opacity: isClosing ? 1 : 0,
-                    transform: isClosing
-                      ? "translateX(0)"
-                      : "translateX(-10px)",
-                  }}
-                >
-                  {question}
-                </button>
-              ))}
+      {/* Example Questions - Positioned absolutely above input */}
+      {showExampleQuestions && (
+        <div
+          className={`border-t border-gray-200 bg-white z-20 ${
+            isClosing ? "closing-animation" : ""
+          }`}
+          style={{
+            animation: isClosing
+              ? "slideUpFadeOut 0.3s ease-in forwards"
+              : "slideDownFadeIn 0.3s ease-out forwards",
+          }}
+        >
+          <div className="p-4 pb-6">
+            <div className="flex flex-col gap-2 w-full">
+              <p className="text-sm text-gray-600 mb-2 font-medium flex items-center">
+                <Lightbulb className="h-4 w-4 mr-1 text-gray-500" />
+                Voorbeeld vragen:
+              </p>
+              {isLoadingQuestions ? (
+                <div className="flex items-center space-x-2 text-gray-500">
+                  <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                  <span className="text-sm">Vragen laden...</span>
+                </div>
+              ) : questionsError ? (
+                <div className="text-gray-500 text-sm">
+                  Voorbeeldvragen zijn op dit moment niet beschikbaar
+                </div>
+              ) : (
+                exampleQuestions.map((question, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleExampleQuestionClick(question)}
+                    className="px-3 py-2 text-sm bg-white border border-gray-300 rounded-full hover:bg-gray-100 hover:border-gray-400 transition-colors duration-200 text-gray-700 break-words text-balance w-full shadow-sm"
+                    style={{
+                      animation: isClosing
+                        ? `slideOutToRight 0.3s ease-in ${
+                            (exampleQuestions.length - 1 - index) * 0.05
+                          }s forwards`
+                        : `slideInFromLeft 0.4s ease-out ${
+                            index * 0.05
+                          }s forwards`,
+                      opacity: isClosing ? 1 : 0,
+                      transform: isClosing
+                        ? "translateX(0)"
+                        : "translateX(-10px)",
+                    }}
+                  >
+                    {question}
+                  </button>
+                ))
+              )}
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        <div className="flex space-x-2">
+      {/* Input */}
+      <div className="pr-4 pl-4 bg-white border-t border-gray-200">
+        <div className="flex space-x-2 p-4">
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
