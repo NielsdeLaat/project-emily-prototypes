@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { PERSONA_PROMPTS } from "./personaPrompts";
+import { PERSONA_PROMPTS } from "@/config/personas";
 import { API, ERROR_MESSAGES, UI } from "@/config/constants";
 import type { ChatMessage } from "@/types/chat";
 

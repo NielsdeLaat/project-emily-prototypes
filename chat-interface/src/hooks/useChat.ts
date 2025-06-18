@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Message, Persona, ChatState, ChatActions } from "@/types/chat";
 import { getInitialMessage } from "@/config/personas";
@@ -38,8 +38,15 @@ export const useChat = (persona: Persona): ChatState & ChatActions => {
   const [exampleQuestions, setExampleQuestions] = useState<string[]>([]);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
   const [questionsError, setQuestionsError] = useState(false);
+  const [lastGeneratedHistoryHash, setLastGeneratedHistoryHash] =
+    useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+
+  // Create a hash of the current chat history to track changes
+  const currentHistoryHash = useMemo(() => {
+    return messages.map((msg) => `${msg.id}:${msg.text}`).join("|");
+  }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({
@@ -55,7 +62,16 @@ export const useChat = (persona: Persona): ChatState & ChatActions => {
     saveChatHistory(persona.id, messages);
   }, [messages, persona.id]);
 
-  const loadExampleQuestions = async () => {
+  const loadExampleQuestions = async (forceRegenerate = false) => {
+    // Only regenerate if history changed or forced
+    if (
+      !forceRegenerate &&
+      currentHistoryHash === lastGeneratedHistoryHash &&
+      exampleQuestions.length > 0
+    ) {
+      return; // Use cached questions
+    }
+
     setIsLoadingQuestions(true);
     setQuestionsError(false);
     setExampleQuestions([]);
@@ -73,6 +89,7 @@ export const useChat = (persona: Persona): ChatState & ChatActions => {
       );
       if (questions.length > 0) {
         setExampleQuestions(questions);
+        setLastGeneratedHistoryHash(currentHistoryHash);
       } else {
         setQuestionsError(true);
       }
@@ -126,8 +143,9 @@ export const useChat = (persona: Persona): ChatState & ChatActions => {
 
       setMessages((prev) => [...prev, aiResponse]);
 
+      // Regenerate questions after new messages if panel is open
       if (showExampleQuestions) {
-        await loadExampleQuestions();
+        await loadExampleQuestions(true);
       }
     } catch (error) {
       console.error("Error getting ChatGPT response:", error);
@@ -150,6 +168,7 @@ export const useChat = (persona: Persona): ChatState & ChatActions => {
       }, TIMING.EXAMPLE_QUESTIONS_CLOSE_DELAY);
     } else {
       setShowExampleQuestions(true);
+      // Only load questions if we don't have cached ones for current history
       await loadExampleQuestions();
     }
   };

@@ -29,6 +29,8 @@ export interface ChatState {
   exampleQuestions: string[];
   isLoadingQuestions: boolean;
   questionsError: boolean;
+  // Note: lastGeneratedHistoryHash is tracked internally for optimization
+  // Example questions are only regenerated when chat history changes
 }
 
 export interface ChatActions {
