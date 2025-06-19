@@ -12,6 +12,17 @@ import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SUCCESS_MESSAGES } from "@/config/constants";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 const queryClient = new QueryClient();
 
@@ -50,14 +61,36 @@ const App = () => {
               )}
             </div>
           </div>
-          <Button
-            onClick={handleResetChats}
-            variant="destructive"
-            size="icon"
-            className="fixed bottom-4 right-4 rounded-full shadow-lg"
-          >
-            <Trash2 className="h-5 w-5" />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                size="icon"
+                className="fixed bottom-4 right-4 rounded-full shadow-lg"
+              >
+                <Trash2 className="h-5 w-5" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Weet je het zeker?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Hiermee verwijder je <b>alle</b> chatgeschiedenis. Dit kan
+                  niet ongedaan worden gemaakt.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuleren</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleResetChats}
+                  autoFocus
+                  className="bg-emilyBlue text-white hover:bg-emilyBlue/90"
+                >
+                  Verwijderen
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </TooltipProvider>
       </QueryClientProvider>
     </ErrorBoundary>
