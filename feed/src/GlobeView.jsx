@@ -29,7 +29,7 @@ const categories = {
 const sidebarItems = [
   {
     id: 1,
-    title: "Abraham",
+    title: "Abraham, 42",
     description:
       "Zijn geloof werd verboden, zijn arbeid gestolen, zijn identiteit uitgewist , toch wist hij te ontsnappen.",
     image: AbrahamImg,
@@ -42,7 +42,7 @@ const sidebarItems = [
   },
   {
     id: 2,
-    title: "Emily",
+    title: "Emily , 23",
     description:
       "Gewapend met een stem en een masker trotseerde ze traangas en stilte — en vond vrijheid in het vertellen.",
     image: emilyImg,

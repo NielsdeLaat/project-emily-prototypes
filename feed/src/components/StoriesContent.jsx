@@ -23,7 +23,7 @@ const categories = {
 const sidebarItems = [
   {
     id: 1,
-    title: "Abraham",
+    title: "Abraham, 42",
     description:
       "Hij groeide op met gebed, familie en een diepgewortelde traditie. Wat volgde was isolatie, dwangarbeid en stilte — opgelegd in naam van heropvoeding.",
     image: AbrahamImg,
@@ -36,7 +36,7 @@ const sidebarItems = [
   },
   {
     id: 2,
-    title: "Emily",
+    title: "Emily, 23",
     description:
       "Gewapend met een stem en een masker trotseerde ze traangas en stilte — en vond vrijheid in het vertellen.",
     image: emilyImg,
@@ -49,7 +49,7 @@ const sidebarItems = [
   },
   {
     id: 3,
-    title: "Carlos",
+    title: "Carlos, 29",
     description:
       "Hij groeide op tussen grenzen, van landen, culturen en verwachtingen, en vocht zich vrij met zijn blik op waardigheid.",
     image: carlosImg,
@@ -62,7 +62,7 @@ const sidebarItems = [
   },
   {
     id: 4,
-    title: "Barry",
+    title: "Barry, 31",
     description:
       "Barry vluchtte voor zijn leven, maar vond nergens rust. Niet in Burundi, niet in Kenia. Alleen stilte, schaamte en angst die zich bleven herhalen.",
     image: barryImg,
@@ -75,7 +75,7 @@ const sidebarItems = [
   },
   {
     id: 5,
-    title: "Tyrone",
+    title: "Tyrone, 15",
     description:
       "Tyrone verliet Oeganda in de hoop op rust en veiligheid. In plaats daarvan kwam hij terecht in een nieuw land, waar het gevaar bleef.",
     image: tyroneImg,
@@ -88,7 +88,7 @@ const sidebarItems = [
   },
   {
     id: 6,
-    title: "Sara",
+    title: "Sara, 27",
     description:
       "Ze trotseerde dood, vrieskou en verraad , voor een maaltijd, een stem, en uiteindelijk een leven in vrijheid.",
     image: SaraImg,
@@ -101,7 +101,7 @@ const sidebarItems = [
   },
   {
     id: 7,
-    title: "Mike",
+    title: "Mike, 38",
     description:
       "Wat gebeurt er als je wordt uitgesloten door de samenleving die je probeert te helpen, simpelweg omdat je jezelf bent?",
     image: MikeImg,

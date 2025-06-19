@@ -129,10 +129,11 @@ export default function GlobeView() {
   const expandedStories = {
     1: {
       title: "Abraham's Verhaal",
-      text: `In dit verhaal vertelt Ablikim hoe zijn leven als jonge Oeigoerse man in Xinjiang abrupt veranderde toen de Chinese overheid in 2017 begon met het opsluiten van duizenden leden van zijn gemeenschap. Zijn vader werd gearresteerd vanwege zijn geloof, hijzelf werd zonder reden meegenomen en belandde in een systeem van dwangarbeid, surveillantie en ideologische herprogrammering.
+      text: `In dit verhaal vertelt Abraham hoe zijn leven als jonge Oeigoerse man in Xinjiang abrupt veranderde toen de Chinese overheid in 2017 begon met het opsluiten van duizenden leden van zijn gemeenschap. Zijn vader werd gearresteerd vanwege zijn geloof, hijzelf werd zonder reden meegenomen en belandde in een systeem van dwangarbeid, surveillantie en ideologische herprogrammering.
+
 Het is een verhaal over wat er gebeurt wanneer je identiteit doelbewust wordt uitgewist. Over werk dat geen werk is, lessen die geen onderwijs zijn, en leven zonder contact of vrijheid. En over hoe vluchten soms de enige manier is om opnieuw mens te mogen zijn.
-Door zijn verhaal te delen, hoopt Ablikim zichtbaar te maken wat voor velen onzichtbaar blijft — en aandacht te vragen voor de duizenden anderen die nog steeds gevangen zitten in stilte.
-`,
+
+Door zijn verhaal te delen, hoopt Abraham zichtbaar te maken wat voor velen onzichtbaar blijft — en aandacht te vragen voor de duizenden anderen die nog steeds gevangen zitten in stilte.`,
       age: 42
     },
     2: {
@@ -158,33 +159,37 @@ Vandaag reist Carlos door het land, geeft workshops aan jongeren en gebruikt zij
     4: {
       title: "Barry's Verhaal",
       text: `In dit verhaal vertelt Barry, een 23-jarige transgender man uit Burundi, over zijn leven vol bedreigingen, geweld en verlies. Nadat zijn identiteit bekend werd, werd hij achtervolgd, zijn ouders vermoord, en hijzelf meermaals mishandeld — ook onderweg naar wat hij hoopte dat een veiligere plek zou zijn.
+
 In plaats van bescherming vond hij nieuw geweld, ook in het vluchtelingenkamp waar hij terechtkwam. Zijn kinderen overleefden ternauwernood een vergiftiging. Hij leefde maandenlang met zijn trauma's zonder te durven zeggen wie hij werkelijk was — totdat zijn gezondheid hem dwong om zijn verhaal wél te vertellen.
-Barry's verhaal legt bloot hoe kwetsbaar het bestaan is van transgender vluchtelingen. Hoe moeilijk het is om hulp te vragen als je al zo vaak gestraft bent voor wie je bent. En hoe veerkracht soms betekent: gewoon doorgaan, ook als alles pijn doet.
-`,
+
+Barry's verhaal legt bloot hoe kwetsbaar het bestaan is van transgender vluchtelingen. Hoe moeilijk het is om hulp te vragen als je al zo vaak gestraft bent voor wie je bent. En hoe veerkracht soms betekent: gewoon doorgaan, ook als alles pijn doet.`,
       age: 31
     },
     5: {
       title: "Tyrone's Verhaal",
       text: `In dit verhaal deelt Tyrone hoe hij als jonge homoseksuele man in 2014 vluchtte naar Kenia — een plek die veiliger zou moeten zijn. Maar direct na aankomst werd hij mishandeld, herhaaldelijk gearresteerd en bedreigd. Niet alleen door vreemden, maar ook door de politie.
+
 Hij vertelt hoe het is om steeds weer te moeten verhuizen, omdat zelfs je buren je niet met rust laten. En hoe het voelt als je nergens echt veilig bent — niet thuis, maar ook niet daarbuiten.
-Tyrone's ervaring laat zien dat vluchten niet altijd een einde maakt aan gevaar, en dat voor veel LHBTI+ vluchtelingen veiligheid iets is waar je in stilte op hoopt, maar zelden echt vindt.
-`,
+
+Tyrone's ervaring laat zien dat vluchten niet altijd een einde maakt aan gevaar, en dat voor veel LHBTI+ vluchtelingen veiligheid iets is waar je in stilte op hoopt, maar zelden echt vindt.`,
       age: 15
     },
     6: {
       title: "Sara's Verhaal",
       text: `Hier volgt het aangrijpende verhaal van Sara, een vrouw die opgroeide in het gesloten Noord-Korea en twee keer haar leven riskeerde om te ontsnappen aan onderdrukking, honger en stilzwijgen. Haar reis voert van de duisternis van een totalitair regime, via mensenhandel in China, naar vrijheid in Zuid-Korea.
+
 Door dit verhaal te delen, werpen we licht op de werkelijkheid achter grenzen en propaganda — en op de kracht van menselijkheid, zelfs wanneer die systematisch wordt onderdrukt. Het is een verhaal over overleven, herinneren en het weigeren om te zwijgen.
-Want elk verhaal dat wordt verteld, maakt de wereld een stukje helderder. En Sara's verhaal is niet alleen het hare — het is een stem voor duizenden anderen die nog steeds in stilte leven.
-`,
+
+Want elk verhaal dat wordt verteld, maakt de wereld een stukje helderder. En Sara's verhaal is niet alleen het hare — het is een stem voor duizenden anderen die nog steeds in stilte leven.`,
       age: 27
     },
     7: {
       title: "Mike's Verhaal",
       text: `Mike groeide op in Oeganda, werkte als journalist en beleidsadviseur, en zette zich in voor volksgezondheid. Maar toen hij open was over zijn seksuele geaardheid, verloor hij zijn baan, werd hij mishandeld en buitengesloten. Wat volgde was geen vlucht, maar een keuze om te blijven — en te bouwen aan iets beters.
+
 In dit verhaal lees je hoe hij ondanks persoonlijke risico's bleef opkomen voor de rechten van gemarginaliseerde groepen. Over hoe hij zorgde voor toegang tot hiv-zorg, media trainde in respectvolle verslaggeving en zich bleef uitspreken tegen discriminatie, ook toen het niet veilig was.
-Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stappen die in stilte worden gezet, en toch een grote impact hebben.
-`,
+
+Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stappen die in stilte worden gezet, en toch een grote impact hebben.`,
       age: 38
     }
   };
@@ -233,7 +238,7 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
     if (map.current) return;
 
     mapboxgl.accessToken = 'pk.eyJ1Ijoic3RldmllZ3JpZmZpbmRlc2lnbiIsImEiOiJja24waTQzeHYwbndvMnZtbnFrYXV3ZjdjIn0.zhhJzykz0VYq7RQWBJxh7A';
-
+    
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
@@ -269,63 +274,95 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
         "star-intensity": 0.1
       });
 
-      // Add country boundaries with thinner lines
+      // Add country boundaries
       map.current.addSource('countries', {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
       });
 
+      // Add country fills for highlighting
       map.current.addLayer({
         'id': 'country-fills',
         'type': 'fill',
         'source': 'countries',
         'source-layer': 'country_boundaries',
         'paint': {
-          'fill-color': '#e0e0e0',
+          'fill-color': [
+            'case',
+            ['==', ['get', 'name_en'], ''],  // Default case
+            '#ffffff',
+            '#ffffff'
+          ],
           'fill-opacity': 0.4
         }
       });
 
-      map.current.addLayer({
-        'id': 'country-borders',
-        'type': 'line',
-        'source': 'countries',
-        'source-layer': 'country_boundaries',
-        'paint': {
-          'line-color': '#000000',
-          'line-width': 0.5  // Thin lines but in black
-        }
-      });
-
-      // Add territory boundaries with thinner lines
-      map.current.addSource('territories', {
-        type: 'vector',
-        url: 'mapbox://mapbox.country-boundaries-v1'
-      });
-
+      // Add territory fills with the same style
       map.current.addLayer({
         'id': 'territory-fills',
         'type': 'fill',
-        'source': 'territories',
+        'source': 'countries',
         'source-layer': 'country_boundaries',
-        'filter': ['==', 'mapbox:is_territory', true],
+        'filter': [
+          'any',
+          ['==', ['get', 'name_en'], 'Taiwan'],
+          ['==', ['get', 'name_en'], 'Hong Kong']
+        ],
         'paint': {
-          'fill-color': '#e0e0e0',
+          'fill-color': '#ffffff',
           'fill-opacity': 0.4
         }
       });
 
+      // Add country labels
       map.current.addLayer({
-        'id': 'territory-borders',
-        'type': 'line',
-        'source': 'territories',
+        'id': 'country-labels',
+        'type': 'symbol',
+        'source': 'countries',
         'source-layer': 'country_boundaries',
-        'filter': ['==', 'mapbox:is_territory', true],
+        'filter': [
+          'all',
+          ['!=', ['get', 'name_en'], 'Taiwan'],
+          ['!=', ['get', 'name_en'], 'Hong Kong']
+        ],
+        'layout': {
+          'text-field': ['get', 'name_en'],
+          'text-size': [
+            'interpolate',
+            ['linear'],
+            ['zoom'],
+            1.5, 12,
+            3, 0
+          ],
+          'text-allow-overlap': false,
+          'text-ignore-placement': false,
+          'text-anchor': 'center',
+          'visibility': [
+            'case',
+            ['>=', ['zoom'], 3],
+            'none',
+            'visible'
+          ]
+        },
         'paint': {
-          'line-color': '#000000',
-          'line-width': 0.5  // Thin lines but in black
+          'text-color': '#000000',
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 1.5
         }
       });
+
+      // Add country boundaries with thinner lines
+      map.current.addLayer({
+        'id': 'country-boundaries',
+        'type': 'line',
+        'source': 'countries',
+        'source-layer': 'country_boundaries',
+        'layout': {},
+        'paint': {
+          'line-color': '#a0a0a0',
+          'line-width': 0.5
+        }
+      }, 'country-labels');
 
       sidebarItems.forEach(story => {
         const el = document.createElement('div');
@@ -475,43 +512,6 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
         });
       });
 
-      // Add country labels
-      map.current.addLayer({
-        'id': 'country-labels',
-        'type': 'symbol',
-        'source': 'countries',
-        'source-layer': 'country_boundaries',
-        'filter': [
-          'all',
-          ['!=', ['get', 'name_nl'], 'Taiwan'],
-          ['!=', ['get', 'name_nl'], 'Hong Kong']
-        ],
-        'layout': {
-          'text-field': ['get', 'name_nl'],
-          'text-size': [
-            'interpolate',
-            ['linear'],
-            ['zoom'],
-            1.5, 12,
-            3, 0
-          ],
-          'text-allow-overlap': false,
-          'text-ignore-placement': false,
-          'text-anchor': 'center',
-          'visibility': [
-            'case',
-            ['>=', ['zoom'], 3],
-            'none',
-            'visible'
-          ]
-        },
-        'paint': {
-          'text-color': '#000000',
-          'text-halo-color': '#ffffff',
-          'text-halo-width': 1
-        }
-      });
-
       // Add territory labels
       map.current.addLayer({
         'id': 'territory-labels',
@@ -559,20 +559,24 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
             item.location.country === country.properties.name_en
           ));
 
-          // Highlight the clicked country or territory
+          // Reset all fills first
+          map.current.setPaintProperty('country-fills', 'fill-color', '#ffffff');
+          map.current.setPaintProperty('territory-fills', 'fill-color', '#ffffff');
+
+          // Then highlight the clicked country or territory
           if (country.properties.name_en === 'Taiwan' || country.properties.name_en === 'Hong Kong') {
             map.current.setPaintProperty('territory-fills', 'fill-color', [
               'case',
               ['==', ['get', 'name_en'], country.properties.name_en],
               '#ffd700',
-              '#e0e0e0'
+              '#ffffff'
             ]);
           } else {
             map.current.setPaintProperty('country-fills', 'fill-color', [
               'case',
               ['==', ['get', 'name_en'], country.properties.name_en],
               '#ffd700',
-              '#e0e0e0'
+              '#ffffff'
             ]);
           }
         }
@@ -659,21 +663,46 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
             zIndex: 1000
           }}
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              backgroundColor: 'white',
-              padding: '20px',
-              borderRadius: '12px',
-              maxWidth: '600px',
-              width: '90%',
-              maxHeight: '90vh',
-              overflowY: 'auto'
-            }}
-          >
-            <ProgressOverview 
-              userProgress={userProgress} 
-              sidebarItems={sidebarItems} 
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '20px',
+            maxWidth: '90vw',
+            width: '600px',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative'
+          }}>
+            {/* Close button */}
+            <button
+              onClick={() => setIsProfileOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '15px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#666',
+                width: '30px',
+                height: '30px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                transition: 'background-color 0.2s',
+                zIndex: 1
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            >
+              ×
+            </button>
+            
+            <ProgressOverview
+              userProgress={userProgress}
+              sidebarItems={sidebarItems}
               onResetProgress={handleResetProgress}
             />
           </div>
@@ -748,7 +777,7 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
             <div className="story-card">
               {/* Back Button - Moved to top of expanded story */}
               <button
-                className="button-base mb-4"
+                className="text-gray-600 hover:text-gray-800 mb-4 flex items-center gap-2 transition-colors duration-200"
                 onClick={() => {
                   setSelectedStory(null);
                   setExpandedStory(null);
@@ -765,17 +794,29 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                 />
               </div>
 
-              <h2 className="text-xl font-semibold mb-4">{selectedStory.title}</h2>
+              <h2 className="text-xl font-semibold mb-4">{selectedStory.title}, {expandedStories[selectedStory.id].age}</h2>
+              
+              {/* Location */}
+              <p className="text-sm italic mb-4 flex items-center gap-1" style={{ color: '#777' }}>
+                📍 {selectedStory.location.country === "Hong Kong" 
+                  ? "Hong Kong" 
+                  : `${selectedStory.location.name}, ${selectedStory.location.country}`
+                }
+              </p>
 
-              <div className="prose max-w-none mb-6">
-                <h3 className="text-xl font-semibold mb-4">{expandedStories[selectedStory.id].title}</h3>
-                {expandedStories[selectedStory.id].text.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4">{paragraph}</p>
-                ))}
-              </div>
+              {/* Chat Button - Moved right under the name */}
+              <button
+                className="button-base w-full mb-6"
+                onClick={() => {
+                  // Handle chat functionality
+                  markAsVisited(selectedStory.id, userProgress, setUserProgress);
+                }}
+              >
+                Chat met {selectedStory.title}
+              </button>
 
-              {/* Categories in expanded view */}
-              <div className="flex flex-wrap gap-2 mb-4">
+              {/* Categories in expanded view - Moved under chat button */}
+              <div className="flex flex-wrap gap-2 mb-6">
                 {selectedStory.categories.map((cat) => (
                   <span
                     key={cat}
@@ -786,44 +827,10 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                 ))}
               </div>
 
-              {/* Chat Button - Now in Emily Blue */}
-              <button
-                className="button-base w-full"
-                onClick={() => {
-                  // Handle chat functionality
-                  markAsVisited(selectedStory.id, userProgress, setUserProgress);
-                }}
-              >
-                Chat met {selectedStory.title}
-              </button>
-
-              {/* Filter Section - Moved under expanded story */}
-              <div className="filter-section">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Filters</h3>
-                  <button
-                    className="text-emily-blue hover:text-emily-blue/80"
-                    onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  >
-                    {isFilterOpen ? '▼' : '▶'}
-                  </button>
-                </div>
-
-                {isFilterOpen && (
-                  <div className="grid grid-cols-2 gap-2">
-                    {Object.entries(categories).map(([key, { label, icon }]) => (
-                      <button
-                        key={key}
-                        className={`filter-button ${selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
-                          }`}
-                        onClick={() => toggleCategory(key)}
-                      >
-                        <span className="mr-2">{icon}</span>
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <div className="prose max-w-none mb-6">
+                {expandedStories[selectedStory.id].text.split('\n\n').map((paragraph, index) => (
+                  <p key={index} className="mb-4">{paragraph}</p>
+                ))}
               </div>
             </div>
           ) : (
@@ -908,19 +915,29 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                           className="w-full h-full object-cover rounded"
                         />
                       </div>
-                      <h3 className="text-xl font-semibold mb-2">{story.title}</h3>
+                      <h3 className="text-xl font-semibold mb-2">{story.title}, {expandedStories[story.id].age}</h3>
+                      
+                      {/* Location */}
+                      <p className="text-sm italic mb-4 flex items-center gap-1" style={{ color: '#777' }}>
+                        📍 {story.location.country === "Hong Kong" 
+                          ? "Hong Kong" 
+                          : `${story.location.name}, ${story.location.country}`
+                        }
+                      </p>
+
                       <p className="text-gray-600 mb-4">{story.description}</p>
 
-                      {/* Read More Button - Moved above categories */}
+                      {/* Read More Button */}
                       <button
                         className="read-more-button mb-4"
+                        style={{ fontSize: '16px' }}
                         onClick={() => {
                           setSelectedStory(story);
                           setExpandedStory(story.id);
                           markAsVisited(story.id, userProgress, setUserProgress);
                         }}
                       >
-                        Lees meer...
+                        👉 {story.title === "Sara" || story.title === "Emily" ? "Lees haar verhaal" : "Lees zijn verhaal"}
                       </button>
 
                       {/* Categories */}
