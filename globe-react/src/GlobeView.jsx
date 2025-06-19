@@ -215,6 +215,64 @@ export default function GlobeView() {
         "star-intensity": 0.1
       });
 
+      // Add country boundaries with thinner lines
+      map.current.addSource('countries', {
+        type: 'vector',
+        url: 'mapbox://mapbox.country-boundaries-v1'
+      });
+
+      map.current.addLayer({
+        'id': 'country-fills',
+        'type': 'fill',
+        'source': 'countries',
+        'source-layer': 'country_boundaries',
+        'paint': {
+          'fill-color': '#e0e0e0',
+          'fill-opacity': 0.4
+        }
+      });
+
+      map.current.addLayer({
+        'id': 'country-borders',
+        'type': 'line',
+        'source': 'countries',
+        'source-layer': 'country_boundaries',
+        'paint': {
+          'line-color': '#000000',
+          'line-width': 0.5  // Thin lines but in black
+        }
+      });
+
+      // Add territory boundaries with thinner lines
+      map.current.addSource('territories', {
+        type: 'vector',
+        url: 'mapbox://mapbox.country-boundaries-v1'
+      });
+
+      map.current.addLayer({
+        'id': 'territory-fills',
+        'type': 'fill',
+        'source': 'territories',
+        'source-layer': 'country_boundaries',
+        'filter': ['==', 'mapbox:is_territory', true],
+        'paint': {
+          'fill-color': '#e0e0e0',
+          'fill-opacity': 0.4
+        }
+      });
+
+      map.current.addLayer({
+        'id': 'territory-borders',
+        'type': 'line',
+        'source': 'territories',
+        'source-layer': 'country_boundaries',
+        'filter': ['==', 'mapbox:is_territory', true],
+        'paint': {
+          'line-color': '#000000',
+          'line-width': 0.5  // Thin lines but in black
+        }
+      });
+
       sidebarItems.forEach(story => {
         const el = document.createElement('div');
         el.className = 'marker';
@@ -240,7 +298,7 @@ export default function GlobeView() {
 
         el.appendChild(inner);
 
-        // Create popup content
+        // Create popup content with more information
         const popupContent = document.createElement('div');
         popupContent.style.padding = '15px';
         popupContent.style.maxWidth = '300px';
@@ -248,6 +306,15 @@ export default function GlobeView() {
         popupContent.style.borderRadius = '8px';
         popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
 
+        // Name and Age
+        const title = document.createElement('h3');
+        title.textContent = `${story.title}, ${mockExpandedContent.age[story.id]}`;
+        title.style.margin = '0 0 8px 0';
+        title.style.color = '#333';
+        title.style.fontSize = '18px';
+        popupContent.appendChild(title);
+
+        // Image
         const img = document.createElement('img');
         img.src = story.image;
         img.style.width = '100%';
@@ -257,13 +324,18 @@ export default function GlobeView() {
         img.style.marginBottom = '10px';
         popupContent.appendChild(img);
 
-        const title = document.createElement('h3');
-        title.textContent = story.title;
-        title.style.margin = '0 0 8px 0';
-        title.style.color = '#333';
-        title.style.fontSize = '18px';
-        popupContent.appendChild(title);
+        // Location
+        const location = document.createElement('div');
+        location.style.color = '#666';
+        location.style.fontSize = '13px';
+        location.style.display = 'flex';
+        location.style.alignItems = 'center';
+        location.style.gap = '4px';
+        location.style.marginBottom = '10px';
+        location.innerHTML = `<span>📍</span> ${story.location.name}, ${story.location.country}`;
+        popupContent.appendChild(location);
 
+        // Description
         const desc = document.createElement('p');
         desc.textContent = story.description;
         desc.style.margin = '0 0 10px 0';
@@ -271,7 +343,8 @@ export default function GlobeView() {
         desc.style.fontSize = '14px';
         desc.style.lineHeight = '1.4';
         popupContent.appendChild(desc);
-
+        
+        // Categories
         const categoriesDiv = document.createElement('div');
         categoriesDiv.style.display = 'flex';
         categoriesDiv.style.gap = '5px';
@@ -314,6 +387,9 @@ export default function GlobeView() {
           // Set location and filter stories
           setSelectedLocation(story.location.country);
           setFilteredStories(filterStories(story.location.country, selectedCategories));
+          
+          // Directly show the detailed view
+          setSelectedStory(story);
         };
 
         // Add click event listener
@@ -345,85 +421,11 @@ export default function GlobeView() {
         });
       });
 
-      // Add single source for all boundaries
-      map.current.addSource('boundaries', {
-        type: 'vector',
-        url: 'mapbox://mapbox.country-boundaries-v1'
-      });
-
-      // Add main country fills
-      map.current.addLayer({
-        'id': 'country-fills',
-        'type': 'fill',
-        'source': 'boundaries',
-        'source-layer': 'country_boundaries',
-        'filter': [
-          'all',
-          ['!=', ['get', 'name_en'], 'Taiwan'],
-          ['!=', ['get', 'name_en'], 'Hong Kong']
-        ],
-        'paint': {
-          'fill-color': '#e0e0e0',
-          'fill-opacity': 1
-        }
-      });
-
-      // Add territory fills
-      map.current.addLayer({
-        'id': 'territory-fills',
-        'type': 'fill',
-        'source': 'boundaries',
-        'source-layer': 'country_boundaries',
-        'filter': [
-          'any',
-          ['==', ['get', 'name_en'], 'Taiwan'],
-          ['==', ['get', 'name_en'], 'Hong Kong']
-        ],
-        'paint': {
-          'fill-color': '#e0e0e0',
-          'fill-opacity': 1
-        }
-      });
-
-      // Add main country borders
-      map.current.addLayer({
-        'id': 'country-borders',
-        'type': 'line',
-        'source': 'boundaries',
-        'source-layer': 'country_boundaries',
-        'filter': [
-          'all',
-          ['!=', ['get', 'name_en'], 'Taiwan'],
-          ['!=', ['get', 'name_en'], 'Hong Kong']
-        ],
-        'paint': {
-          'line-color': '#000000',
-          'line-width': 1
-        }
-      });
-
-      // Add territory borders
-      map.current.addLayer({
-        'id': 'territory-borders',
-        'type': 'line',
-        'source': 'boundaries',
-        'source-layer': 'country_boundaries',
-        'filter': [
-          'any',
-          ['==', ['get', 'name_en'], 'Taiwan'],
-          ['==', ['get', 'name_en'], 'Hong Kong']
-        ],
-        'paint': {
-          'line-color': '#000000',
-          'line-width': 1
-        }
-      });
-
       // Add country labels
       map.current.addLayer({
         'id': 'country-labels',
         'type': 'symbol',
-        'source': 'boundaries',
+        'source': 'countries',
         'source-layer': 'country_boundaries',
         'filter': [
           'all',
@@ -460,7 +462,7 @@ export default function GlobeView() {
       map.current.addLayer({
         'id': 'territory-labels',
         'type': 'symbol',
-        'source': 'boundaries',
+        'source': 'territories',
         'source-layer': 'country_boundaries',
         'filter': [
           'any',
@@ -576,98 +578,46 @@ export default function GlobeView() {
 
       {/* Profile Button */}
       <button
-        onClick={() => setIsProfileOpen(true)}
-        style={{
-          position: 'absolute',
-          left: '20px',
-          top: '20px',
-          zIndex: 1000,
-          width: '40px',
-          height: '40px',
-          borderRadius: '50%',
-          backgroundColor: '#ffffff',
-          border: 'none',
-          boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '20px'
-        }}
+        className="fixed top-4 left-4 z-50 bg-white text-emily-blue w-10 h-10 rounded-full shadow-lg hover:border-emily-blue border-2 border-white transition-colors flex items-center justify-center"
+        onClick={() => setIsProfileOpen(!isProfileOpen)}
       >
         🥇
       </button>
 
-      {/* Profile Overlay with Progress */}
+      {/* Profile Modal */}
       {isProfileOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 2000
-        }}>
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '12px',
-            padding: '30px',
-            width: '500px',
-            maxWidth: '90%',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            position: 'relative',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.2)'
-          }}>
-            <button
-              onClick={() => setIsProfileOpen(false)}
-              style={{
-                position: 'absolute',
-                right: '15px',
-                top: '15px',
-                border: 'none',
-                background: 'none',
-                fontSize: '20px',
-                cursor: 'pointer',
-                padding: '5px'
-              }}
-            >
-              ✕
-            </button>
-            <h2 style={{ marginTop: 0, marginBottom: '20px' }}>Your Journey Progress</h2>
-            
-            {/* Reset Progress Button */}
-            <div style={{ 
-              marginBottom: '20px',
-              display: 'flex',
-              justifyContent: 'flex-end' 
-            }}>
-              <button
-                onClick={handleResetProgress}
-                style={{
-                  backgroundColor: '#ff4444',
-                  color: 'white',
-                  border: 'none',
-                  padding: '8px 16px',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'background-color 0.2s ease'
-                }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#ff6666'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#ff4444'}
-              >
-                <span>🔄</span> Reset Progress
-              </button>
-            </div>
-
+        <div
+          onClick={(e) => {
+            // Close modal when clicking outside
+            if (e.target === e.currentTarget) {
+              setIsProfileOpen(false);
+            }
+          }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              padding: '20px',
+              borderRadius: '12px',
+              maxWidth: '600px',
+              width: '90%',
+              maxHeight: '90vh',
+              overflowY: 'auto'
+            }}
+          >
             <ProgressOverview userProgress={userProgress} sidebarItems={sidebarItems} />
           </div>
         </div>
@@ -737,200 +687,149 @@ export default function GlobeView() {
           padding: '30px'
         }}>
           {selectedStory ? (
-            // Detailed Story View
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '20px'
-            }}>
-              {/* Back Button */}
+            // Expanded Story View
+            <div className="story-card">
+              {/* Back Button - Moved to top of expanded story */}
               <button
-                onClick={() => setSelectedStory(null)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  color: '#666',
-                  padding: '0',
-                  marginBottom: '10px'
+                className="button-base mb-4"
+                onClick={() => {
+                  setSelectedStory(null);
+                  setExpandedStory(null);
                 }}
               >
                 ← Terug naar overzicht
               </button>
 
-              {/* Location */}
-              <div style={{
-                color: '#666',
-                fontSize: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}>
-                <span>📍</span>
-                <span>{selectedStory.location.name}, {selectedStory.location.country}</span>
-              </div>
-
-              {/* Hero Image */}
-              <div style={{ 
-                position: 'relative', 
-                width: '100%',
-                height: '250px',
-                borderRadius: '12px',
-                overflow: 'hidden'
-              }}>
+              <div className="relative aspect-w-16 aspect-h-9 mb-4">
                 <img
                   src={selectedStory.image}
                   alt={selectedStory.title}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover'
-                  }}
+                  className="w-full h-full object-cover rounded"
                 />
               </div>
-
-              {/* Name and Age */}
-              <div style={{
-                fontWeight: 'bold',
-                fontSize: '24px',
-                color: '#333'
-              }}>
-                {selectedStory.title}, {mockExpandedContent.age[selectedStory.id]}
+              
+              <h2 className="text-xl font-semibold mb-4">{selectedStory.title}</h2>
+              
+              <div className="prose max-w-none mb-6">
+                {mockExpandedContent.text.split('\n\n').map((paragraph, index) => (
+                  <p key={index} className="mb-4">{paragraph}</p>
+                ))}
               </div>
 
-              {/* Categories */}
-              <div style={{ 
-                display: 'flex', 
-                gap: '8px',
-                flexWrap: 'wrap'
-              }}>
-                {selectedStory.categories.map(cat => (
-                  <span key={cat} style={{
-                    background: '#f0f0f0',
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '13px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    color: '#555'
-                  }}>
+              {/* Categories in expanded view */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                {selectedStory.categories.map((cat) => (
+                  <span
+                    key={cat}
+                    className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded"
+                  >
                     {categories[cat].icon} {categories[cat].label}
                   </span>
                 ))}
               </div>
 
-              {/* Chat Button - Moved up */}
+              {/* Chat Button - Now in Emily Blue */}
               <button
+                className="button-base w-full"
                 onClick={() => {
-                  // Handle visited state when chat button is clicked
-                  if (!userProgress.visitedIds.includes(selectedStory.id)) {
-                    const newProgress = markAsVisited(selectedStory.id);
-                    setUserProgress(newProgress);
-                    
-                    // Find and update the marker's appearance
-                    const markerElement = document.querySelector(`.marker img[alt="${selectedStory.title}"]`);
-                    if (markerElement) {
-                      markerElement.style.border = '2px solid rgba(76, 175, 80, 0.3)';
-                      markerElement.style.filter = 'grayscale(80%) brightness(0.8)';
-                      markerElement.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
-                    }
-                  }
+                  // Handle chat functionality
+                  markAsVisited(selectedStory.id, userProgress, setUserProgress);
                 }}
-                style={{
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px 24px',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  marginTop: '4px',
-                  marginBottom: '16px',
-                  transition: 'background-color 0.2s ease'
-                }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#45a049'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#4CAF50'}
               >
-                <span>💬</span> Chat met {selectedStory.title}
+                Chat met {selectedStory.title}
               </button>
 
-              {/* Story Content */}
-              <div style={{
-                color: '#444',
-                fontSize: '15px',
-                lineHeight: '1.6'
-              }}>
-                <p style={{ margin: '0 0 16px 0' }}>{selectedStory.description}</p>
-                {mockExpandedContent.text.split('\n\n').map((paragraph, index) => (
-                  <p key={index} style={{ margin: '0 0 16px 0' }}>{paragraph}</p>
-                ))}
+              {/* Filter Section - Moved under expanded story */}
+              <div className="filter-section">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Filters</h3>
+                  <button
+                    className="text-emily-blue hover:text-emily-blue/80"
+                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  >
+                    {isFilterOpen ? '▼' : '▶'}
+                  </button>
+                </div>
+
+                {isFilterOpen && (
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(categories).map(([key, { label, icon }]) => (
+                      <button
+                        key={key}
+                        className={`filter-button ${
+                          selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
+                        }`}
+                        onClick={() => toggleCategory(key)}
+                      >
+                        <span className="mr-2">{icon}</span>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ) : (
             // Stories List View
             <>
+              {/* Location Header with Back Option */}
+              {selectedLocation && (
+                <div style={{
+                  marginBottom: '20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}>
+                  <button
+                    onClick={() => {
+                      setSelectedLocation(null);
+                      setFilteredStories(sidebarItems);
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      color: '#666',
+                      padding: '8px 0'
+                    }}
+                  >
+                    <span>←</span>
+                    <span>Alle verhalen</span>
+                  </button>
+                  <span style={{ color: '#666' }}>|</span>
+                  <span style={{ color: '#333', fontWeight: 'bold' }}>{selectedLocation}</span>
+                </div>
+              )}
+
               {/* Filter Section */}
-              <div style={{ 
-                marginBottom: '20px',
-                padding: '15px',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '12px',
-                transition: 'all 0.3s ease'
-              }}>
-                <div 
-                  onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    cursor: 'pointer',
-                    marginBottom: isFilterOpen ? '15px' : '0'
-                  }}
-                >
-                  <h3 style={{ margin: 0, color: '#333' }}>Filters</h3>
-                  <span style={{ fontSize: '20px' }}>{isFilterOpen ? '▼' : '▶'}</span>
+              <div className="filter-section">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Filters</h3>
+                  <button
+                    className="text-emily-blue hover:text-emily-blue/80"
+                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  >
+                    {isFilterOpen ? '▼' : '▶'}
+                  </button>
                 </div>
                 
                 {isFilterOpen && (
-                  <div style={{ 
-                    maxHeight: '300px',
-                    overflowY: 'auto',
-                    transition: 'max-height 0.3s ease'
-                  }}>
-                    <div style={{ marginBottom: '15px' }}>
-                      <h4 style={{ margin: '0 0 10px 0', color: '#666' }}>Categories</h4>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                        {Object.entries(categories).map(([key, { label, icon }]) => (
-                          <button
-                            key={key}
-                            onClick={() => toggleCategory(key)}
-                            style={{
-                              padding: '6px 12px',
-                              backgroundColor: selectedCategories.includes(key) ? '#3386c0' : '#e0e0e0',
-                              color: selectedCategories.includes(key) ? 'white' : '#333',
-                              border: 'none',
-                              borderRadius: '20px',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '5px'
-                            }}
-                          >
-                            <span>{icon}</span>
-                            <span>{label}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {Object.entries(categories).map(([key, { label, icon }]) => (
+                      <button
+                        key={key}
+                        className={`filter-button ${
+                          selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
+                        }`}
+                        onClick={() => toggleCategory(key)}
+                      >
+                        <span className="mr-2">{icon}</span>
+                        {label}
+                      </button>
+                    ))}
                   </div>
                 )}
               </div>
@@ -943,108 +842,41 @@ export default function GlobeView() {
                 maxWidth: '90%',
                 margin: '0 auto'
               }}>
-                {filteredStories.map((item) => (
-                  <div
-                    key={item.id}
-                    style={{
-                      backgroundColor: '#ffffff',
-                      borderRadius: '12px',
-                      padding: '15px',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '12px'
-                    }}
-                  >
-                    {/* Location */}
-                    <div style={{
-                      color: '#666',
-                      fontSize: '13px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '4px'
-                    }}>
-                      <span>📍</span>
-                      <span>{item.location.name}, {item.location.country}</span>
-                    </div>
-
-                    {/* Image */}
-                    <div style={{ position: 'relative', aspectRatio: '16/9' }}>
+                {filteredStories.map((story) => (
+                  <div key={story.id} className="story-card">
+                    <div className="relative aspect-w-16 aspect-h-9 mb-4">
                       <img
-                        src={item.image}
-                        alt={item.title}
-                        style={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          borderRadius: '8px'
-                        }}
+                        src={story.image}
+                        alt={story.title}
+                        className="w-full h-full object-cover rounded"
                       />
                     </div>
-
-                    {/* Name and Age */}
-                    <div style={{
-                      fontWeight: 'bold',
-                      fontSize: '16px',
-                      color: '#333'
-                    }}>
-                      {item.title}, {mockExpandedContent.age[item.id]}
-                    </div>
-
-                    {/* Description */}
-                    <p style={{ 
-                      margin: '0',
-                      color: '#666', 
-                      fontSize: '14px',
-                      lineHeight: '1.4',
-                      display: '-webkit-box',
-                      WebkitLineClamp: '2',
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
-                    }}>
-                      {item.description}
-                    </p>
+                    <h3 className="text-xl font-semibold mb-2">{story.title}</h3>
+                    <p className="text-gray-600 mb-4">{story.description}</p>
+                    
+                    {/* Read More Button - Moved above categories */}
+                    <button
+                      className="read-more-button mb-4"
+                      onClick={() => {
+                        setSelectedStory(story);
+                        setExpandedStory(story.id);
+                        markAsVisited(story.id, userProgress, setUserProgress);
+                      }}
+                    >
+                      Lees meer...
+                    </button>
 
                     {/* Categories */}
-                    <div style={{ 
-                      display: 'flex', 
-                      gap: '6px',
-                      flexWrap: 'wrap'
-                    }}>
-                      {item.categories.map(cat => (
-                        <span key={cat} style={{
-                          background: '#f0f0f0',
-                          padding: '4px 8px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '4px',
-                          color: '#555'
-                        }}>
+                    <div className="flex flex-wrap gap-2">
+                      {story.categories.map((cat) => (
+                        <span
+                          key={cat}
+                          className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded"
+                        >
                           {categories[cat].icon} {categories[cat].label}
                         </span>
                       ))}
                     </div>
-
-                    {/* Read More Button */}
-                    <button
-                      onClick={() => setSelectedStory(item)}
-                      style={{
-                        backgroundColor: '#3386c0',
-                        color: 'white',
-                        border: 'none',
-                        padding: '8px 16px',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        transition: 'background-color 0.2s ease'
-                      }}
-                      onMouseOver={(e) => e.target.style.backgroundColor = '#2776b0'}
-                      onMouseOut={(e) => e.target.style.backgroundColor = '#3386c0'}
-                    >
-                      Lees meer...
-                    </button>
                   </div>
                 ))}
               </div>
