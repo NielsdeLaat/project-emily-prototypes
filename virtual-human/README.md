@@ -1,4 +1,10 @@
-# 🧠 Virtual Human – Emily
+[![HTML](https://img.shields.io/badge/HTML-%23E34F26.svg?logo=html5&logoColor=white)](#)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=000)](#)
+[![CSS](https://img.shields.io/badge/CSS-639?logo=css&logoColor=fff)](#)
+[![ChatGPT](https://img.shields.io/badge/ChatGPT-74aa9c?logo=openai&logoColor=white)](#)
+
+
+# Virtual Human – Emily
 
 **Emily** is a virtual AI persona you can talk to about her experience during the Hong Kong protests. This prototype explores how emotionally realistic conversations with AI characters can raise awareness of sensitive topics through interactive storytelling.
 
@@ -6,7 +12,7 @@
 
 ---
 
-## 🚀 Features
+## Features
 
 - 🗣️ AI-powered conversation with a virtual human
 - 🎭 Emotionally engaging character with a real backstory
@@ -26,22 +32,23 @@
     ```bash
     npm install
     
-3. ** Add keys & .env file **
+3. **Add keys & .env file**
    In the root file, create an env. file and add your open ai key and elevenlabs key
    
 4. Run the Development server
    ```bash
    npm run dev
+
 5. Open in browser
 Visit: http://localhost:5173 
 
 **##Project Goal**
 This prototype is part of a design research project focused on digital empathy and storytelling through virtual humans. Emily is a fictional character based on real protest experiences in Hong Kong. The goal is to explore how AI can deliver emotional, human-like narratives to increase awareness of sensitive political and social topics.
 
-##License
+## License
 This project is a demo created for educational purposes.
 Not intended for commercial or production deployment.
 
-##Created by
+## Created by
 Lin Hui Ye - 488316
 Media & Design student – Fontys Hogeschool
