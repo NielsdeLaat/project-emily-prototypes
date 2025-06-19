@@ -16,6 +16,7 @@ export interface Story {
 }
 
 export const stories: Story[] = [
+  //HONG KONG
   {
     id: 1,
     title: "Demonstraties in Hongkong",
@@ -23,7 +24,7 @@ export const stories: Story[] = [
       {
         id: 1,
         title: "Geschiedenis van Hong Kong",
-        videoUrl: "/videos/hongkong.mp4",
+        videoUrl: "/videos/hongkong-city.mp4",
         subtitles: [
           {
             startTime: 0,
@@ -45,7 +46,7 @@ export const stories: Story[] = [
       {
         id: 2,
         title: "Protesteren voor vrijheid",
-        videoUrl: "/videos/demonstrations.mp4",
+        videoUrl: "/videos/hongkong-demonstrations.mp4",
         subtitles: [
           {
             startTime: 0,
@@ -67,7 +68,7 @@ export const stories: Story[] = [
       {
         id: 3,
         title: "Reactie van China",
-        videoUrl: "/videos/police.mp4",
+        videoUrl: "/videos/hongkong-police.mp4",
         subtitles: [
           {
             startTime: 0,
@@ -88,51 +89,79 @@ export const stories: Story[] = [
       },
     ],
   },
+  //OEGANDA
   {
     id: 2,
-    title: "Climate Change",
+    title: "LHBTI-rechten in Oeganda",
     segments: [
       {
         id: 1,
-        title: "Global Warming",
-        videoUrl: "/videos/climate1.mp4",
+        title: "Wet en cultuur",
+        videoUrl: "/videos/uganda-flag.mp4",
         subtitles: [
           {
             startTime: 0,
-            endTime: 4,
-            text: "The Earth's temperature is rising at an unprecedented rate.",
+            endTime: 3,
+            text: "Oeganda ligt in Oost-Afrika en telt meer dan 45 miljoen inwoners.",
           },
           {
             startTime: 4,
-            endTime: 8,
-            text: "Scientists warn of dire consequences if we don't act now.",
+            endTime: 7,
+            text: "Het land staat bekend om zijn natuur, jonge bevolking en religieuze tradities.",
           },
           {
-            startTime: 8,
-            endTime: 12,
-            text: "The evidence is clear and undeniable.",
+            startTime: 7,
+            endTime: 11,
+            text: "Christendom en islam spelen een grote rol in het dagelijks leven en de politiek.",
+          },
+          {
+            startTime: 11,
+            endTime: 15,
+            text: "Binnen deze conservatieve samenleving is er weinig ruimte voor seksuele diversiteit.",
           },
         ],
       },
       {
         id: 2,
-        title: "Impact",
-        videoUrl: "/videos/climate2.mp4",
+        title: "Straf en stigma",
+        videoUrl: "/videos/uganda-arrest.mp4",
         subtitles: [
           {
             startTime: 0,
             endTime: 5,
-            text: "Rising sea levels threaten coastal communities.",
+            text: "LHBTI-personen riskeren in Oeganda gevangenisstraf, ontslag en uitsluiting.",
           },
           {
             startTime: 5,
             endTime: 10,
-            text: "Extreme weather events become more frequent and intense.",
+            text: "In 2023 werd een wet aangenomen die zelfs het 'promoten' van homoseksualiteit verbiedt.",
           },
           {
             startTime: 10,
             endTime: 15,
-            text: "Ecosystems struggle to adapt to rapid changes.",
+            text: "Kerken, media en politici wakkeren angst en haat aan tegen seksuele minderheden.",
+          },
+        ],
+      },
+      {
+        id: 3,
+        title: "Verzet en hoop",
+        videoUrl: "/videos/uganda-lgbtq-support.mp4",
+        subtitles: [
+          {
+            startTime: 0,
+            endTime: 4,
+            text: "Ondanks het gevaar blijven activisten opkomen voor mensenrechten en zorgtoegang.",
+          },
+          {
+            startTime: 4,
+            endTime: 8,
+            text: "Ze bieden juridische hulp, gezondheidszorg en training aan journalisten en beleidsmakers.",
+          },
+          {
+            startTime: 8,
+            endTime: 12,
+            text: "Hun strijd toont: zelfs onder druk is moed, solidariteit en verandering mogelijk.",
           },
         ],
       },
@@ -140,49 +169,93 @@ export const stories: Story[] = [
   },
   {
     id: 3,
-    title: "Technology Revolution",
+    title: "Vluchtelingen uit Noord-Korea",
     segments: [
       {
         id: 1,
-        title: "AI Development",
-        videoUrl: "/videos/tech1.mp4",
+        title: "Leven in armoede en honger",
+        videoUrl: "/videos/nkorea-intro.mp4",
         subtitles: [
           {
             startTime: 0,
             endTime: 4,
-            text: "Artificial Intelligence is transforming our world.",
+            text: "Noord-Korea kende in de jaren '90 een zware hongersnood die honderdduizenden levens kostte.",
           },
           {
             startTime: 4,
             endTime: 8,
-            text: "From healthcare to transportation, AI is everywhere.",
+            text: "In arme mijnstreken stierven hele families van de honger, zonder hulp van de staat.",
           },
           {
             startTime: 8,
             endTime: 12,
-            text: "The possibilities seem endless.",
+            text: "Ouders verkochten bezittingen of ruilden zelfs van hun kinderen om voedsel te bemachtigen.",
+          },
+          {
+            startTime: 12,
+            endTime: 15,
+            text: "Voor veel gezinnen was vluchten de enige manier om te overleven.",
           },
         ],
       },
       {
         id: 2,
-        title: "Future Impact",
-        videoUrl: "/videos/tech2.mp4",
+        title: "De oversteek naar China",
+        videoUrl: "/videos/nkorea-river.mp4",
         subtitles: [
           {
             startTime: 0,
             endTime: 5,
-            text: "How will AI shape our future?",
+            text: "Via bevroren rivieren, zoals de Tumen rivier, proberen veel Noord-Koreanen naar China te vluchten.",
           },
           {
             startTime: 5,
             endTime: 10,
-            text: "The ethical implications are profound.",
+            text: "De oversteek is gevaarlijk: mensen zakken door het ijs of worden neergeschoten door grenswachten. Niet veel Koreanen overleven de vlucht.",
+          },
+        ],
+      },
+      {
+        id: 3,
+        title: "Terugkeer en vervolging",
+        videoUrl: "/videos/nkorea-labor.mp4",
+        subtitles: [
+          {
+            startTime: 0,
+            endTime: 4,
+            text: "China deporteert veel Noord-Koreanen die worden opgepakt, terug naar het regime.",
+          },
+          {
+            startTime: 4,
+            endTime: 8,
+            text: "Teruggestuurde vluchtelingen belanden vaak in werkkampen of gevangenissen.",
+          },
+          {
+            startTime: 8,
+            endTime: 12,
+            text: "Kinderen en ouderen worden soms vrijgelaten, maar leven dan zonder registratie of steun.",
+          },
+        ],
+      },
+      {
+        id: 4,
+        title: "Een leven in vrijheid",
+        videoUrl: "/videos/nkorea-skorea.mp4",
+        subtitles: [
+          {
+            startTime: 0,
+            endTime: 5,
+            text: "Sommigen weten via tussenpersonen en risicovolle routes Zuid-Korea of Europa te bereiken.",
+          },
+          {
+            startTime: 5,
+            endTime: 10,
+            text: "Daar bouwen ze een nieuw leven op, met veiligheid, onderwijs en toekomst.",
           },
           {
             startTime: 10,
             endTime: 15,
-            text: "We must navigate this revolution carefully.",
+            text: "Veel gevluchte Noord-Koreanen delen hun verhaal, om aandacht te vragen voor wie is achtergebleven.",
           },
         ],
       },
