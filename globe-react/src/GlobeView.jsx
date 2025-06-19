@@ -5,31 +5,31 @@ import { initializeProgress, markAsVisited } from './utils/progressUtils';
 import ProgressOverview from './components/ProgressOverview';
 
 // Import images
-import ablikimImg from './img/Ablikim.png';
+import AbrahamImg from './img/Abraham.png';
 import emilyImg from './img/Emily.png';
 import carlosImg from './img/Carlos.png';
 import barryImg from './img/Barry.png';
 import tyroneImg from './img/Tyrone.png';
-import eunjuImg from './img/Eunju_Kim.png';
-import kikonyogoImg from './img/Kikonyogo_Kivumbi.png';
+import SaraImg from './img/Sara.png';
+import MikeImg from './img/Mike.png';
 
 // Categories for filtering
 const categories = {
-  religious: { label: "Religious Persecution", icon: "⛪" },
-  lgbtq: { label: "LGBTQ+ Rights", icon: "🏳️‍🌈" },
-  racism: { label: "Racial Discrimination", icon: "✊" },
-  political: { label: "Political Oppression", icon: "🗳️" },
-  gender: { label: "Gender Rights", icon: "♀️" },
-  refugee: { label: "Refugee Status", icon: "🏃" }
+  religious: { label: "Religieuze Vervolging", icon: "⛪" },
+  lgbtq: { label: "LHBTI+ Rechten", icon: "🏳️‍🌈" },
+  racism: { label: "Racisme", icon: "✊" },
+  political: { label: "Politieke Onderdrukking", icon: "🗳️" },
+  gender: { label: "Genderrechten", icon: "♀️" },
+  refugee: { label: "Vluchteling", icon: "🏃" }
 };
 
 // Story data with locations and categories
 const sidebarItems = [
   {
     id: 1,
-    title: "Ablikim",
-    description: "Zijn geloof werd verboden, zijn arbeid gestolen, zijn identiteit uitgewist , toch wist hij te ontsnappen.",
-    image: ablikimImg,
+    title: "Abramham",
+    description: "Hij groeide op met gebed, familie en een diepgewortelde traditie. Wat volgde was isolatie, dwangarbeid en stilte, opgelegd in naam van heropvoeding.",
+    image: AbrahamImg,
     location: {
       name: "Xinjiang Village",
       coordinates: [87.6177, 43.7928], // Urumqi, Xinjiang
@@ -64,7 +64,7 @@ const sidebarItems = [
   {
     id: 4,
     title: "Barry",
-    description: "Verlaten, verkracht en verguisd, maar nog altijd vechtend voor zichzelf, zijn gezin en zijn waarheid.",
+    description: "Barry vluchtte voor zijn leven, maar vond nergens rust. Niet in Burundi, niet in Kenia. Alleen stilte, schaamte en angst die zich bleven herhalen.",
     image: barryImg,
     location: {
       name: "Bujumbura",
@@ -76,7 +76,7 @@ const sidebarItems = [
   {
     id: 5,
     title: "Tyrone",
-    description: "Gejaagd om zijn bestaan, door staten en straten, bleef hij vechten voor een plek waar hij gewoon mocht zijn.",
+    description: "Tyrone verliet Oeganda in de hoop op rust en veiligheid. In plaats daarvan kwam hij terecht in een nieuw land, waar het gevaar bleef.",
     image: tyroneImg,
     location: {
       name: "Kampala",
@@ -87,9 +87,9 @@ const sidebarItems = [
   },
   {
     id: 6,
-    title: "Eunju Kim",
-    description: "Ze trotseerde dood, vrieskou en verraad , voor een maaltijd, een stem, en uiteindelijk een leven in vrijheid.",
-    image: eunjuImg,
+    title: "Sara",
+    description: "Gejaagd om zijn bestaan, door staten en straten, bleef hij vechten voor een plek waar hij gewoon mocht zijn.",
+    image: SaraImg,
     location: {
       name: "Eundok",
       coordinates: [129.3274, 41.8142], // Eundok, North Hamgyong
@@ -99,9 +99,9 @@ const sidebarItems = [
   },
   {
     id: 7,
-    title: "Kikonyogo Kivumbi",
-    description: "Geverfd als vijand vanwege liefde, verloor hij zijn werk, zijn veiligheid en bijna zijn leven , maar niet zijn stem.",
-    image: kikonyogoImg,
+    title: "Mike",
+    description: "Wat gebeurt er als je wordt uitgesloten door de samenleving die je probeert te helpen, simpelweg omdat je jezelf bent?",
+    image: MikeImg,
     location: {
       name: "Kampala",
       coordinates: [32.5825, 0.3476], // Kampala Center
@@ -126,17 +126,66 @@ export default function GlobeView() {
   const [expandedStory, setExpandedStory] = useState(null);
   const [selectedStory, setSelectedStory] = useState(null);
 
-  // Mock data for expanded content
-  const mockExpandedContent = {
-    text: "Hier volgt een uitgebreid verhaal over de ervaringen en uitdagingen die deze persoon heeft doorgemaakt. Het verhaal gaat dieper in op de persoonlijke reis, de obstakels die overwonnen zijn, en de hoop voor de toekomst. Door deze verhalen te delen, creëren we begrip en verbinding tussen verschillende culturen en ervaringen.\n\nDe impact van deze gebeurtenissen reikt verder dan alleen het persoonlijke verhaal. Het laat zien hoe maatschappelijke structuren en systemen mensen kunnen beïnvloeden, maar ook hoe veerkracht en vastberadenheid kunnen leiden tot positieve verandering.\n\nDoor het delen van deze verhalen hopen we anderen te inspireren en bewustwording te creëren over belangrijke maatschappelijke kwesties. Elk verhaal is een stap richting meer begrip en empathie in onze samenleving.",
-    age: {
-      1: 42,
-      2: 23,
-      3: 29,
-      4: 31,
-      5: 15,
-      6: 27,
-      7: 38
+  const expandedStories = {
+    1: {
+      title: "Abraham's Verhaal",
+      text: `In dit verhaal vertelt Ablikim hoe zijn leven als jonge Oeigoerse man in Xinjiang abrupt veranderde toen de Chinese overheid in 2017 begon met het opsluiten van duizenden leden van zijn gemeenschap. Zijn vader werd gearresteerd vanwege zijn geloof, hijzelf werd zonder reden meegenomen en belandde in een systeem van dwangarbeid, surveillantie en ideologische herprogrammering.
+Het is een verhaal over wat er gebeurt wanneer je identiteit doelbewust wordt uitgewist. Over werk dat geen werk is, lessen die geen onderwijs zijn, en leven zonder contact of vrijheid. En over hoe vluchten soms de enige manier is om opnieuw mens te mogen zijn.
+Door zijn verhaal te delen, hoopt Ablikim zichtbaar te maken wat voor velen onzichtbaar blijft — en aandacht te vragen voor de duizenden anderen die nog steeds gevangen zitten in stilte.
+`,
+      age: 42
+    },
+    2: {
+      title: "Emily's Verhaal",
+      text: `Emily was een jonge student toen de protesten in Hong Kong begonnen. Traangas, waterkanonnen en politiegeweld werden haar dagelijkse realiteit. Maar ze bleef filmen, vastbesloten om de waarheid vast te leggen.
+
+De invoering van de nationale veiligheidswet maakte haar werk steeds gevaarlijker. Vrienden werden gearresteerd, nieuwsredacties gesloten. Emily besloot haar verhalen online te delen, wetende dat dit haar in gevaar zou brengen.
+
+Nu, vanuit het buitenland, blijft ze schrijven over Hong Kong. Haar stem is haar wapen, haar woorden haar verzet. Ze vecht voor de vrijheid om te vertellen wat er echt gebeurt in haar geliefde stad.`,
+      age: 23
+    },
+    3: {
+      title: "Carlos' Verhaal",
+      text: `Carlos werd geboren in een klein dorpje in Mexico, waar zijn familie al generaties lang woonde. Als kind merkte hij al dat hij 'anders' was - zijn donkerdere huid maakte hem een doelwit van pesterijen en discriminatie.
+
+Op zoek naar een beter leven trok zijn familie naar de stad. Maar ook daar vond Carlos geen acceptatie. Op school, op het werk, in het dagelijks leven - overal voelde hij de blik van vooroordeel.
+
+Hij vond zijn roeping in kunst en activisme. Door zijn schilderijen en installaties vertelt hij het verhaal van uitsluiting en onrecht. Zijn werk werd zijn stem tegen racisme en ongelijkheid.
+
+Vandaag reist Carlos door het land, geeft workshops aan jongeren en gebruikt zijn kunst om dialoog te starten over racisme en identiteit. Hij vecht voor een Mexico waar iedereen zichzelf kan zijn, ongeacht huidskleur.`,
+      age: 29
+    },
+    4: {
+      title: "Barry's Verhaal",
+      text: `In dit verhaal vertelt Barry, een 23-jarige transgender man uit Burundi, over zijn leven vol bedreigingen, geweld en verlies. Nadat zijn identiteit bekend werd, werd hij achtervolgd, zijn ouders vermoord, en hijzelf meermaals mishandeld — ook onderweg naar wat hij hoopte dat een veiligere plek zou zijn.
+In plaats van bescherming vond hij nieuw geweld, ook in het vluchtelingenkamp waar hij terechtkwam. Zijn kinderen overleefden ternauwernood een vergiftiging. Hij leefde maandenlang met zijn trauma's zonder te durven zeggen wie hij werkelijk was — totdat zijn gezondheid hem dwong om zijn verhaal wél te vertellen.
+Barry's verhaal legt bloot hoe kwetsbaar het bestaan is van transgender vluchtelingen. Hoe moeilijk het is om hulp te vragen als je al zo vaak gestraft bent voor wie je bent. En hoe veerkracht soms betekent: gewoon doorgaan, ook als alles pijn doet.
+`,
+      age: 31
+    },
+    5: {
+      title: "Tyrone's Verhaal",
+      text: `In dit verhaal deelt Tyrone hoe hij als jonge homoseksuele man in 2014 vluchtte naar Kenia — een plek die veiliger zou moeten zijn. Maar direct na aankomst werd hij mishandeld, herhaaldelijk gearresteerd en bedreigd. Niet alleen door vreemden, maar ook door de politie.
+Hij vertelt hoe het is om steeds weer te moeten verhuizen, omdat zelfs je buren je niet met rust laten. En hoe het voelt als je nergens echt veilig bent — niet thuis, maar ook niet daarbuiten.
+Tyrone's ervaring laat zien dat vluchten niet altijd een einde maakt aan gevaar, en dat voor veel LHBTI+ vluchtelingen veiligheid iets is waar je in stilte op hoopt, maar zelden echt vindt.
+`,
+      age: 15
+    },
+    6: {
+      title: "Sara's Verhaal",
+      text: `Hier volgt het aangrijpende verhaal van Sara, een vrouw die opgroeide in het gesloten Noord-Korea en twee keer haar leven riskeerde om te ontsnappen aan onderdrukking, honger en stilzwijgen. Haar reis voert van de duisternis van een totalitair regime, via mensenhandel in China, naar vrijheid in Zuid-Korea.
+Door dit verhaal te delen, werpen we licht op de werkelijkheid achter grenzen en propaganda — en op de kracht van menselijkheid, zelfs wanneer die systematisch wordt onderdrukt. Het is een verhaal over overleven, herinneren en het weigeren om te zwijgen.
+Want elk verhaal dat wordt verteld, maakt de wereld een stukje helderder. En Sara's verhaal is niet alleen het hare — het is een stem voor duizenden anderen die nog steeds in stilte leven.
+`,
+      age: 27
+    },
+    7: {
+      title: "Mike's Verhaal",
+      text: `Mike groeide op in Oeganda, werkte als journalist en beleidsadviseur, en zette zich in voor volksgezondheid. Maar toen hij open was over zijn seksuele geaardheid, verloor hij zijn baan, werd hij mishandeld en buitengesloten. Wat volgde was geen vlucht, maar een keuze om te blijven — en te bouwen aan iets beters.
+In dit verhaal lees je hoe hij ondanks persoonlijke risico's bleef opkomen voor de rechten van gemarginaliseerde groepen. Over hoe hij zorgde voor toegang tot hiv-zorg, media trainde in respectvolle verslaggeving en zich bleef uitspreken tegen discriminatie, ook toen het niet veilig was.
+Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stappen die in stilte worden gezet, en toch een grote impact hebben.
+`,
+      age: 38
     }
   };
 
@@ -144,7 +193,7 @@ export default function GlobeView() {
   const filterStories = (country, categories) => {
     return sidebarItems.filter(item => {
       const matchesCountry = !country || item.location.country === country;
-      const matchesCategories = categories.length === 0 || 
+      const matchesCategories = categories.length === 0 ||
         categories.every(cat => item.categories.includes(cat));
       return matchesCountry && matchesCategories;
     });
@@ -163,7 +212,7 @@ export default function GlobeView() {
 
   // Add reset progress function
   const handleResetProgress = () => {
-    if (window.confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+    if (window.confirm('Weet je zeker dat je alle vooruitgang wilt resetten? Dit kan niet ongedaan worden gemaakt.')) {
       localStorage.removeItem('userProgress');
       setUserProgress({ visitedIds: [] });
       
@@ -184,7 +233,7 @@ export default function GlobeView() {
     if (map.current) return;
 
     mapboxgl.accessToken = 'pk.eyJ1Ijoic3RldmllZ3JpZmZpbmRlc2lnbiIsImEiOiJja24waTQzeHYwbndvMnZtbnFrYXV3ZjdjIn0.zhhJzykz0VYq7RQWBJxh7A';
-    
+
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v12',
@@ -201,7 +250,12 @@ export default function GlobeView() {
       },
       renderWorldCopies: true,
       pitch: 0,
-      bearing: 0
+      bearing: 0,
+      locale: {
+        'NavigationControl.ZoomIn': 'Inzoomen',
+        'NavigationControl.ZoomOut': 'Uitzoomen',
+        'NavigationControl.ResetBearing': 'Draai naar het noorden',
+      }
     });
 
     map.current.on('style.load', () => {
@@ -285,7 +339,7 @@ export default function GlobeView() {
         inner.style.borderRadius = '50%';
         inner.style.cursor = 'pointer';
         inner.style.transition = 'all 0.3s ease';
-        
+
         // Add visited state visual indicator
         if (userProgress.visitedIds.includes(story.id)) {
           inner.style.border = '2px solid rgba(76, 175, 80, 0.3)';
@@ -308,7 +362,7 @@ export default function GlobeView() {
 
         // Name and Age
         const title = document.createElement('h3');
-        title.textContent = `${story.title}, ${mockExpandedContent.age[story.id]}`;
+        title.textContent = `${story.title}, ${expandedStories[story.id].age}`;
         title.style.margin = '0 0 8px 0';
         title.style.color = '#333';
         title.style.fontSize = '18px';
@@ -343,7 +397,7 @@ export default function GlobeView() {
         desc.style.fontSize = '14px';
         desc.style.lineHeight = '1.4';
         popupContent.appendChild(desc);
-        
+
         // Categories
         const categoriesDiv = document.createElement('div');
         categoriesDiv.style.display = 'flex';
@@ -383,11 +437,11 @@ export default function GlobeView() {
         const handleMarkerClick = () => {
           // Force sidebar open
           setIsSidebarOpen(true);
-          
+
           // Set location and filter stories
           setSelectedLocation(story.location.country);
           setFilteredStories(filterStories(story.location.country, selectedCategories));
-          
+
           // Directly show the detailed view
           setSelectedStory(story);
         };
@@ -429,11 +483,11 @@ export default function GlobeView() {
         'source-layer': 'country_boundaries',
         'filter': [
           'all',
-          ['!=', ['get', 'name_en'], 'Taiwan'],
-          ['!=', ['get', 'name_en'], 'Hong Kong']
+          ['!=', ['get', 'name_nl'], 'Taiwan'],
+          ['!=', ['get', 'name_nl'], 'Hong Kong']
         ],
         'layout': {
-          'text-field': ['get', 'name_en'],
+          'text-field': ['get', 'name_nl'],
           'text-size': [
             'interpolate',
             ['linear'],
@@ -501,10 +555,10 @@ export default function GlobeView() {
           const country = e.features[0];
           setSelectedCountry(country);
           setSelectedLocation(country.properties.name_en);
-          setFilteredStories(sidebarItems.filter(item => 
+          setFilteredStories(sidebarItems.filter(item =>
             item.location.country === country.properties.name_en
           ));
-          
+
           // Highlight the clicked country or territory
           if (country.properties.name_en === 'Taiwan' || country.properties.name_en === 'Hong Kong') {
             map.current.setPaintProperty('territory-fills', 'fill-color', [
@@ -553,27 +607,27 @@ export default function GlobeView() {
   }, [isSidebarOpen]);
 
   return (
-    <div style={{ 
-      position: 'fixed', 
-      top: 0, 
-      left: 0, 
-      right: 0, 
-      bottom: 0, 
-      margin: 0, 
-      padding: 0, 
-      overflow: 'hidden' 
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      margin: 0,
+      padding: 0,
+      overflow: 'hidden'
     }}>
       {/* Map Container */}
-      <div 
-        ref={mapContainer} 
-        style={{ 
+      <div
+        ref={mapContainer}
+        style={{
           position: 'absolute',
           left: 0,
           top: 0,
           width: isSidebarOpen ? 'calc(100% - 30%)' : '100%',
           height: '100%',
           transition: 'width 0.3s ease-in-out'
-        }} 
+        }}
       />
 
       {/* Profile Button */}
@@ -588,7 +642,6 @@ export default function GlobeView() {
       {isProfileOpen && (
         <div
           onClick={(e) => {
-            // Close modal when clicking outside
             if (e.target === e.currentTarget) {
               setIsProfileOpen(false);
             }
@@ -618,11 +671,15 @@ export default function GlobeView() {
               overflowY: 'auto'
             }}
           >
-            <ProgressOverview userProgress={userProgress} sidebarItems={sidebarItems} />
+            <ProgressOverview 
+              userProgress={userProgress} 
+              sidebarItems={sidebarItems} 
+              onResetProgress={handleResetProgress}
+            />
           </div>
         </div>
       )}
-      
+
       {/* Sidebar Container with Integrated Tab */}
       <div style={{
         position: 'absolute',
@@ -707,11 +764,12 @@ export default function GlobeView() {
                   className="w-full h-full object-cover rounded"
                 />
               </div>
-              
+
               <h2 className="text-xl font-semibold mb-4">{selectedStory.title}</h2>
-              
+
               <div className="prose max-w-none mb-6">
-                {mockExpandedContent.text.split('\n\n').map((paragraph, index) => (
+                <h3 className="text-xl font-semibold mb-4">{expandedStories[selectedStory.id].title}</h3>
+                {expandedStories[selectedStory.id].text.split('\n\n').map((paragraph, index) => (
                   <p key={index} className="mb-4">{paragraph}</p>
                 ))}
               </div>
@@ -721,7 +779,7 @@ export default function GlobeView() {
                 {selectedStory.categories.map((cat) => (
                   <span
                     key={cat}
-                    className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded"
+                    className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded capitalize"
                   >
                     {categories[cat].icon} {categories[cat].label}
                   </span>
@@ -756,9 +814,8 @@ export default function GlobeView() {
                     {Object.entries(categories).map(([key, { label, icon }]) => (
                       <button
                         key={key}
-                        className={`filter-button ${
-                          selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
-                        }`}
+                        className={`filter-button ${selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
+                          }`}
                         onClick={() => toggleCategory(key)}
                       >
                         <span className="mr-2">{icon}</span>
@@ -815,15 +872,14 @@ export default function GlobeView() {
                     {isFilterOpen ? '▼' : '▶'}
                   </button>
                 </div>
-                
+
                 {isFilterOpen && (
                   <div className="grid grid-cols-2 gap-2">
                     {Object.entries(categories).map(([key, { label, icon }]) => (
                       <button
                         key={key}
-                        className={`filter-button ${
-                          selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
-                        }`}
+                        className={`filter-button ${selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
+                          }`}
                         onClick={() => toggleCategory(key)}
                       >
                         <span className="mr-2">{icon}</span>
@@ -842,43 +898,65 @@ export default function GlobeView() {
                 maxWidth: '90%',
                 margin: '0 auto'
               }}>
-                {filteredStories.map((story) => (
-                  <div key={story.id} className="story-card">
-                    <div className="relative aspect-w-16 aspect-h-9 mb-4">
-                      <img
-                        src={story.image}
-                        alt={story.title}
-                        className="w-full h-full object-cover rounded"
-                      />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">{story.title}</h3>
-                    <p className="text-gray-600 mb-4">{story.description}</p>
-                    
-                    {/* Read More Button - Moved above categories */}
-                    <button
-                      className="read-more-button mb-4"
-                      onClick={() => {
-                        setSelectedStory(story);
-                        setExpandedStory(story.id);
-                        markAsVisited(story.id, userProgress, setUserProgress);
-                      }}
-                    >
-                      Lees meer...
-                    </button>
+                {filteredStories.length > 0 ? (
+                  filteredStories.map((story) => (
+                    <div key={story.id} className="story-card">
+                      <div className="relative aspect-w-16 aspect-h-9 mb-4">
+                        <img
+                          src={story.image}
+                          alt={story.title}
+                          className="w-full h-full object-cover rounded"
+                        />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">{story.title}</h3>
+                      <p className="text-gray-600 mb-4">{story.description}</p>
 
-                    {/* Categories */}
-                    <div className="flex flex-wrap gap-2">
-                      {story.categories.map((cat) => (
-                        <span
-                          key={cat}
-                          className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded"
-                        >
-                          {categories[cat].icon} {categories[cat].label}
-                        </span>
-                      ))}
+                      {/* Read More Button - Moved above categories */}
+                      <button
+                        className="read-more-button mb-4"
+                        onClick={() => {
+                          setSelectedStory(story);
+                          setExpandedStory(story.id);
+                          markAsVisited(story.id, userProgress, setUserProgress);
+                        }}
+                      >
+                        Lees meer...
+                      </button>
+
+                      {/* Categories */}
+                      <div className="flex flex-wrap gap-2">
+                        {story.categories.map((cat) => (
+                          <span
+                            key={cat}
+                            className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded capitalize"
+                          >
+                            {categories[cat].icon} {categories[cat].label}
+                          </span>
+                        ))}
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 px-4">
+                    <div className="text-4xl mb-4">🔍</div>
+                    <h3 className="text-xl font-semibold mb-2">
+                      {selectedLocation 
+                        ? "Geen verhalen gevonden in dit land..."
+                        : selectedCategories.length > 0 
+                          ? "Geen verhalen gevonden met deze combinatie van filters..."
+                          : "Geen verhalen gevonden..."
+                      }
+                    </h3>
+                    <p className="text-gray-600">
+                      {selectedLocation 
+                        ? "Probeer een ander land te selecteren"
+                        : selectedCategories.length > 0 
+                          ? "Probeer andere filters te selecteren"
+                          : "Probeer andere zoek criteria"
+                      }
+                    </p>
                   </div>
-                ))}
+                )}
               </div>
             </>
           )}

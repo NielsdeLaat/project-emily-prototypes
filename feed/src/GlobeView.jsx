@@ -7,13 +7,13 @@ import StoriesContent from "./components/StoriesContent";
 import FeedContent from "./components/FeedContent";
 
 // Import images
-import ablikimImg from "./img/Ablikim.png";
+import AbrahamImg from "./img/Abraham.png";
 import emilyImg from "./img/Emily.png";
 import carlosImg from "./img/Carlos.png";
 import barryImg from "./img/Barry.png";
 import tyroneImg from "./img/Tyrone.png";
-import eunjuImg from "./img/Eunju_Kim.png";
-import kikonyogoImg from "./img/Kikonyogo_Kivumbi.png";
+import SaraImg from "./img/Sara.png";
+import MikeImg from "./img/Mike.png";
 
 // Categories for filtering
 const categories = {
@@ -29,10 +29,10 @@ const categories = {
 const sidebarItems = [
   {
     id: 1,
-    title: "Ablikim",
+    title: "Abraham",
     description:
       "Zijn geloof werd verboden, zijn arbeid gestolen, zijn identiteit uitgewist , toch wist hij te ontsnappen.",
-    image: ablikimImg,
+    image: AbrahamImg,
     location: {
       name: "Xinjiang Village",
       coordinates: [87.6177, 43.7928], // Urumqi, Xinjiang
@@ -70,7 +70,7 @@ const sidebarItems = [
     id: 4,
     title: "Barry",
     description:
-      "Verlaten, verkracht en verguisd, maar nog altijd vechtend voor zichzelf, zijn gezin en zijn waarheid.",
+      "Barry vluchtte voor zijn leven, maar vond nergens rust. Niet in Burundi, niet in Kenia. Alleen stilte, schaamte en angst die zich bleven herhalen.",
     image: barryImg,
     location: {
       name: "Bujumbura",
@@ -83,7 +83,7 @@ const sidebarItems = [
     id: 5,
     title: "Tyrone",
     description:
-      "Gejaagd om zijn bestaan, door staten en straten, bleef hij vechten voor een plek waar hij gewoon mocht zijn.",
+      "Tyrone verliet Oeganda in de hoop op rust en veiligheid. In plaats daarvan kwam hij terecht in een nieuw land, waar het gevaar bleef.",
     image: tyroneImg,
     location: {
       name: "Kampala",
@@ -94,10 +94,10 @@ const sidebarItems = [
   },
   {
     id: 6,
-    title: "Eunju Kim",
+    title: "Sara",
     description:
       "Ze trotseerde dood, vrieskou en verraad , voor een maaltijd, een stem, en uiteindelijk een leven in vrijheid.",
-    image: eunjuImg,
+    image: SaraImg,
     location: {
       name: "Eundok",
       coordinates: [129.3274, 41.8142], // Eundok, North Hamgyong
@@ -107,10 +107,10 @@ const sidebarItems = [
   },
   {
     id: 7,
-    title: "Kikonyogo Kivumbi",
+    title: "Mike",
     description:
-      "Geverfd als vijand vanwege liefde, verloor hij zijn werk, zijn veiligheid en bijna zijn leven , maar niet zijn stem.",
-    image: kikonyogoImg,
+      "Wat gebeurt er als je wordt uitgesloten door de samenleving die je probeert te helpen, simpelweg omdat je jezelf bent?",
+    image: MikeImg,
     location: {
       name: "Kampala",
       coordinates: [32.5825, 0.3476], // Kampala Center

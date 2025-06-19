@@ -36,4 +36,8 @@
   .filter-button {
     @apply px-3 py-1 rounded bg-gray-200 hover:bg-emily-blue hover:text-white transition-all duration-300;
   }
+
+  .progress-bar {
+    @apply h-full bg-orange-500 transition-all duration-300;
+  }
 }
