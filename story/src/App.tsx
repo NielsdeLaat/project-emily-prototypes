@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { stories } from "@/data/stories";
 import { Button } from "@/components/ui/button";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Initialize React Query client for data fetching
 const queryClient = new QueryClient();
@@ -83,74 +84,76 @@ const App = () => {
   }, [showPhone, isAnimating]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        {/* Toast notifications */}
-        <Toaster />
-        <Sonner />
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          {/* Toast notifications */}
+          <Toaster />
+          <Sonner />
 
-        {/* Story Selection Buttons */}
-        {!showPhone && (
-          <div className="fixed inset-0 flex items-center justify-center">
-            <div className="max-w-2xl w-full p-8">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-8 text-balance text-center">
-                <p className="text-lg leading-relaxed text-white/90">
-                  Met dit prototype kan je een aantal verhalen testen die horen
-                  bij verschillende persona's. Met het menu hieronder kan je
-                  testen wel verhaal je wilt bekijken.
-                </p>
-              </div>
-              {/* <h1 className="text-4xl font-bold text-center mb-12 text-white">
-                Welk verhaal wil je zien?
-              </h1> */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {stories.map((story) => (
-                  <Button
-                    key={story.id}
-                    onClick={() => handleStorySelect(story.id)}
-                    className="h-40 text-lg text-balance font-medium bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:shadow-xl"
-                  >
-                    {story.title}
-                  </Button>
-                ))}
+          {/* Story Selection Buttons */}
+          {!showPhone && (
+            <div className="fixed inset-0 flex items-center justify-center">
+              <div className="max-w-2xl w-full p-8">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mb-8 text-balance text-center">
+                  <p className="text-lg leading-relaxed text-white/90">
+                    Met dit prototype kan je een aantal verhalen testen die
+                    horen bij verschillende persona's. Met het menu hieronder
+                    kan je testen wel verhaal je wilt bekijken.
+                  </p>
+                </div>
+                {/* <h1 className="text-4xl font-bold text-center mb-12 text-white">
+                  Welk verhaal wil je zien?
+                </h1> */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {stories.map((story) => (
+                    <Button
+                      key={story.id}
+                      onClick={() => handleStorySelect(story.id)}
+                      className="h-40 text-lg text-balance font-medium bg-white/10 hover:bg-white/20 text-white border border-white/20 rounded-xl shadow-lg backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:shadow-xl"
+                    >
+                      {story.title}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Mobile viewport container with slide animation */}
-        <div
-          className={`mobile-viewport-container ${
-            showPhone ? "slide-in" : "slide-out"
-          }`}
-          style={{ display: isAnimating || showPhone ? "flex" : "none" }}
-          onClick={(e) => {
-            // Only close if clicking the container itself, not its children
-            if (e.target === e.currentTarget) {
-              handleClose();
-            }
-          }}
-        >
-          <div className="mobile-viewport">
-            <BrowserRouter>
-              <Routes>
-                <Route
-                  path="/"
-                  element={
-                    <Index
-                      onClose={handleClose}
-                      onShowPhone={handleShow}
-                      selectedStory={selectedStory}
-                    />
-                  }
-                />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
+          {/* Mobile viewport container with slide animation */}
+          <div
+            className={`mobile-viewport-container ${
+              showPhone ? "slide-in" : "slide-out"
+            }`}
+            style={{ display: isAnimating || showPhone ? "flex" : "none" }}
+            onClick={(e) => {
+              // Only close if clicking the container itself, not its children
+              if (e.target === e.currentTarget) {
+                handleClose();
+              }
+            }}
+          >
+            <div className="mobile-viewport">
+              <BrowserRouter>
+                <Routes>
+                  <Route
+                    path="/"
+                    element={
+                      <Index
+                        onClose={handleClose}
+                        onShowPhone={handleShow}
+                        selectedStory={selectedStory}
+                      />
+                    }
+                  />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </div>
           </div>
-        </div>
-      </TooltipProvider>
-    </QueryClientProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
