@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SUCCESS_MESSAGES } from "@/config/constants";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -29,35 +30,37 @@ const App = () => {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <div className="mobile-viewport-container">
-          <div className="mobile-viewport">
-            {isLoading ? (
-              <LoadingScreen onLoadingComplete={() => setIsLoading(false)} />
-            ) : (
-              <BrowserRouter>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </BrowserRouter>
-            )}
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <div className="mobile-viewport-container">
+            <div className="mobile-viewport">
+              {isLoading ? (
+                <LoadingScreen onLoadingComplete={() => setIsLoading(false)} />
+              ) : (
+                <BrowserRouter>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </BrowserRouter>
+              )}
+            </div>
           </div>
-        </div>
-        <Button
-          onClick={handleResetChats}
-          variant="destructive"
-          size="icon"
-          className="fixed bottom-4 right-4 rounded-full shadow-lg"
-        >
-          <Trash2 className="h-5 w-5" />
-        </Button>
-      </TooltipProvider>
-    </QueryClientProvider>
+          <Button
+            onClick={handleResetChats}
+            variant="destructive"
+            size="icon"
+            className="fixed bottom-4 right-4 rounded-full shadow-lg"
+          >
+            <Trash2 className="h-5 w-5" />
+          </Button>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 

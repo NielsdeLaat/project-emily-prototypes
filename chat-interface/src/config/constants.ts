@@ -31,8 +31,10 @@ export const API = {
 
 // Error messages
 export const ERROR_MESSAGES = {
-  API_ERROR: "I'm having trouble connecting right now. Please try again later.",
-  NO_RESPONSE: "I'm not sure how to respond to that.",
+  API_ERROR:
+    "Ik heb op dit moment problemen met verbinden. Probeer het later nog eens.",
+  NO_RESPONSE:
+    "Er is iets misgegaan met het sturen van je bericht. Probeer het nog eens.",
   EXAMPLE_QUESTIONS_UNAVAILABLE:
     "Voorbeeldvragen zijn op dit moment niet beschikbaar",
   AI_RESPONSE_FAILED: "Failed to get response from AI. Please try again.",
@@ -40,10 +42,10 @@ export const ERROR_MESSAGES = {
 
 // Success messages
 export const SUCCESS_MESSAGES = {
-  CALL_STARTED: "You are now connected with",
-  CALL_ENDED: "The call has been disconnected",
-  CHAT_HISTORY_CLEARED: "Chat history cleared",
-  CHAT_HISTORY_RESET: "All chat histories have been reset.",
+  CALL_STARTED: "Je belt nu met",
+  CALL_ENDED: "Je hebt opgehangen.",
+  CHAT_HISTORY_CLEARED: "Chatgeschiedenis verwijderd.",
+  CHAT_HISTORY_RESET: "Alle chatgeschiedenis gereset.",
 } as const;
 
 // Loading messages
