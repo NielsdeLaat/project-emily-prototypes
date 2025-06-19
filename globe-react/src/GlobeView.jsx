@@ -27,7 +27,7 @@ const categories = {
 const sidebarItems = [
   {
     id: 1,
-    title: "Abramham",
+    title: "Abraham",
     description: "Hij groeide op met gebed, familie en een diepgewortelde traditie. Wat volgde was isolatie, dwangarbeid en stilte, opgelegd in naam van heropvoeding.",
     image: AbrahamImg,
     location: {
@@ -215,6 +215,13 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
     });
   };
 
+  // Auto-collapse filters when only one story is shown
+  useEffect(() => {
+    if (filteredStories.length === 1 && isFilterOpen) {
+      setIsFilterOpen(false);
+    }
+  }, [filteredStories.length, isFilterOpen]);
+
   // Add reset progress function
   const handleResetProgress = () => {
     if (window.confirm('Weet je zeker dat je alle vooruitgang wilt resetten? Dit kan niet ongedaan worden gemaakt.')) {
@@ -260,6 +267,35 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
         'NavigationControl.ZoomIn': 'Inzoomen',
         'NavigationControl.ZoomOut': 'Uitzoomen',
         'NavigationControl.ResetBearing': 'Draai naar het noorden',
+      }
+    });
+
+    // Add map interaction handlers to close sidebar
+    map.current.on('click', (e) => {
+      // Only close sidebar if clicking on empty areas (not on countries or markers)
+      const features = map.current.queryRenderedFeatures(e.point);
+      const hasCountryFeature = features.some(feature => 
+        feature.source === 'countries' || 
+        feature.source === 'territories' ||
+        feature.layer?.id?.includes('country') ||
+        feature.layer?.id?.includes('territory')
+      );
+      
+      // Don't close sidebar if clicking on a country or if there are features at click point
+      if (!hasCountryFeature && features.length === 0 && isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    });
+
+    map.current.on('dragstart', () => {
+      if (isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    });
+
+    map.current.on('zoomstart', () => {
+      if (isSidebarOpen) {
+        setIsSidebarOpen(false);
       }
     });
 
@@ -396,6 +432,8 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
         popupContent.style.backgroundColor = 'white';
         popupContent.style.borderRadius = '8px';
         popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        popupContent.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+        popupContent.style.position = 'relative';
 
         // Name and Age
         const title = document.createElement('h3');
@@ -403,7 +441,14 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
         title.style.margin = '0 0 8px 0';
         title.style.color = '#333';
         title.style.fontSize = '18px';
+        title.style.fontWeight = '600';
+        title.style.fontFamily = 'inherit';
         popupContent.appendChild(title);
+
+        // Image container with relative positioning
+        const imgContainer = document.createElement('div');
+        imgContainer.style.position = 'relative';
+        imgContainer.style.marginBottom = '12px';
 
         // Image
         const img = document.createElement('img');
@@ -411,29 +456,119 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
         img.style.width = '100%';
         img.style.height = '200px';
         img.style.objectFit = 'cover';
-        img.style.borderRadius = '4px';
-        img.style.marginBottom = '10px';
-        popupContent.appendChild(img);
+        img.style.borderRadius = '6px';
+        img.style.display = 'block';
+        
+        // Apply grayscale filter if story has been visited
+        if (userProgress.visitedIds.includes(story.id)) {
+          img.style.filter = 'grayscale(80%) brightness(0.8)';
+        }
+        
+        imgContainer.appendChild(img);
 
-        // Location
+        // Add visited badge over image if story has been visited
+        if (userProgress.visitedIds.includes(story.id)) {
+          const visitedBadge = document.createElement('div');
+          visitedBadge.style.position = 'absolute';
+          visitedBadge.style.top = '10px';
+          visitedBadge.style.right = '10px';
+          visitedBadge.style.background = 'rgba(34, 197, 94, 0.9)';
+          visitedBadge.style.color = 'white';
+          visitedBadge.style.padding = '4px 8px';
+          visitedBadge.style.borderRadius = '12px';
+          visitedBadge.style.fontSize = '11px';
+          visitedBadge.style.fontWeight = '500';
+          visitedBadge.style.fontFamily = 'inherit';
+          visitedBadge.textContent = '✅ Bekeken';
+          imgContainer.appendChild(visitedBadge);
+        }
+
+        popupContent.appendChild(imgContainer);
+
+        // Location with extra spacing and italic
         const location = document.createElement('div');
-        location.style.color = '#666';
+        location.style.color = '#777';
         location.style.fontSize = '13px';
         location.style.display = 'flex';
         location.style.alignItems = 'center';
         location.style.gap = '4px';
-        location.style.marginBottom = '10px';
+        location.style.marginBottom = '12px';
+        location.style.marginTop = '8px';
+        location.style.fontFamily = 'inherit';
+        location.style.fontStyle = 'italic';
         location.innerHTML = `<span>📍</span> ${story.location.name}, ${story.location.country}`;
         popupContent.appendChild(location);
 
-        // Description
+        // Description with improved typography
         const desc = document.createElement('p');
         desc.textContent = story.description;
-        desc.style.margin = '0 0 10px 0';
-        desc.style.color = '#666';
+        desc.style.margin = '0 0 15px 0';
+        desc.style.color = '#555';
         desc.style.fontSize = '14px';
-        desc.style.lineHeight = '1.4';
+        desc.style.lineHeight = '1.5';
+        desc.style.padding = '0 2px';
+        desc.style.fontFamily = 'inherit';
         popupContent.appendChild(desc);
+
+        // Call-to-action button (moved above categories)
+        const ctaButton = document.createElement('button');
+        ctaButton.textContent = '👉 Lees verder';
+        ctaButton.style.width = '100%';
+        ctaButton.style.padding = '10px 16px';
+        ctaButton.style.backgroundColor = '#3B82F6';
+        ctaButton.style.color = 'white';
+        ctaButton.style.border = 'none';
+        ctaButton.style.borderRadius = '6px';
+        ctaButton.style.fontSize = '14px';
+        ctaButton.style.fontWeight = '500';
+        ctaButton.style.cursor = 'pointer';
+        ctaButton.style.transition = 'background-color 0.2s ease';
+        ctaButton.style.marginBottom = '15px';
+        ctaButton.style.fontFamily = 'inherit';
+        
+        // Create click handler with proper state access
+        const handleMarkerClick = () => {
+          // Force sidebar open
+          setIsSidebarOpen(true);
+
+          // Set location and filter stories
+          setSelectedLocation(story.location.country);
+          setFilteredStories(filterStories(story.location.country, selectedCategories));
+
+          // Directly show the detailed view
+          setSelectedStory(story);
+          setExpandedStory(story.id);
+          
+          // Mark as visited and update visual state immediately
+          markAsVisited(story.id, userProgress, setUserProgress);
+          
+          // Update marker appearance immediately
+          if (userProgress.visitedIds.includes(story.id)) {
+            inner.style.border = '2px solid rgba(76, 175, 80, 0.3)';
+            inner.style.filter = 'grayscale(80%) brightness(0.8)';
+            inner.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
+          }
+        };
+        
+        // Add click event listener to marker
+        el.addEventListener('click', handleMarkerClick);
+        
+        // Add click handler to navigate to full story (popup button)
+        ctaButton.addEventListener('click', () => {
+          handleMarkerClick();
+          // Close the popup
+          marker.getPopup().remove();
+        });
+
+        // Hover effect with consistent color
+        ctaButton.onmouseenter = () => {
+          ctaButton.style.backgroundColor = '#1D4ED8';
+        };
+        ctaButton.onmouseleave = () => {
+          ctaButton.style.backgroundColor = '#3B82F6';
+        };
+
+        popupContent.appendChild(ctaButton);
 
         // Categories
         const categoriesDiv = document.createElement('div');
@@ -450,6 +585,7 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
           catSpan.style.display = 'flex';
           catSpan.style.alignItems = 'center';
           catSpan.style.gap = '4px';
+          catSpan.style.fontFamily = 'inherit';
           catSpan.innerHTML = `${categories[cat].icon} ${categories[cat].label}`;
           categoriesDiv.appendChild(catSpan);
         });
@@ -469,22 +605,6 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
             className: 'custom-popup'
           }).setDOMContent(popupContent))
           .addTo(map.current);
-
-        // Create click handler with proper state access
-        const handleMarkerClick = () => {
-          // Force sidebar open
-          setIsSidebarOpen(true);
-
-          // Set location and filter stories
-          setSelectedLocation(story.location.country);
-          setFilteredStories(filterStories(story.location.country, selectedCategories));
-
-          // Directly show the detailed view
-          setSelectedStory(story);
-        };
-
-        // Add click event listener
-        el.addEventListener('click', handleMarkerClick);
 
         // Add hover events
         el.addEventListener('mouseenter', () => {
@@ -508,6 +628,22 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
             inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
           }
           setHoveredMarker(null);
+          
+          // Remove popup when leaving marker (unless hovering over popup)
+          setTimeout(() => {
+            if (!popupContent.matches(':hover')) {
+              marker.getPopup().remove();
+            }
+          }, 100);
+        });
+
+        // Add popup hover events
+        popupContent.addEventListener('mouseenter', () => {
+          // Keep popup visible when hovering over it
+        });
+
+        popupContent.addEventListener('mouseleave', () => {
+          // Remove popup when mouse leaves the popup area
           marker.getPopup().remove();
         });
       });
@@ -590,6 +726,36 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
       map.current.on('mouseleave', ['country-fills', 'territory-fills'], () => {
         map.current.getCanvas().style.cursor = '';
       });
+
+      // Add click handler for countries
+      map.current.on('click', 'country-fills', (e) => {
+        if (e.features.length > 0) {
+          const countryName = e.features[0].properties.name_en;
+          const countryStories = sidebarItems.filter(story => 
+            story.location.country === countryName
+          );
+          
+          // Always open sidebar, even for countries without stories
+          setIsSidebarOpen(true);
+          
+          // Set location and filter stories
+          setSelectedLocation(countryName);
+          setFilteredStories(filterStories(countryName, selectedCategories));
+          
+          // Clear selected story to show list view
+          setSelectedStory(null);
+          setExpandedStory(null);
+        }
+      });
+
+      // Add cursor pointer for countries
+      map.current.on('mouseenter', 'country-fills', () => {
+        map.current.getCanvas().style.cursor = 'pointer';
+      });
+
+      map.current.on('mouseleave', 'country-fills', () => {
+        map.current.getCanvas().style.cursor = '';
+      });
     });
 
     return () => {
@@ -630,14 +796,58 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
           top: 0,
           width: isSidebarOpen ? 'calc(100% - 30%)' : '100%',
           height: '100%',
-          transition: 'width 0.3s ease-in-out'
+          transition: 'width 0.3s ease-in-out',
+          zIndex: 5
         }}
       />
+
+      {/* Globe Dimming Overlay */}
+      {isSidebarOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: 'calc(100% - 30%)',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.15)',
+            backdropFilter: 'blur(2px)',
+            pointerEvents: 'none',
+            zIndex: 10,
+            transition: 'all 0.3s ease-in-out'
+          }}
+        />
+      )}
 
       {/* Profile Button */}
       <button
         className="fixed top-4 left-4 z-50 bg-white text-emily-blue w-10 h-10 rounded-full shadow-lg hover:border-emily-blue border-2 border-white transition-colors flex items-center justify-center"
         onClick={() => setIsProfileOpen(!isProfileOpen)}
+        onMouseEnter={(e) => {
+          const tooltip = document.createElement('div');
+          tooltip.textContent = 'Bekijk je voortgang en ontdekkingen';
+          tooltip.style.cssText = `
+            position: fixed;
+            top: ${e.clientY - 40}px;
+            left: ${e.clientX + 10}px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 10000;
+            pointer-events: none;
+            white-space: nowrap;
+          `;
+          tooltip.id = 'progress-tooltip';
+          document.body.appendChild(tooltip);
+        }}
+        onMouseLeave={() => {
+          const tooltip = document.getElementById('progress-tooltip');
+          if (tooltip) {
+            tooltip.remove();
+          }
+        }}
       >
         🥇
       </button>
@@ -770,8 +980,36 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
           backgroundColor: '#ffffff',
           boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
           overflowY: 'auto',
-          padding: '30px'
+          padding: '30px',
+          position: 'relative'
         }}>
+          {/* Close Button */}
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            style={{
+              position: 'absolute',
+              top: '15px',
+              right: '15px',
+              background: 'none',
+              border: 'none',
+              fontSize: '20px',
+              cursor: 'pointer',
+              color: '#666',
+              width: '30px',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
+              transition: 'background-color 0.2s',
+              zIndex: 1
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            title="Sluit zijbalk"
+          >
+            ×
+          </button>
           {selectedStory ? (
             // Expanded Story View
             <div className="story-card">
@@ -810,6 +1048,11 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                 onClick={() => {
                   // Handle chat functionality
                   markAsVisited(selectedStory.id, userProgress, setUserProgress);
+                  
+                  // Force re-render to update visual state
+                  setTimeout(() => {
+                    setFilteredStories([...filteredStories]);
+                  }, 100);
                 }}
               >
                 Chat met {selectedStory.title}
@@ -873,10 +1116,10 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">Filters</h3>
                   <button
-                    className="text-emily-blue hover:text-emily-blue/80"
+                    className="text-emily-blue hover:text-emily-blue/80 text-sm"
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
                   >
-                    {isFilterOpen ? '▼' : '▶'}
+                    {isFilterOpen ? 'Verberg filters' : 'Toon filters'}
                   </button>
                 </div>
 
@@ -912,13 +1155,23 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                         <img
                           src={story.image}
                           alt={story.title}
-                          className="w-full h-full object-cover rounded"
+                          className="w-full h-full object-cover rounded cursor-pointer"
+                          onClick={() => {
+                            setSelectedStory(story);
+                            setExpandedStory(story.id);
+                            markAsVisited(story.id, userProgress, setUserProgress);
+                            
+                            // Force re-render to update visual state
+                            setTimeout(() => {
+                              setFilteredStories([...filteredStories]);
+                            }, 100);
+                          }}
                         />
                       </div>
                       <h3 className="text-xl font-semibold mb-2">{story.title}, {expandedStories[story.id].age}</h3>
                       
                       {/* Location */}
-                      <p className="text-sm italic mb-4 flex items-center gap-1" style={{ color: '#777' }}>
+                      <p className="text-sm italic mb-4 flex items-center gap-1" style={{ color: '#777', fontSize: '13px', marginTop: '6px' }}>
                         📍 {story.location.country === "Hong Kong" 
                           ? "Hong Kong" 
                           : `${story.location.name}, ${story.location.country}`
@@ -935,6 +1188,11 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                           setSelectedStory(story);
                           setExpandedStory(story.id);
                           markAsVisited(story.id, userProgress, setUserProgress);
+                          
+                          // Force re-render to update visual state
+                          setTimeout(() => {
+                            setFilteredStories([...filteredStories]);
+                          }, 100);
                         }}
                       >
                         👉 {story.title === "Sara" || story.title === "Emily" ? "Lees haar verhaal" : "Lees zijn verhaal"}
