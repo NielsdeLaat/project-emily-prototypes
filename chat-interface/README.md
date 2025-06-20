@@ -2,6 +2,8 @@
 
 A modern web application that lets users chat and call with virtual personas who have lived through human rights challenges. The interface is inspired by popular messaging apps, making it accessible and familiar. Users can select a persona, send messages, receive AI-powered responses, and simulate calls—all in a safe, privacy-conscious environment.
 
+![Chat UI](readme-images/chat.png)
+
 [Link naar het online prototype](https://project-emily-chat-interface.vercel.app/)
 
 ## Features
