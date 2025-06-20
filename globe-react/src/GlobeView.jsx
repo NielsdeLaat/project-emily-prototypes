@@ -6,31 +6,31 @@ import ProgressOverview from './components/ProgressOverview';
 import SocialFeed from './components/SocialFeed';
 
 // Import images
-import ablikimImg from './img/Ablikim.png';
+import AbrahamImg from './img/Abraham.png';
 import emilyImg from './img/Emily.png';
 import carlosImg from './img/Carlos.png';
 import barryImg from './img/Barry.png';
 import tyroneImg from './img/Tyrone.png';
-import eunjuImg from './img/Eunju_Kim.png';
-import kikonyogoImg from './img/Kikonyogo_Kivumbi.png';
+import SaraImg from './img/Sara.png';
+import MikeImg from './img/Mike.png';
 
 // Categories for filtering
 const categories = {
-  religious: { label: "Religious Persecution", icon: "⛪" },
-  lgbtq: { label: "LGBTQ+ Rights", icon: "🏳️‍🌈" },
-  racism: { label: "Racial Discrimination", icon: "✊" },
-  political: { label: "Political Oppression", icon: "🗳️" },
-  gender: { label: "Gender Rights", icon: "♀️" },
-  refugee: { label: "Refugee Status", icon: "🏃" }
+  religious: { label: "Religieuze Vervolging", icon: "⛪" },
+  lgbtq: { label: "LHBTI+ Rechten", icon: "🏳️‍🌈" },
+  racism: { label: "Racisme", icon: "✊" },
+  political: { label: "Politieke Onderdrukking", icon: "🗳️" },
+  gender: { label: "Genderrechten", icon: "♀️" },
+  refugee: { label: "Vluchteling", icon: "🏃" }
 };
 
 // Story data with locations and categories
 const sidebarItems = [
   {
     id: 1,
-    title: "Ablikim",
-    description: "Zijn geloof werd verboden, zijn arbeid gestolen, zijn identiteit uitgewist , toch wist hij te ontsnappen.",
-    image: ablikimImg,
+    title: "Abraham",
+    description: "Hij groeide op met gebed, familie en een diepgewortelde traditie. Wat volgde was isolatie, dwangarbeid en stilte, opgelegd in naam van heropvoeding.",
+    image: AbrahamImg,
     location: {
       name: "Xinjiang Village",
       coordinates: [87.6177, 43.7928], // Urumqi, Xinjiang
@@ -65,7 +65,7 @@ const sidebarItems = [
   {
     id: 4,
     title: "Barry",
-    description: "Verlaten, verkracht en verguisd, maar nog altijd vechtend voor zichzelf, zijn gezin en zijn waarheid.",
+    description: "Barry vluchtte voor zijn leven, maar vond nergens rust. Niet in Burundi, niet in Kenia. Alleen stilte, schaamte en angst die zich bleven herhalen.",
     image: barryImg,
     location: {
       name: "Bujumbura",
@@ -77,7 +77,7 @@ const sidebarItems = [
   {
     id: 5,
     title: "Tyrone",
-    description: "Gejaagd om zijn bestaan, door staten en straten, bleef hij vechten voor een plek waar hij gewoon mocht zijn.",
+    description: "Tyrone verliet Oeganda in de hoop op rust en veiligheid. In plaats daarvan kwam hij terecht in een nieuw land, waar het gevaar bleef.",
     image: tyroneImg,
     location: {
       name: "Kampala",
@@ -88,9 +88,9 @@ const sidebarItems = [
   },
   {
     id: 6,
-    title: "Eunju Kim",
-    description: "Ze trotseerde dood, vrieskou en verraad , voor een maaltijd, een stem, en uiteindelijk een leven in vrijheid.",
-    image: eunjuImg,
+    title: "Sara",
+    description: "Gejaagd om zijn bestaan, door staten en straten, bleef hij vechten voor een plek waar hij gewoon mocht zijn.",
+    image: SaraImg,
     location: {
       name: "Eundok",
       coordinates: [129.3274, 41.8142], // Eundok, North Hamgyong
@@ -100,9 +100,9 @@ const sidebarItems = [
   },
   {
     id: 7,
-    title: "Kikonyogo Kivumbi",
-    description: "Geverfd als vijand vanwege liefde, verloor hij zijn werk, zijn veiligheid en bijna zijn leven , maar niet zijn stem.",
-    image: kikonyogoImg,
+    title: "Mike",
+    description: "Wat gebeurt er als je wordt uitgesloten door de samenleving die je probeert te helpen, simpelweg omdat je jezelf bent?",
+    image: MikeImg,
     location: {
       name: "Kampala",
       coordinates: [32.5825, 0.3476], // Kampala Center
@@ -146,7 +146,7 @@ export default function GlobeView() {
   const filterStories = (country, categories) => {
     return sidebarItems.filter(item => {
       const matchesCountry = !country || item.location.country === country;
-      const matchesCategories = categories.length === 0 || 
+      const matchesCategories = categories.length === 0 ||
         categories.every(cat => item.categories.includes(cat));
       return matchesCountry && matchesCategories;
     });
@@ -163,9 +163,16 @@ export default function GlobeView() {
     });
   };
 
+  // Auto-collapse filters when only one story is shown
+  useEffect(() => {
+    if (filteredStories.length === 1 && isFilterOpen) {
+      setIsFilterOpen(false);
+    }
+  }, [filteredStories.length, isFilterOpen]);
+
   // Add reset progress function
   const handleResetProgress = () => {
-    if (window.confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+    if (window.confirm('Weet je zeker dat je alle vooruitgang wilt resetten? Dit kan niet ongedaan worden gemaakt.')) {
       localStorage.removeItem('userProgress');
       setUserProgress({ visitedIds: [] });
       
@@ -203,7 +210,41 @@ export default function GlobeView() {
       },
       renderWorldCopies: true,
       pitch: 0,
-      bearing: 0
+      bearing: 0,
+      locale: {
+        'NavigationControl.ZoomIn': 'Inzoomen',
+        'NavigationControl.ZoomOut': 'Uitzoomen',
+        'NavigationControl.ResetBearing': 'Draai naar het noorden',
+      }
+    });
+
+    // Add map interaction handlers to close sidebar
+    map.current.on('click', (e) => {
+      // Only close sidebar if clicking on empty areas (not on countries or markers)
+      const features = map.current.queryRenderedFeatures(e.point);
+      const hasCountryFeature = features.some(feature => 
+        feature.source === 'countries' || 
+        feature.source === 'territories' ||
+        feature.layer?.id?.includes('country') ||
+        feature.layer?.id?.includes('territory')
+      );
+      
+      // Don't close sidebar if clicking on a country or if there are features at click point
+      if (!hasCountryFeature && features.length === 0 && isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    });
+
+    map.current.on('dragstart', () => {
+      if (isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    });
+
+    map.current.on('zoomstart', () => {
+      if (isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
     });
 
     map.current.on('style.load', () => {
@@ -217,210 +258,44 @@ export default function GlobeView() {
         "star-intensity": 0.1
       });
 
-      // Add country boundaries with thinner lines
+      // Add country boundaries
       map.current.addSource('countries', {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
       });
 
+      // Add country fills for highlighting
       map.current.addLayer({
         'id': 'country-fills',
         'type': 'fill',
         'source': 'countries',
         'source-layer': 'country_boundaries',
         'paint': {
-          'fill-color': '#e0e0e0',
+          'fill-color': [
+            'case',
+            ['==', ['get', 'name_en'], ''],  // Default case
+            '#ffffff',
+            '#ffffff'
+          ],
           'fill-opacity': 0.4
         }
       });
 
-      map.current.addLayer({
-        'id': 'country-borders',
-        'type': 'line',
-        'source': 'countries',
-        'source-layer': 'country_boundaries',
-        'paint': {
-          'line-color': '#000000',
-          'line-width': 0.5  // Thin lines but in black
-        }
-      });
-
-      // Add territory boundaries with thinner lines
-      map.current.addSource('territories', {
-        type: 'vector',
-        url: 'mapbox://mapbox.country-boundaries-v1'
-      });
-
+      // Add territory fills with the same style
       map.current.addLayer({
         'id': 'territory-fills',
         'type': 'fill',
-        'source': 'territories',
+        'source': 'countries',
         'source-layer': 'country_boundaries',
-        'filter': ['==', 'mapbox:is_territory', true],
+        'filter': [
+          'any',
+          ['==', ['get', 'name_en'], 'Taiwan'],
+          ['==', ['get', 'name_en'], 'Hong Kong']
+        ],
         'paint': {
-          'fill-color': '#e0e0e0',
+          'fill-color': '#ffffff',
           'fill-opacity': 0.4
         }
-      });
-
-      map.current.addLayer({
-        'id': 'territory-borders',
-        'type': 'line',
-        'source': 'territories',
-        'source-layer': 'country_boundaries',
-        'filter': ['==', 'mapbox:is_territory', true],
-        'paint': {
-          'line-color': '#000000',
-          'line-width': 0.5  // Thin lines but in black
-        }
-      });
-
-      sidebarItems.forEach(story => {
-        const el = document.createElement('div');
-        el.className = 'marker';
-
-        const inner = document.createElement('div');
-        inner.style.width = '30px';
-        inner.style.height = '30px';
-        inner.style.backgroundImage = `url(${story.image})`;
-        inner.style.backgroundSize = 'cover';
-        inner.style.borderRadius = '50%';
-        inner.style.cursor = 'pointer';
-        inner.style.transition = 'all 0.3s ease';
-        
-        // Add visited state visual indicator
-        if (userProgress.visitedIds.includes(story.id)) {
-          inner.style.border = '2px solid rgba(76, 175, 80, 0.3)';
-          inner.style.filter = 'grayscale(80%) brightness(0.8)';
-          inner.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
-        } else {
-          inner.style.border = '2px solid white';
-          inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-        }
-
-        el.appendChild(inner);
-
-        // Create popup content with more information
-        const popupContent = document.createElement('div');
-        popupContent.style.padding = '15px';
-        popupContent.style.maxWidth = '300px';
-        popupContent.style.backgroundColor = 'white';
-        popupContent.style.borderRadius = '8px';
-        popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-
-        // Name and Age
-        const title = document.createElement('h3');
-        title.textContent = `${story.title}, ${mockExpandedContent.age[story.id]}`;
-        title.style.margin = '0 0 8px 0';
-        title.style.color = '#333';
-        title.style.fontSize = '18px';
-        popupContent.appendChild(title);
-
-        // Image
-        const img = document.createElement('img');
-        img.src = story.image;
-        img.style.width = '100%';
-        img.style.height = '200px';
-        img.style.objectFit = 'cover';
-        img.style.borderRadius = '4px';
-        img.style.marginBottom = '10px';
-        popupContent.appendChild(img);
-
-        // Location
-        const location = document.createElement('div');
-        location.style.color = '#666';
-        location.style.fontSize = '13px';
-        location.style.display = 'flex';
-        location.style.alignItems = 'center';
-        location.style.gap = '4px';
-        location.style.marginBottom = '10px';
-        location.innerHTML = `<span>📍</span> ${story.location.name}, ${story.location.country}`;
-        popupContent.appendChild(location);
-
-        // Description
-        const desc = document.createElement('p');
-        desc.textContent = story.description;
-        desc.style.margin = '0 0 10px 0';
-        desc.style.color = '#666';
-        desc.style.fontSize = '14px';
-        desc.style.lineHeight = '1.4';
-        popupContent.appendChild(desc);
-        
-        // Categories
-        const categoriesDiv = document.createElement('div');
-        categoriesDiv.style.display = 'flex';
-        categoriesDiv.style.gap = '5px';
-        categoriesDiv.style.flexWrap = 'wrap';
-
-        story.categories.forEach(cat => {
-          const catSpan = document.createElement('span');
-          catSpan.style.background = '#f0f0f0';
-          catSpan.style.padding = '4px 8px';
-          catSpan.style.borderRadius = '4px';
-          catSpan.style.fontSize = '12px';
-          catSpan.style.display = 'flex';
-          catSpan.style.alignItems = 'center';
-          catSpan.style.gap = '4px';
-          catSpan.innerHTML = `${categories[cat].icon} ${categories[cat].label}`;
-          categoriesDiv.appendChild(catSpan);
-        });
-
-        popupContent.appendChild(categoriesDiv);
-
-        const marker = new mapboxgl.Marker({
-          element: el,
-          anchor: 'center'
-        })
-          .setLngLat(story.location.coordinates)
-          .setPopup(new mapboxgl.Popup({
-            offset: 25,
-            closeButton: false,
-            closeOnClick: false,
-            anchor: 'top',
-            className: 'custom-popup'
-          }).setDOMContent(popupContent))
-          .addTo(map.current);
-
-        // Create click handler with proper state access
-        const handleMarkerClick = () => {
-          // Force sidebar open
-          setIsSidebarOpen(true);
-          
-          // Set location and filter stories
-          setSelectedLocation(story.location.country);
-          setFilteredStories(filterStories(story.location.country, selectedCategories));
-          
-          // Directly show the detailed view
-          setSelectedStory(story);
-        };
-
-        // Add click event listener
-        el.addEventListener('click', handleMarkerClick);
-
-        // Add hover events
-        el.addEventListener('mouseenter', () => {
-          if (userProgress.visitedIds.includes(story.id)) {
-            inner.style.transform = 'scale(1.1)';
-            inner.style.filter = 'grayscale(50%) brightness(0.9)';
-          } else {
-            inner.style.transform = 'scale(1.2)';
-            inner.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
-          }
-          setHoveredMarker(story.id);
-          marker.getPopup().addTo(map.current);
-        });
-
-        el.addEventListener('mouseleave', () => {
-          if (userProgress.visitedIds.includes(story.id)) {
-            inner.style.transform = 'scale(1)';
-            inner.style.filter = 'grayscale(80%) brightness(0.8)';
-          } else {
-            inner.style.transform = 'scale(1)';
-            inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-          }
-          setHoveredMarker(null);
-          marker.getPopup().remove();
-        });
       });
 
       // Add country labels
@@ -456,8 +331,269 @@ export default function GlobeView() {
         'paint': {
           'text-color': '#000000',
           'text-halo-color': '#ffffff',
-          'text-halo-width': 1
+          'text-halo-width': 1.5
         }
+      });
+
+      // Add country boundaries with thinner lines
+      map.current.addLayer({
+        'id': 'country-boundaries',
+        'type': 'line',
+        'source': 'countries',
+        'source-layer': 'country_boundaries',
+        'layout': {},
+        'paint': {
+          'line-color': '#a0a0a0',
+          'line-width': 0.5
+        }
+      }, 'country-labels');
+
+      sidebarItems.forEach(story => {
+        const el = document.createElement('div');
+        el.className = 'marker';
+
+        const inner = document.createElement('div');
+        inner.style.width = '30px';
+        inner.style.height = '30px';
+        inner.style.backgroundImage = `url(${story.image})`;
+        inner.style.backgroundSize = 'cover';
+        inner.style.borderRadius = '50%';
+        inner.style.cursor = 'pointer';
+        inner.style.transition = 'all 0.3s ease';
+
+        // Add visited state visual indicator
+        if (userProgress.visitedIds.includes(story.id)) {
+          inner.style.border = '2px solid rgba(76, 175, 80, 0.3)';
+          inner.style.filter = 'grayscale(80%) brightness(0.8)';
+          inner.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
+        } else {
+          inner.style.border = '2px solid white';
+          inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        }
+
+        el.appendChild(inner);
+
+        // Create popup content with more information
+        const popupContent = document.createElement('div');
+        popupContent.style.padding = '15px';
+        popupContent.style.maxWidth = '300px';
+        popupContent.style.backgroundColor = 'white';
+        popupContent.style.borderRadius = '8px';
+        popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        popupContent.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+        popupContent.style.position = 'relative';
+
+        // Name and Age
+        const title = document.createElement('h3');
+        title.textContent = `${story.title}, ${expandedStories[story.id].age}`;
+        title.style.margin = '0 0 8px 0';
+        title.style.color = '#333';
+        title.style.fontSize = '18px';
+        title.style.fontWeight = '600';
+        title.style.fontFamily = 'inherit';
+        popupContent.appendChild(title);
+
+        // Image container with relative positioning
+        const imgContainer = document.createElement('div');
+        imgContainer.style.position = 'relative';
+        imgContainer.style.marginBottom = '12px';
+
+        // Image
+        const img = document.createElement('img');
+        img.src = story.image;
+        img.style.width = '100%';
+        img.style.height = '200px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '6px';
+        img.style.display = 'block';
+        
+        // Apply grayscale filter if story has been visited
+        if (userProgress.visitedIds.includes(story.id)) {
+          img.style.filter = 'grayscale(80%) brightness(0.8)';
+        }
+        
+        imgContainer.appendChild(img);
+
+        // Add visited badge over image if story has been visited
+        if (userProgress.visitedIds.includes(story.id)) {
+          const visitedBadge = document.createElement('div');
+          visitedBadge.style.position = 'absolute';
+          visitedBadge.style.top = '10px';
+          visitedBadge.style.right = '10px';
+          visitedBadge.style.background = 'rgba(34, 197, 94, 0.9)';
+          visitedBadge.style.color = 'white';
+          visitedBadge.style.padding = '4px 8px';
+          visitedBadge.style.borderRadius = '12px';
+          visitedBadge.style.fontSize = '11px';
+          visitedBadge.style.fontWeight = '500';
+          visitedBadge.style.fontFamily = 'inherit';
+          visitedBadge.textContent = '✅ Bekeken';
+          imgContainer.appendChild(visitedBadge);
+        }
+
+        popupContent.appendChild(imgContainer);
+
+        // Location with extra spacing and italic
+        const location = document.createElement('div');
+        location.style.color = '#777';
+        location.style.fontSize = '13px';
+        location.style.display = 'flex';
+        location.style.alignItems = 'center';
+        location.style.gap = '4px';
+        location.style.marginBottom = '12px';
+        location.style.marginTop = '8px';
+        location.style.fontFamily = 'inherit';
+        location.style.fontStyle = 'italic';
+        location.innerHTML = `<span>📍</span> ${story.location.name}, ${story.location.country}`;
+        popupContent.appendChild(location);
+
+        // Description with improved typography
+        const desc = document.createElement('p');
+        desc.textContent = story.description;
+        desc.style.margin = '0 0 15px 0';
+        desc.style.color = '#555';
+        desc.style.fontSize = '14px';
+        desc.style.lineHeight = '1.5';
+        desc.style.padding = '0 2px';
+        desc.style.fontFamily = 'inherit';
+        popupContent.appendChild(desc);
+
+        // Call-to-action button (moved above categories)
+        const ctaButton = document.createElement('button');
+        ctaButton.textContent = '👉 Lees verder';
+        ctaButton.style.width = '100%';
+        ctaButton.style.padding = '10px 16px';
+        ctaButton.style.backgroundColor = '#3B82F6';
+        ctaButton.style.color = 'white';
+        ctaButton.style.border = 'none';
+        ctaButton.style.borderRadius = '6px';
+        ctaButton.style.fontSize = '14px';
+        ctaButton.style.fontWeight = '500';
+        ctaButton.style.cursor = 'pointer';
+        ctaButton.style.transition = 'background-color 0.2s ease';
+        ctaButton.style.marginBottom = '15px';
+        ctaButton.style.fontFamily = 'inherit';
+        
+        // Create click handler with proper state access
+        const handleMarkerClick = () => {
+          // Force sidebar open
+          setIsSidebarOpen(true);
+
+          // Set location and filter stories
+          setSelectedLocation(story.location.country);
+          setFilteredStories(filterStories(story.location.country, selectedCategories));
+
+          // Directly show the detailed view
+          setSelectedStory(story);
+          setExpandedStory(story.id);
+          
+          // Mark as visited and update visual state immediately
+          markAsVisited(story.id, userProgress, setUserProgress);
+          
+          // Update marker appearance immediately
+          if (userProgress.visitedIds.includes(story.id)) {
+            inner.style.border = '2px solid rgba(76, 175, 80, 0.3)';
+            inner.style.filter = 'grayscale(80%) brightness(0.8)';
+            inner.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
+          }
+        };
+        
+        // Add click event listener to marker
+        el.addEventListener('click', handleMarkerClick);
+        
+        // Add click handler to navigate to full story (popup button)
+        ctaButton.addEventListener('click', () => {
+          handleMarkerClick();
+          // Close the popup
+          marker.getPopup().remove();
+        });
+
+        // Hover effect with consistent color
+        ctaButton.onmouseenter = () => {
+          ctaButton.style.backgroundColor = '#1D4ED8';
+        };
+        ctaButton.onmouseleave = () => {
+          ctaButton.style.backgroundColor = '#3B82F6';
+        };
+
+        popupContent.appendChild(ctaButton);
+
+        // Categories
+        const categoriesDiv = document.createElement('div');
+        categoriesDiv.style.display = 'flex';
+        categoriesDiv.style.gap = '5px';
+        categoriesDiv.style.flexWrap = 'wrap';
+
+        story.categories.forEach(cat => {
+          const catSpan = document.createElement('span');
+          catSpan.style.background = '#f0f0f0';
+          catSpan.style.padding = '4px 8px';
+          catSpan.style.borderRadius = '4px';
+          catSpan.style.fontSize = '12px';
+          catSpan.style.display = 'flex';
+          catSpan.style.alignItems = 'center';
+          catSpan.style.gap = '4px';
+          catSpan.style.fontFamily = 'inherit';
+          catSpan.innerHTML = `${categories[cat].icon} ${categories[cat].label}`;
+          categoriesDiv.appendChild(catSpan);
+        });
+
+        popupContent.appendChild(categoriesDiv);
+
+        const marker = new mapboxgl.Marker({
+          element: el,
+          anchor: 'center'
+        })
+          .setLngLat(story.location.coordinates)
+          .setPopup(new mapboxgl.Popup({
+            offset: 25,
+            closeButton: false,
+            closeOnClick: false,
+            anchor: 'top',
+            className: 'custom-popup'
+          }).setDOMContent(popupContent))
+          .addTo(map.current);
+
+        // Add hover events
+        el.addEventListener('mouseenter', () => {
+          if (userProgress.visitedIds.includes(story.id)) {
+            inner.style.transform = 'scale(1.1)';
+            inner.style.filter = 'grayscale(50%) brightness(0.9)';
+          } else {
+            inner.style.transform = 'scale(1.2)';
+            inner.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+          }
+          setHoveredMarker(story.id);
+          marker.getPopup().addTo(map.current);
+        });
+
+        el.addEventListener('mouseleave', () => {
+          if (userProgress.visitedIds.includes(story.id)) {
+            inner.style.transform = 'scale(1)';
+            inner.style.filter = 'grayscale(80%) brightness(0.8)';
+          } else {
+            inner.style.transform = 'scale(1)';
+            inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+          }
+          setHoveredMarker(null);
+          
+          // Remove popup when leaving marker (unless hovering over popup)
+          setTimeout(() => {
+            if (!popupContent.matches(':hover')) {
+              marker.getPopup().remove();
+            }
+          }, 100);
+        });
+
+        // Add popup hover events
+        popupContent.addEventListener('mouseenter', () => {
+          // Keep popup visible when hovering over it
+        });
+
+        popupContent.addEventListener('mouseleave', () => {
+          // Remove popup when mouse leaves the popup area
+          marker.getPopup().remove();
+        });
       });
 
       // Add territory labels
@@ -503,24 +639,28 @@ export default function GlobeView() {
           const country = e.features[0];
           setSelectedCountry(country);
           setSelectedLocation(country.properties.name_en);
-          setFilteredStories(sidebarItems.filter(item => 
+          setFilteredStories(sidebarItems.filter(item =>
             item.location.country === country.properties.name_en
           ));
-          
-          // Highlight the clicked country or territory
+
+          // Reset all fills first
+          map.current.setPaintProperty('country-fills', 'fill-color', '#ffffff');
+          map.current.setPaintProperty('territory-fills', 'fill-color', '#ffffff');
+
+          // Then highlight the clicked country or territory
           if (country.properties.name_en === 'Taiwan' || country.properties.name_en === 'Hong Kong') {
             map.current.setPaintProperty('territory-fills', 'fill-color', [
               'case',
               ['==', ['get', 'name_en'], country.properties.name_en],
               '#ffd700',
-              '#e0e0e0'
+              '#ffffff'
             ]);
           } else {
             map.current.setPaintProperty('country-fills', 'fill-color', [
               'case',
               ['==', ['get', 'name_en'], country.properties.name_en],
               '#ffd700',
-              '#e0e0e0'
+              '#ffffff'
             ]);
           }
         }
@@ -532,6 +672,36 @@ export default function GlobeView() {
       });
 
       map.current.on('mouseleave', ['country-fills', 'territory-fills'], () => {
+        map.current.getCanvas().style.cursor = '';
+      });
+
+      // Add click handler for countries
+      map.current.on('click', 'country-fills', (e) => {
+        if (e.features.length > 0) {
+          const countryName = e.features[0].properties.name_en;
+          const countryStories = sidebarItems.filter(story => 
+            story.location.country === countryName
+          );
+          
+          // Always open sidebar, even for countries without stories
+          setIsSidebarOpen(true);
+          
+          // Set location and filter stories
+          setSelectedLocation(countryName);
+          setFilteredStories(filterStories(countryName, selectedCategories));
+          
+          // Clear selected story to show list view
+          setSelectedStory(null);
+          setExpandedStory(null);
+        }
+      });
+
+      // Add cursor pointer for countries
+      map.current.on('mouseenter', 'country-fills', () => {
+        map.current.getCanvas().style.cursor = 'pointer';
+      });
+
+      map.current.on('mouseleave', 'country-fills', () => {
         map.current.getCanvas().style.cursor = '';
       });
     });
@@ -555,33 +725,77 @@ export default function GlobeView() {
   }, [isSidebarOpen]);
 
   return (
-    <div style={{ 
-      position: 'fixed', 
-      top: 0, 
-      left: 0, 
-      right: 0, 
-      bottom: 0, 
-      margin: 0, 
-      padding: 0, 
-      overflow: 'hidden' 
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      margin: 0,
+      padding: 0,
+      overflow: 'hidden'
     }}>
       {/* Map Container */}
-      <div 
-        ref={mapContainer} 
-        style={{ 
+      <div
+        ref={mapContainer}
+        style={{
           position: 'absolute',
           left: 0,
           top: 0,
           width: isSidebarOpen ? 'calc(100% - 30%)' : '100%',
           height: '100%',
-          transition: 'width 0.3s ease-in-out'
-        }} 
+          transition: 'width 0.3s ease-in-out',
+          zIndex: 5
+        }}
       />
+
+      {/* Globe Dimming Overlay */}
+      {isSidebarOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: 'calc(100% - 30%)',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.15)',
+            backdropFilter: 'blur(2px)',
+            pointerEvents: 'none',
+            zIndex: 10,
+            transition: 'all 0.3s ease-in-out'
+          }}
+        />
+      )}
 
       {/* Profile Button */}
       <button
         className="fixed top-4 left-4 z-50 bg-white text-emily-blue w-10 h-10 rounded-full shadow-lg hover:border-emily-blue border-2 border-white transition-colors flex items-center justify-center"
         onClick={() => setIsProfileOpen(!isProfileOpen)}
+        onMouseEnter={(e) => {
+          const tooltip = document.createElement('div');
+          tooltip.textContent = 'Bekijk je voortgang en ontdekkingen';
+          tooltip.style.cssText = `
+            position: fixed;
+            top: ${e.clientY - 40}px;
+            left: ${e.clientX + 10}px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 10000;
+            pointer-events: none;
+            white-space: nowrap;
+          `;
+          tooltip.id = 'progress-tooltip';
+          document.body.appendChild(tooltip);
+        }}
+        onMouseLeave={() => {
+          const tooltip = document.getElementById('progress-tooltip');
+          if (tooltip) {
+            tooltip.remove();
+          }
+        }}
       >
         🥇
       </button>
@@ -590,7 +804,6 @@ export default function GlobeView() {
       {isProfileOpen && (
         <div
           onClick={(e) => {
-            // Close modal when clicking outside
             if (e.target === e.currentTarget) {
               setIsProfileOpen(false);
             }
@@ -608,23 +821,52 @@ export default function GlobeView() {
             zIndex: 1000
           }}
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              backgroundColor: 'white',
-              padding: '20px',
-              borderRadius: '12px',
-              maxWidth: '600px',
-              width: '90%',
-              maxHeight: '90vh',
-              overflowY: 'auto'
-            }}
-          >
-            <ProgressOverview userProgress={userProgress} sidebarItems={sidebarItems} />
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '20px',
+            maxWidth: '90vw',
+            width: '600px',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative'
+          }}>
+            {/* Close button */}
+            <button
+              onClick={() => setIsProfileOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '15px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#666',
+                width: '30px',
+                height: '30px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                transition: 'background-color 0.2s',
+                zIndex: 1
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            >
+              ×
+            </button>
+            
+            <ProgressOverview
+              userProgress={userProgress}
+              sidebarItems={sidebarItems}
+              onResetProgress={handleResetProgress}
+            />
           </div>
         </div>
       )}
-      
+
       {/* Sidebar Container with Integrated Tab */}
       <div style={{
         position: 'absolute',
@@ -686,7 +928,8 @@ export default function GlobeView() {
           backgroundColor: '#ffffff',
           boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
           overflowY: 'auto',
-          padding: '30px'
+          padding: '30px',
+          position: 'relative'
         }}>
           {/* Tab Switcher */}
           <div className="flex gap-2 mb-6">

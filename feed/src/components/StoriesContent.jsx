@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 // Import images (assuming these will be passed or handled within StoriesContent if dynamic)
-import ablikimImg from "../img/Ablikim.png";
+import AbrahamImg from "../img/Abraham.png";
 import emilyImg from "../img/Emily.png";
 import carlosImg from "../img/Carlos.png";
 import barryImg from "../img/Barry.png";
 import tyroneImg from "../img/Tyrone.png";
-import eunjuImg from "../img/Eunju_Kim.png";
-import kikonyogoImg from "../img/Kikonyogo_Kivumbi.png";
+import SaraImg from "../img/Sara.png";
+import MikeImg from "../img/Mike.png";
 
 // Categories for filtering - Moved here
 const categories = {
@@ -23,10 +23,10 @@ const categories = {
 const sidebarItems = [
   {
     id: 1,
-    title: "Ablikim",
+    title: "Abraham, 42",
     description:
-      "Zijn geloof werd verboden, zijn arbeid gestolen, zijn identiteit uitgewist , toch wist hij te ontsnappen.",
-    image: ablikimImg,
+      "Hij groeide op met gebed, familie en een diepgewortelde traditie. Wat volgde was isolatie, dwangarbeid en stilte — opgelegd in naam van heropvoeding.",
+    image: AbrahamImg,
     location: {
       name: "Xinjiang Village",
       coordinates: [87.6177, 43.7928],
@@ -36,7 +36,7 @@ const sidebarItems = [
   },
   {
     id: 2,
-    title: "Emily",
+    title: "Emily, 23",
     description:
       "Gewapend met een stem en een masker trotseerde ze traangas en stilte — en vond vrijheid in het vertellen.",
     image: emilyImg,
@@ -49,7 +49,7 @@ const sidebarItems = [
   },
   {
     id: 3,
-    title: "Carlos",
+    title: "Carlos, 29",
     description:
       "Hij groeide op tussen grenzen, van landen, culturen en verwachtingen, en vocht zich vrij met zijn blik op waardigheid.",
     image: carlosImg,
@@ -62,9 +62,9 @@ const sidebarItems = [
   },
   {
     id: 4,
-    title: "Barry",
+    title: "Barry, 31",
     description:
-      "Verlaten, verkracht en verguisd, maar nog altijd vechtend voor zichzelf, zijn gezin en zijn waarheid.",
+      "Barry vluchtte voor zijn leven, maar vond nergens rust. Niet in Burundi, niet in Kenia. Alleen stilte, schaamte en angst die zich bleven herhalen.",
     image: barryImg,
     location: {
       name: "Bujumbura",
@@ -75,9 +75,9 @@ const sidebarItems = [
   },
   {
     id: 5,
-    title: "Tyrone",
+    title: "Tyrone, 15",
     description:
-      "Gejaagd om zijn bestaan, door staten en straten, bleef hij vechten voor een plek waar hij gewoon mocht zijn.",
+      "Tyrone verliet Oeganda in de hoop op rust en veiligheid. In plaats daarvan kwam hij terecht in een nieuw land, waar het gevaar bleef.",
     image: tyroneImg,
     location: {
       name: "Kampala",
@@ -88,10 +88,10 @@ const sidebarItems = [
   },
   {
     id: 6,
-    title: "Eunju Kim",
+    title: "Sara, 27",
     description:
       "Ze trotseerde dood, vrieskou en verraad , voor een maaltijd, een stem, en uiteindelijk een leven in vrijheid.",
-    image: eunjuImg,
+    image: SaraImg,
     location: {
       name: "Eundok",
       coordinates: [129.3274, 41.8142],
@@ -101,10 +101,10 @@ const sidebarItems = [
   },
   {
     id: 7,
-    title: "Kikonyogo Kivumbi",
+    title: "Mike, 38",
     description:
-      "Geverfd als vijand vanwege liefde, verloor hij zijn werk, zijn veiligheid en bijna zijn leven , maar niet zijn stem.",
-    image: kikonyogoImg,
+      "Wat gebeurt er als je wordt uitgesloten door de samenleving die je probeert te helpen, simpelweg omdat je jezelf bent?",
+    image: MikeImg,
     location: {
       name: "Kampala",
       coordinates: [32.5825, 0.3476],
