@@ -2,7 +2,7 @@
 
 An immersive web application that tells the stories of people around the world who have faced human rights challenges, in the form of a social media story. For the prototype, users can select from a set of video subjects. Then they can watch the narratives unfold with subtitles, and click between sections at their desire.
 
-![Story app UI](readne-images/story.jpg)
+![Story app UI](readme-images/story.png)
 
 [Link naar het online prototype](https://project-emily-prototypes-flame.vercel.app/)
 
