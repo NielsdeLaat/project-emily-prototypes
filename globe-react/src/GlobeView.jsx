@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { initializeProgress, markAsVisited } from './utils/progressUtils';
 import ProgressOverview from './components/ProgressOverview';
+import SocialFeed from './components/SocialFeed';
 
 // Import images
 import ablikimImg from './img/Ablikim.png';
@@ -125,6 +126,7 @@ export default function GlobeView() {
   const [userProgress, setUserProgress] = useState(() => initializeProgress());
   const [expandedStory, setExpandedStory] = useState(null);
   const [selectedStory, setSelectedStory] = useState(null);
+  const [activeTab, setActiveTab] = useState('verhaal'); // 'verhaal' or 'social'
 
   // Mock data for expanded content
   const mockExpandedContent = {
@@ -686,201 +688,221 @@ export default function GlobeView() {
           overflowY: 'auto',
           padding: '30px'
         }}>
-          {selectedStory ? (
-            // Expanded Story View
-            <div className="story-card">
-              {/* Back Button - Moved to top of expanded story */}
-              <button
-                className="button-base mb-4"
-                onClick={() => {
-                  setSelectedStory(null);
-                  setExpandedStory(null);
-                }}
-              >
-                ← Terug naar overzicht
-              </button>
+          {/* Tab Switcher */}
+          <div className="flex gap-2 mb-6">
+            <button
+              className={`px-4 py-2 rounded-full font-semibold transition-colors duration-200 ${activeTab === 'verhaal' ? 'bg-emily-blue text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              onClick={() => setActiveTab('verhaal')}
+            >
+              Verhaal
+            </button>
+            <button
+              className={`px-4 py-2 rounded-full font-semibold transition-colors duration-200 ${activeTab === 'social' ? 'bg-emily-blue text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              onClick={() => setActiveTab('social')}
+            >
+              Social Feed
+            </button>
+          </div>
+          {/* Tab Content */}
+          {activeTab === 'verhaal' ? (
+            selectedStory ? (
+              // Expanded Story View
+              <div className="story-card">
+                {/* Back Button - Moved to top of expanded story */}
+                <button
+                  className="button-base mb-4"
+                  onClick={() => {
+                    setSelectedStory(null);
+                    setExpandedStory(null);
+                  }}
+                >
+                  ← Terug naar overzicht
+                </button>
 
-              <div className="relative aspect-w-16 aspect-h-9 mb-4">
-                <img
-                  src={selectedStory.image}
-                  alt={selectedStory.title}
-                  className="w-full h-full object-cover rounded"
-                />
-              </div>
-              
-              <h2 className="text-xl font-semibold mb-4">{selectedStory.title}</h2>
-              
-              <div className="prose max-w-none mb-6">
-                {mockExpandedContent.text.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4">{paragraph}</p>
-                ))}
-              </div>
-
-              {/* Categories in expanded view */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                {selectedStory.categories.map((cat) => (
-                  <span
-                    key={cat}
-                    className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded"
-                  >
-                    {categories[cat].icon} {categories[cat].label}
-                  </span>
-                ))}
-              </div>
-
-              {/* Chat Button - Now in Emily Blue */}
-              <button
-                className="button-base w-full"
-                onClick={() => {
-                  // Handle chat functionality
-                  markAsVisited(selectedStory.id, userProgress, setUserProgress);
-                }}
-              >
-                Chat met {selectedStory.title}
-              </button>
-
-              {/* Filter Section - Moved under expanded story */}
-              <div className="filter-section">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Filters</h3>
-                  <button
-                    className="text-emily-blue hover:text-emily-blue/80"
-                    onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  >
-                    {isFilterOpen ? '▼' : '▶'}
-                  </button>
-                </div>
-
-                {isFilterOpen && (
-                  <div className="grid grid-cols-2 gap-2">
-                    {Object.entries(categories).map(([key, { label, icon }]) => (
-                      <button
-                        key={key}
-                        className={`filter-button ${
-                          selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
-                        }`}
-                        onClick={() => toggleCategory(key)}
-                      >
-                        <span className="mr-2">{icon}</span>
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            // Stories List View
-            <>
-              {/* Location Header with Back Option */}
-              {selectedLocation && (
-                <div style={{
-                  marginBottom: '20px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px'
-                }}>
-                  <button
-                    onClick={() => {
-                      setSelectedLocation(null);
-                      setFilteredStories(sidebarItems);
-                    }}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      color: '#666',
-                      padding: '8px 0'
-                    }}
-                  >
-                    <span>←</span>
-                    <span>Alle verhalen</span>
-                  </button>
-                  <span style={{ color: '#666' }}>|</span>
-                  <span style={{ color: '#333', fontWeight: 'bold' }}>{selectedLocation}</span>
-                </div>
-              )}
-
-              {/* Filter Section */}
-              <div className="filter-section">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Filters</h3>
-                  <button
-                    className="text-emily-blue hover:text-emily-blue/80"
-                    onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  >
-                    {isFilterOpen ? '▼' : '▶'}
-                  </button>
+                <div className="relative aspect-w-16 aspect-h-9 mb-4">
+                  <img
+                    src={selectedStory.image}
+                    alt={selectedStory.title}
+                    className="w-full h-full object-cover rounded"
+                  />
                 </div>
                 
-                {isFilterOpen && (
-                  <div className="grid grid-cols-2 gap-2">
-                    {Object.entries(categories).map(([key, { label, icon }]) => (
-                      <button
-                        key={key}
-                        className={`filter-button ${
-                          selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
-                        }`}
-                        onClick={() => toggleCategory(key)}
-                      >
-                        <span className="mr-2">{icon}</span>
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                <h2 className="text-xl font-semibold mb-4">{selectedStory.title}</h2>
+                
+                <div className="prose max-w-none mb-6">
+                  {mockExpandedContent.text.split('\n\n').map((paragraph, index) => (
+                    <p key={index} className="mb-4">{paragraph}</p>
+                  ))}
+                </div>
 
-              {/* Stories List */}
-              <div style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                gap: '30px',
-                maxWidth: '90%',
-                margin: '0 auto'
-              }}>
-                {filteredStories.map((story) => (
-                  <div key={story.id} className="story-card">
-                    <div className="relative aspect-w-16 aspect-h-9 mb-4">
-                      <img
-                        src={story.image}
-                        alt={story.title}
-                        className="w-full h-full object-cover rounded"
-                      />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">{story.title}</h3>
-                    <p className="text-gray-600 mb-4">{story.description}</p>
-                    
-                    {/* Read More Button - Moved above categories */}
-                    <button
-                      className="read-more-button mb-4"
-                      onClick={() => {
-                        setSelectedStory(story);
-                        setExpandedStory(story.id);
-                        markAsVisited(story.id, userProgress, setUserProgress);
-                      }}
+                {/* Categories in expanded view */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {selectedStory.categories.map((cat) => (
+                    <span
+                      key={cat}
+                      className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded"
                     >
-                      Lees meer...
-                    </button>
+                      {categories[cat].icon} {categories[cat].label}
+                    </span>
+                  ))}
+                </div>
 
-                    {/* Categories */}
-                    <div className="flex flex-wrap gap-2">
-                      {story.categories.map((cat) => (
-                        <span
-                          key={cat}
-                          className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded"
+                {/* Chat Button - Now in Emily Blue */}
+                <button
+                  className="button-base w-full"
+                  onClick={() => {
+                    // Handle chat functionality
+                    markAsVisited(selectedStory.id, userProgress, setUserProgress);
+                  }}
+                >
+                  Chat met {selectedStory.title}
+                </button>
+
+                {/* Filter Section - Moved under expanded story */}
+                <div className="filter-section">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">Filters</h3>
+                    <button
+                      className="text-emily-blue hover:text-emily-blue/80"
+                      onClick={() => setIsFilterOpen(!isFilterOpen)}
+                    >
+                      {isFilterOpen ? '▼' : '▶'}
+                    </button>
+                  </div>
+
+                  {isFilterOpen && (
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.entries(categories).map(([key, { label, icon }]) => (
+                        <button
+                          key={key}
+                          className={`filter-button ${
+                            selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
+                          }`}
+                          onClick={() => toggleCategory(key)}
                         >
-                          {categories[cat].icon} {categories[cat].label}
-                        </span>
+                          <span className="mr-2">{icon}</span>
+                          {label}
+                        </button>
                       ))}
                     </div>
-                  </div>
-                ))}
+                  )}
+                </div>
               </div>
-            </>
+            ) : (
+              // Stories List View
+              <>
+                {/* Location Header with Back Option */}
+                {selectedLocation && (
+                  <div style={{
+                    marginBottom: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px'
+                  }}>
+                    <button
+                      onClick={() => {
+                        setSelectedLocation(null);
+                        setFilteredStories(sidebarItems);
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        color: '#666',
+                        padding: '8px 0'
+                      }}
+                    >
+                      <span>←</span>
+                      <span>Alle verhalen</span>
+                    </button>
+                    <span style={{ color: '#666' }}>|</span>
+                    <span style={{ color: '#333', fontWeight: 'bold' }}>{selectedLocation}</span>
+                  </div>
+                )}
+
+                {/* Filter Section */}
+                <div className="filter-section">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">Filters</h3>
+                    <button
+                      className="text-emily-blue hover:text-emily-blue/80"
+                      onClick={() => setIsFilterOpen(!isFilterOpen)}
+                    >
+                      {isFilterOpen ? '▼' : '▶'}
+                    </button>
+                  </div>
+                  
+                  {isFilterOpen && (
+                    <div className="grid grid-cols-2 gap-2">
+                      {Object.entries(categories).map(([key, { label, icon }]) => (
+                        <button
+                          key={key}
+                          className={`filter-button ${
+                            selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
+                          }`}
+                          onClick={() => toggleCategory(key)}
+                        >
+                          <span className="mr-2">{icon}</span>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Stories List */}
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: '30px',
+                  maxWidth: '90%',
+                  margin: '0 auto'
+                }}>
+                  {filteredStories.map((story) => (
+                    <div key={story.id} className="story-card">
+                      <div className="relative aspect-w-16 aspect-h-9 mb-4">
+                        <img
+                          src={story.image}
+                          alt={story.title}
+                          className="w-full h-full object-cover rounded"
+                        />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">{story.title}</h3>
+                      <p className="text-gray-600 mb-4">{story.description}</p>
+                      
+                      {/* Read More Button - Moved above categories */}
+                      <button
+                        className="read-more-button mb-4"
+                        onClick={() => {
+                          setSelectedStory(story);
+                          setExpandedStory(story.id);
+                          markAsVisited(story.id, userProgress, setUserProgress);
+                        }}
+                      >
+                        Lees meer...
+                      </button>
+
+                      {/* Categories */}
+                      <div className="flex flex-wrap gap-2">
+                        {story.categories.map((cat) => (
+                          <span
+                            key={cat}
+                            className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded"
+                          >
+                            {categories[cat].icon} {categories[cat].label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )
+          ) : (
+            <SocialFeed sidebarItems={sidebarItems} />
           )}
         </div>
       </div>
