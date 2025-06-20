@@ -1,39 +1,172 @@
-# README
+# Chat Interface – MTalking with AI Prototype
 
-## Chat Interface Prototype
-
-De Chat Interface is een prototype dat zich focust op het maken van een bekende omgeving en een optie voor minder directe interactie. Het neemt de vorm aan van een interface dat vergelijkbaar is met bijvoorbeeld Whatsapp. Hierin kunnen gebruikers berichten sturen naar de persona’s en antwoorden terugkrijgen. Ook kunnen ze bellen met persona’s om de functie van prototype 1 te benutten.
-
-Het doel van dit concept is om het praten met de persona toegankelijker te maken. Berichten sturen is makkelijker dan praten. Uit het eerste doelgroeponderzoek bleek dat niet iedereen even enthousiast was om zelf te praten met de AI persona’s, dit prototype biedt een optie om dit te verhelpen.
+A modern web application that lets users chat and call with virtual personas who have lived through human rights challenges. The interface is inspired by popular messaging apps, making it accessible and familiar. Users can select a persona, send messages, receive AI-powered responses, and simulate calls—all in a safe, privacy-conscious environment.
 
 [Link naar het online prototype](https://project-emily-chat-interface.vercel.app/)
 
-### Proces
+## Features
 
-Dit prototype komt voort uit een ander concept dat tijdens een hackathon is ontstaan. We kregen namelijk mee dat niet iedereen het prettig vindt om direct met een beeld (zoals een avatar of webcam) te communiceren met een persona. Daarom besloot ik om een messaging-app te bouwen, vergelijkbaar met WhatsApp.
+- **Chat with Personas**: Send and receive messages with a range of unique personas, each with their own story and background
+- **Multiple Personas**: Choose from several personas, each with a unique avatar and introduction
+- **Modern, Familiar UI**: Inspired by WhatsApp and other popular messaging apps
+- **Safe API Integration**: ChatGPT integration is handled securely, with API keys stored safely and never exposed to users
+- **Example Questions**: AI generated questions to help keep the conversation going
 
-Ik gaf hiervoor eerst de volgende prompt aan Loveable:
+## Personas
+
+- **Emily** – Refugee from Hong Kong
+- **Jason** – Journalist and activist from Hong Kong
+- **Abraham** – Uyghur survivor from Xinjiang
+- **Sara** – Refugee from North Korea
+- **Mike** – LGBTQ+ activist from Uganda
+- **Tyrone** – LGBTQ+ refugee from Uganda
+- **Barry** – Transgender refugee from Burundi
+
+Each persona has a unique story and responds authentically within their lived experience.
+
+## Quick Start
+
+### Prerequisites
+
+[![Node.js](https://img.shields.io/badge/Node.js-6DA55F?logo=node.js&logoColor=white)](#)
+[![npm](https://img.shields.io/badge/npm-CB3837?logo=npm&logoColor=fff)](#) [![Yarn](https://img.shields.io/badge/Yarn-2C8EBB?logo=yarn&logoColor=fff)](#)
+
+- Node.js (version 14 or higher)
+- npm or yarn package manager
+- Modern web browser
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/NielsdeLaat/project-emily-prototypes.git
+   cd project-emily-prototypes/chat-interface
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser**
+   Navigate to `http://localhost:8080` to view the application
+
+## 🗨️ How to Use
+
+- **Choose a Persona**: On the main menu, select a persona to start chatting
+- **Send Messages**: Type and send messages; the persona will reply in real time
+- **Switch Personas**: Return to the main menu to chat with a different persona
+- **Choose an Example Question**: Click on the lightbulb next to the send button and recieve some tips
+
+## Technologies Used
+
+[![React](https://img.shields.io/badge/React-%2320232a.svg?logo=react&logoColor=%2361DAFB)](#)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](#)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind%20CSS-%2338B2AC.svg?logo=tailwind-css&logoColor=white)](#)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=fff)](#)
+
+- **React 18**: Modern React with hooks and functional components
+- **TypeScript**: Type-safe development for robust code
+- **Tailwind CSS**: Utility-first CSS framework for styling
+- **Vite**: Fast build tool and development server
+- **OpenAI API**: Secure integration for AI-powered chat responses
+
+## Project Structure
 
 ```
-Design a charming, user-friendly chat interface for a mobile app where users can engage in conversations with Emily—a friendly virtual companion. Include an easy-to-access call function, allowing users to initiate voice calls with Emily. Prioritize a modern, inviting design that makes users feel at ease and connected.
+chat-interface/
+├── public/
+│   ├── avatars/           # Persona avatar images
+│   ├── favicon.ico
+│   ├── images/            # UI images
+│   └── ...
+├── src/
+│   ├── components/        # React components (ChatInterface, CallInterface, PersonaMenu, etc.)
+│   ├── config/            # Persona and app configuration
+│   ├── hooks/             # Custom React hooks
+│   ├── lib/               # Utility functions
+│   ├── pages/             # Page components
+│   ├── services/          # API and chat services
+│   ├── types/             # TypeScript types
+│   ├── App.tsx            # Main application component
+│   └── main.tsx           # Application entry point
+├── package.json           # Dependencies and scripts
+└── README.md              # This file
 ```
 
-Dit gaf al een sterke basis voor een message-app met Emily. Hierna ben ik erop voortgegaan door functionaliteit toe te voegen voor de call function:
+## Customization
 
-```
-Add the call functionality behind the call button. Make it so it visually works, but it does not need to make or record sound.
-```
+### Adding or Editing Personas
 
-Het laatste wat ik met Loveable heb gedaan was het toevoegen van meerdere gesprekspartners. Ik heb tussendoor geprobeerd om Loveable de ChatGPT integratie te laten maken, maar dit werkte niet goed. Daarom heb ik na deze versie verder gewerkt in Cursor.
+- Update `src/config/personas.ts` to add or modify persona details, avatars, and prompts
+- Add new avatar images to `public/avatars/`
 
-```
-Create a menu with multiple people/ai that you can go to. I need a back button on the current page and then the same interface for multiple people. Their names should be Jason, Kellan, Jessica, Kevin
-```
+### Styling
 
-_Het prototype vanuit Loveable:_
+- Modify Tailwind classes in components for custom styles
+- Update CSS variables in `src/index.css`
+- Customize color scheme in `tailwind.config.ts`
 
-![Main menu](readme-images/choose-persona.png "Main menu")![Chat UI](readme-images/chat.png "Chat UI")![Call UI](readme-images/call.png "Call UI")
+### Localization
 
-Hierna ben ik verder gegaan in Cursor. Hierin heb ik ChatGPT integratie toegevoegd op een veilige manier. Ik heb Cursor gevraagd om de integratie te maken en daarna met ChatGPT zelf gekeken naar de veiligste manieren om mijn API KEY te gebruiken. Ook heb ik zelf avatars toegevoegd.
+- Update text content in components and config files for further localization
 
-Dat kwam uit op het prototype wat er nu is. De API KEY is te vinden in een lokale .env file en in het online prototype staat het ingevuld in het Vercel project. Dit zorgt ervoor dat de key veilig is en niet gevonden kan worden door gebruikers.
+## Troubleshooting
+
+**Chat not working?**
+
+- Ensure your OpenAI API key is set in a local `.env` file (not committed to version control)
+- Check the browser console for errors
+- Make sure the API key is valid and has sufficient quota
+
+**Avatars or images not loading?**
+
+- Check that all image files are present in `public/avatars/` and `public/images/`
+
+**Call function not working?**
+
+- The call feature is visual only (no audio); ensure your browser supports modern CSS and JavaScript
+
+## Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+3. **Commit your changes**: `git commit -m 'Add amazing feature'`
+4. **Push to the branch**: `git push origin feature/amazing-feature`
+5. **Open a Pull Request**
+
+### Development Guidelines
+
+- Follow React and TypeScript best practices
+- Use meaningful commit messages
+- Test your changes thoroughly
+- Update documentation as needed
+
+## Process
+
+This prototype evolved from a hackathon concept, where the need for a less direct, more accessible way to interact with AI personas was identified. The interface was inspired by messaging apps like WhatsApp, and developed further to include multiple personas, avatars, and secure ChatGPT integration. The API key is stored securely in a local `.env` file and never exposed to users.
+
+## License
+
+[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](#)
+
+This project is open source and licensed under the MIT License
+
+## Acknowledgments
+
+- **React Team** for the amazing framework
+- **Tailwind CSS** for the utility-first styling approach
+- **OpenAI** for the chat API
+- **All contributors** who help improve this project
+
+**Made with ❤️ for human rights education and awareness**
