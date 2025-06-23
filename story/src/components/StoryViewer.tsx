@@ -64,8 +64,7 @@ export const StoryViewer = ({ onClose, storyId, onBack }: StoryViewerProps) => {
       setCurrentSegment((prev) => prev + 1);
       setCurrentTime(0);
     } else {
-      // Open chat interface in new window when story completes
-      window.open("https://project-emily-chat-interface.vercel.app/", "_blank");
+      window.location.href = "https://project-emily-chat-interface.vercel.app/";
     }
   };
 
@@ -83,8 +82,7 @@ export const StoryViewer = ({ onClose, storyId, onBack }: StoryViewerProps) => {
   };
 
   const handleNext = () => {
-    // Open chat interface in new window when story completes
-    window.open("https://project-emily-chat-interface.vercel.app/", "_blank");
+    window.location.href = "https://project-emily-chat-interface.vercel.app/";
   };
 
   const handlePrevious = () => {

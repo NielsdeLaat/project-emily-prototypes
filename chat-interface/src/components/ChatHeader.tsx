@@ -24,7 +24,7 @@ const ChatHeader = ({ persona, onBack, onCall }: ChatHeaderProps) => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <Avatar className="h-10 w-10 ring-2 ring-white/20">
-          <AvatarImage src={PERSONA_AVATARS[persona.name]} alt={persona.name} />
+          <AvatarImage src={PERSONA_AVATARS[persona.id]} alt={persona.name} />
           <AvatarFallback className="bg-white/20 text-white">
             {persona.name.substring(0, 2).toUpperCase()}
           </AvatarFallback>

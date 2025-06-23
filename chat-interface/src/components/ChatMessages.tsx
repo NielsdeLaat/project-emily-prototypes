@@ -7,14 +7,14 @@ import type { Message } from "@/types/chat";
 interface ChatMessagesProps {
   messages: Message[];
   isTyping: boolean;
-  personaName: string;
+  personaId: string;
   messagesEndRef: React.RefObject<HTMLDivElement>;
 }
 
 const ChatMessages = ({
   messages,
   isTyping,
-  personaName,
+  personaId,
   messagesEndRef,
 }: ChatMessagesProps) => {
   return (
@@ -26,9 +26,9 @@ const ChatMessages = ({
       {isTyping && (
         <div className="flex items-center space-x-2">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={PERSONA_AVATARS[personaName]} alt={personaName} />
+            <AvatarImage src={PERSONA_AVATARS[personaId]} alt={personaId} />
             <AvatarFallback className="bg-purple-100 text-purple-600 text-xs">
-              {personaName.substring(0, 2).toUpperCase()}
+              {personaId.substring(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div className="bg-white rounded-2xl px-4 py-2 shadow-sm">

@@ -22,10 +22,10 @@ export const useChat = (persona: Persona): ChatState & ChatActions => {
     return [
       {
         id: "1",
-        text: getInitialMessage(persona.name),
+        text: getInitialMessage(persona.id),
         sender: "ai",
         timestamp: new Date(Date.now() - UI.INITIAL_MESSAGE_DELAY),
-        personaName: persona.name,
+        personaName: persona.id,
       },
     ];
   });
@@ -109,7 +109,7 @@ export const useChat = (persona: Persona): ChatState & ChatActions => {
       text,
       sender: "user",
       timestamp: new Date(),
-      personaName: persona.name,
+      personaName: persona.id,
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -138,7 +138,7 @@ export const useChat = (persona: Persona): ChatState & ChatActions => {
         text: response,
         sender: "ai",
         timestamp: new Date(),
-        personaName: persona.name,
+        personaName: persona.id,
       };
 
       setMessages((prev) => [...prev, aiResponse]);
