@@ -7,13 +7,13 @@ import StoriesContent from "./components/StoriesContent";
 import FeedContent from "./components/FeedContent";
 
 // Import images
-import AbrahamImg from "./img/Abraham.png";
+import KadirImg from "./img/Kadir.png";
 import emilyImg from "./img/Emily.png";
 import carlosImg from "./img/Carlos.png";
-import barryImg from "./img/Barry.png";
+import FabriceImg from "./img/Fabrice.png";
 import tyroneImg from "./img/Tyrone.png";
-import SaraImg from "./img/Sara.png";
-import MikeImg from "./img/Mike.png";
+import Sae_ByeokImg from "./img/Sae_byeok.png";
+import MugishaImg from "./img/Mugisha.png";
 
 // Categories for filtering
 const categories = {
@@ -29,10 +29,10 @@ const categories = {
 const sidebarItems = [
   {
     id: 1,
-    title: "Abraham, 42",
+    title: "Kadir, 42",
     description:
       "Zijn geloof werd verboden, zijn arbeid gestolen, zijn identiteit uitgewist , toch wist hij te ontsnappen.",
-    image: AbrahamImg,
+    image: KadirImg,
     location: {
       name: "Xinjiang Village",
       coordinates: [87.6177, 43.7928], // Urumqi, Xinjiang
@@ -68,10 +68,10 @@ const sidebarItems = [
   },
   {
     id: 4,
-    title: "Barry",
+    title: "Frabrice",
     description:
-      "Barry vluchtte voor zijn leven, maar vond nergens rust. Niet in Burundi, niet in Kenia. Alleen stilte, schaamte en angst die zich bleven herhalen.",
-    image: barryImg,
+      "Frabrice vluchtte voor zijn leven, maar vond nergens rust. Niet in Burundi, niet in Kenia. Alleen stilte, schaamte en angst die zich bleven herhalen.",
+    image: FrabriceImg,
     location: {
       name: "Bujumbura",
       coordinates: [29.3618, -3.3731], // Bujumbura Center
@@ -94,10 +94,10 @@ const sidebarItems = [
   },
   {
     id: 6,
-    title: "Sara",
+    title: "Sae_Byeok",
     description:
       "Ze trotseerde dood, vrieskou en verraad , voor een maaltijd, een stem, en uiteindelijk een leven in vrijheid.",
-    image: SaraImg,
+    image: Sae_ByeokImg,
     location: {
       name: "Eundok",
       coordinates: [129.3274, 41.8142], // Eundok, North Hamgyong
@@ -107,10 +107,10 @@ const sidebarItems = [
   },
   {
     id: 7,
-    title: "Mike",
+    title: "Mugisha",
     description:
       "Wat gebeurt er als je wordt uitgesloten door de samenleving die je probeert te helpen, simpelweg omdat je jezelf bent?",
-    image: MikeImg,
+    image: MugishaImg,
     location: {
       name: "Kampala",
       coordinates: [32.5825, 0.3476], // Kampala Center
