@@ -15,12 +15,12 @@ import MugishaImg from './img/Mugisha.png';
 
 // Categories for filtering
 const categories = {
-  religious: { label: "Religious Persecution", icon: "⛪" },
-  lgbtq: { label: "LGBTQ+ Rights", icon: "🏳️‍🌈" },
-  racism: { label: "Racial Discrimination", icon: "✊" },
-  political: { label: "Political Oppression", icon: "🗳️" },
-  gender: { label: "Gender Rights", icon: "♀️" },
-  refugee: { label: "Refugee Status", icon: "🏃" }
+  religious: { label: "Religieuze Vervolging", icon: "⛪" },
+  lgbtq: { label: "LHBTI+ Rechten", icon: "🏳️‍🌈" },
+  racism: { label: "Racisme", icon: "✊" },
+  political: { label: "Politieke Onderdrukking", icon: "🗳️" },
+  gender: { label: "Genderrechten", icon: "♀️" },
+  refugee: { label: "Vluchteling", icon: "🏃" }
 };
 
 // Story data with locations and categories
@@ -28,7 +28,7 @@ const sidebarItems = [
   {
     id: 1,
     title: "Kadir",
-    description: "Zijn geloof werd verboden, zijn arbeid gestolen, zijn identiteit uitgewist , toch wist hij te ontsnappen.",
+    description: "Hij groeide op met gebed, familie en een diepgewortelde traditie. Wat volgde was isolatie, dwangarbeid en stilte, opgelegd in naam van heropvoeding.",
     image: KadirImg,
     location: {
       name: "Xinjiang Village",
@@ -64,7 +64,7 @@ const sidebarItems = [
   {
     id: 4,
     title: "Fabrice",
-    description: "Verlaten, verkracht en verguisd, maar nog altijd vechtend voor zichzelf, zijn gezin en zijn waarheid.",
+    description: "Fabrice vluchtte voor zijn leven, maar vond nergens rust. Niet in Burundi, niet in Kenia. Alleen stilte, schaamte en angst die zich bleven herhalen.",
     image: FabriceImg,
     location: {
       name: "Bujumbura",
@@ -76,7 +76,7 @@ const sidebarItems = [
   {
     id: 5,
     title: "Tyrone",
-    description: "Gejaagd om zijn bestaan, door staten en straten, bleef hij vechten voor een plek waar hij gewoon mocht zijn.",
+    description: "Tyrone verliet Oeganda in de hoop op rust en veiligheid. In plaats daarvan kwam hij terecht in een nieuw land, waar het gevaar bleef.",
     image: tyroneImg,
     location: {
       name: "Kampala",
@@ -87,8 +87,8 @@ const sidebarItems = [
   },
   {
     id: 6,
-    title: "Sae-Byeok",
-    description: "Ze trotseerde dood, vrieskou en verraad , voor een maaltijd, een stem, en uiteindelijk een leven in vrijheid.",
+    title: "Sae_byeok",
+    description: "Gejaagd om zijn bestaan, door staten en straten, bleef hij vechten voor een plek waar hij gewoon mocht zijn.",
     image: Sae_byeokImg,
     location: {
       name: "Eundok",
@@ -100,7 +100,7 @@ const sidebarItems = [
   {
     id: 7,
     title: "Mugisha",
-    description: "Geverfd als vijand vanwege liefde, verloor hij zijn werk, zijn veiligheid en bijna zijn leven , maar niet zijn stem.",
+    description: "Wat gebeurt er als je wordt uitgesloten door de samenleving die je probeert te helpen, simpelweg omdat je jezelf bent?",
     image: MugishaImg,
     location: {
       name: "Kampala",
@@ -126,17 +126,71 @@ export default function GlobeView() {
   const [expandedStory, setExpandedStory] = useState(null);
   const [selectedStory, setSelectedStory] = useState(null);
 
-  // Mock data for expanded content
-  const mockExpandedContent = {
-    text: "Hier volgt een uitgebreid verhaal over de ervaringen en uitdagingen die deze persoon heeft doorgemaakt. Het verhaal gaat dieper in op de persoonlijke reis, de obstakels die overwonnen zijn, en de hoop voor de toekomst. Door deze verhalen te delen, creëren we begrip en verbinding tussen verschillende culturen en ervaringen.\n\nDe impact van deze gebeurtenissen reikt verder dan alleen het persoonlijke verhaal. Het laat zien hoe maatschappelijke structuren en systemen mensen kunnen beïnvloeden, maar ook hoe veerkracht en vastberadenheid kunnen leiden tot positieve verandering.\n\nDoor het delen van deze verhalen hopen we anderen te inspireren en bewustwording te creëren over belangrijke maatschappelijke kwesties. Elk verhaal is een stap richting meer begrip en empathie in onze samenleving.",
-    age: {
-      1: 42,
-      2: 23,
-      3: 29,
-      4: 31,
-      5: 15,
-      6: 27,
-      7: 38
+  const expandedStories = {
+    1: {
+      title: "Kadir's Verhaal",
+      text: `In dit verhaal vertelt Kadir hoe zijn leven als jonge Oeigoerse man in Xinjiang abrupt veranderde toen de Chinese overheid in 2017 begon met het opsluiten van duizenden leden van zijn gemeenschap. Zijn vader werd gearresteerd vanwege zijn geloof, hijzelf werd zonder reden meegenomen en belandde in een systeem van dwangarbeid, surveillantie en ideologische herprogrammering.
+
+Het is een verhaal over wat er gebeurt wanneer je identiteit doelbewust wordt uitgewist. Over werk dat geen werk is, lessen die geen onderwijs zijn, en leven zonder contact of vrijheid. En over hoe vluchten soms de enige manier is om opnieuw mens te mogen zijn.
+
+Door zijn verhaal te delen, hoopt Kadir zichtbaar te maken wat voor velen onzichtbaar blijft — en aandacht te vragen voor de duizenden anderen die nog steeds gevangen zitten in stilte.`,
+      age: 42
+    },
+    2: {
+      title: "Emily's Verhaal",
+      text: `Emily was een jonge student toen de protesten in Hong Kong begonnen. Traangas, waterkanonnen en politiegeweld werden haar dagelijkse realiteit. Maar ze bleef filmen, vastbesloten om de waarheid vast te leggen.
+
+De invoering van de nationale veiligheidswet maakte haar werk steeds gevaarlijker. Vrienden werden gearresteerd, nieuwsredacties gesloten. Emily besloot haar verhalen online te delen, wetende dat dit haar in gevaar zou brengen.
+
+Nu, vanuit het buitenland, blijft ze schrijven over Hong Kong. Haar stem is haar wapen, haar woorden haar verzet. Ze vecht voor de vrijheid om te vertellen wat er echt gebeurt in haar geliefde stad.`,
+      age: 23
+    },
+    3: {
+      title: "Carlos' Verhaal",
+      text: `Carlos werd geboren in een klein dorpje in Mexico, waar zijn familie al generaties lang woonde. Als kind merkte hij al dat hij 'anders' was - zijn donkerdere huid maakte hem een doelwit van pesterijen en discriminatie.
+
+Op zoek naar een beter leven trok zijn familie naar de stad. Maar ook daar vond Carlos geen acceptatie. Op school, op het werk, in het dagelijks leven - overal voelde hij de blik van vooroordeel.
+
+Hij vond zijn roeping in kunst en activisme. Door zijn schilderijen en installaties vertelt hij het verhaal van uitsluiting en onrecht. Zijn werk werd zijn stem tegen racisme en ongelijkheid.
+
+Vandaag reist Carlos door het land, geeft workshops aan jongeren en gebruikt zijn kunst om dialoog te starten over racisme en identiteit. Hij vecht voor een Mexico waar iedereen zichzelf kan zijn, ongeacht huidskleur.`,
+      age: 29
+    },
+    4: {
+      title: "Fabrice's Verhaal",
+      text: `In dit verhaal vertelt Fabrice, een 23-jarige transgender man uit Burundi, over zijn leven vol bedreigingen, geweld en verlies. Nadat zijn identiteit bekend werd, werd hij achtervolgd, zijn ouders vermoord, en hijzelf meermaals mishandeld — ook onderweg naar wat hij hoopte dat een veiligere plek zou zijn.
+
+In plaats van bescherming vond hij nieuw geweld, ook in het vluchtelingenkamp waar hij terechtkwam. Zijn kinderen overleefden ternauwernood een vergiftiging. Hij leefde maandenlang met zijn trauma's zonder te durven zeggen wie hij werkelijk was — totdat zijn gezondheid hem dwong om zijn verhaal wél te vertellen.
+
+Fabrice's verhaal legt bloot hoe kwetsbaar het bestaan is van transgender vluchtelingen. Hoe moeilijk het is om hulp te vragen als je al zo vaak gestraft bent voor wie je bent. En hoe veerkracht soms betekent: gewoon doorgaan, ook als alles pijn doet.`,
+      age: 31
+    },
+    5: {
+      title: "Tyrone's Verhaal",
+      text: `In dit verhaal deelt Tyrone hoe hij als jonge homoseksuele man in 2014 vluchtte naar Kenia — een plek die veiliger zou moeten zijn. Maar direct na aankomst werd hij mishandeld, herhaaldelijk gearresteerd en bedreigd. Niet alleen door vreemden, maar ook door de politie.
+
+Hij vertelt hoe het is om steeds weer te moeten verhuizen, omdat zelfs je buren je niet met rust laten. En hoe het voelt als je nergens echt veilig bent — niet thuis, maar ook niet daarbuiten.
+
+Tyrone's ervaring laat zien dat vluchten niet altijd een einde maakt aan gevaar, en dat voor veel LHBTI+ vluchtelingen veiligheid iets is waar je in stilte op hoopt, maar zelden echt vindt.`,
+      age: 15
+    },
+    6: {
+      title: "Sae_byeok's Verhaal",
+      text: `Hier volgt het aangrijpende verhaal van Sae_byeok, een vrouw die opgroeide in het gesloten Noord-Korea en twee keer haar leven riskeerde om te ontsnappen aan onderdrukking, honger en stilzwijgen. Haar reis voert van de duisternis van een totalitair regime, via mensenhandel in China, naar vrijheid in Zuid-Korea.
+
+Door dit verhaal te delen, werpen we licht op de werkelijkheid achter grenzen en propaganda — en op de kracht van menselijkheid, zelfs wanneer die systematisch wordt onderdrukt. Het is een verhaal over overleven, herinneren en het weigeren om te zwijgen.
+
+Want elk verhaal dat wordt verteld, maakt de wereld een stukje helderder. En Sae_byeok's verhaal is niet alleen het hare — het is een stem voor duizenden anderen die nog steeds in stilte leven.`,
+      age: 27
+    },
+    7: {
+      title: "Mugisha's Verhaal",
+      text: `Mugisha groeide op in Oeganda, werkte als journalist en beleidsadviseur, en zette zich in voor volksgezondheid. Maar toen hij open was over zijn seksuele geaardheid, verloor hij zijn baan, werd hij mishandeld en buitengesloten. Wat volgde was geen vlucht, maar een keuze om te blijven — en te bouwen aan iets beters.
+
+In dit verhaal lees je hoe hij ondanks persoonlijke risico's bleef opkomen voor de rechten van gemarginaliseerde groepen. Over hoe hij zorgde voor toegang tot hiv-zorg, media trainde in respectvolle verslaggeving en zich bleef uitspreken tegen discriminatie, ook toen het niet veilig was.
+
+Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stappen die in stilte worden gezet, en toch een grote impact hebben.`,
+      age: 38
     }
   };
 
@@ -144,7 +198,7 @@ export default function GlobeView() {
   const filterStories = (country, categories) => {
     return sidebarItems.filter(item => {
       const matchesCountry = !country || item.location.country === country;
-      const matchesCategories = categories.length === 0 || 
+      const matchesCategories = categories.length === 0 ||
         categories.every(cat => item.categories.includes(cat));
       return matchesCountry && matchesCategories;
     });
@@ -161,9 +215,16 @@ export default function GlobeView() {
     });
   };
 
+  // Auto-collapse filters when only one story is shown
+  useEffect(() => {
+    if (filteredStories.length === 1 && isFilterOpen) {
+      setIsFilterOpen(false);
+    }
+  }, [filteredStories.length, isFilterOpen]);
+
   // Add reset progress function
   const handleResetProgress = () => {
-    if (window.confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+    if (window.confirm('Weet je zeker dat je alle vooruitgang wilt resetten? Dit kan niet ongedaan worden gemaakt.')) {
       localStorage.removeItem('userProgress');
       setUserProgress({ visitedIds: [] });
       
@@ -201,7 +262,41 @@ export default function GlobeView() {
       },
       renderWorldCopies: true,
       pitch: 0,
-      bearing: 0
+      bearing: 0,
+      locale: {
+        'NavigationControl.ZoomIn': 'Inzoomen',
+        'NavigationControl.ZoomOut': 'Uitzoomen',
+        'NavigationControl.ResetBearing': 'Draai naar het noorden',
+      }
+    });
+
+    // Add map interaction handlers to close sidebar
+    map.current.on('click', (e) => {
+      // Only close sidebar if clicking on empty areas (not on countries or markers)
+      const features = map.current.queryRenderedFeatures(e.point);
+      const hasCountryFeature = features.some(feature => 
+        feature.source === 'countries' || 
+        feature.source === 'territories' ||
+        feature.layer?.id?.includes('country') ||
+        feature.layer?.id?.includes('territory')
+      );
+      
+      // Don't close sidebar if clicking on a country or if there are features at click point
+      if (!hasCountryFeature && features.length === 0 && isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    });
+
+    map.current.on('dragstart', () => {
+      if (isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
+    });
+
+    map.current.on('zoomstart', () => {
+      if (isSidebarOpen) {
+        setIsSidebarOpen(false);
+      }
     });
 
     map.current.on('style.load', () => {
@@ -215,210 +310,44 @@ export default function GlobeView() {
         "star-intensity": 0.1
       });
 
-      // Add country boundaries with thinner lines
+      // Add country boundaries
       map.current.addSource('countries', {
         type: 'vector',
         url: 'mapbox://mapbox.country-boundaries-v1'
       });
 
+      // Add country fills for highlighting
       map.current.addLayer({
         'id': 'country-fills',
         'type': 'fill',
         'source': 'countries',
         'source-layer': 'country_boundaries',
         'paint': {
-          'fill-color': '#e0e0e0',
+          'fill-color': [
+            'case',
+            ['==', ['get', 'name_en'], ''],  // Default case
+            '#ffffff',
+            '#ffffff'
+          ],
           'fill-opacity': 0.4
         }
       });
 
-      map.current.addLayer({
-        'id': 'country-borders',
-        'type': 'line',
-        'source': 'countries',
-        'source-layer': 'country_boundaries',
-        'paint': {
-          'line-color': '#000000',
-          'line-width': 0.5  // Thin lines but in black
-        }
-      });
-
-      // Add territory boundaries with thinner lines
-      map.current.addSource('territories', {
-        type: 'vector',
-        url: 'mapbox://mapbox.country-boundaries-v1'
-      });
-
+      // Add territory fills with the same style
       map.current.addLayer({
         'id': 'territory-fills',
         'type': 'fill',
-        'source': 'territories',
+        'source': 'countries',
         'source-layer': 'country_boundaries',
-        'filter': ['==', 'mapbox:is_territory', true],
+        'filter': [
+          'any',
+          ['==', ['get', 'name_en'], 'Taiwan'],
+          ['==', ['get', 'name_en'], 'Hong Kong']
+        ],
         'paint': {
-          'fill-color': '#e0e0e0',
+          'fill-color': '#ffffff',
           'fill-opacity': 0.4
         }
-      });
-
-      map.current.addLayer({
-        'id': 'territory-borders',
-        'type': 'line',
-        'source': 'territories',
-        'source-layer': 'country_boundaries',
-        'filter': ['==', 'mapbox:is_territory', true],
-        'paint': {
-          'line-color': '#000000',
-          'line-width': 0.5  // Thin lines but in black
-        }
-      });
-
-      sidebarItems.forEach(story => {
-        const el = document.createElement('div');
-        el.className = 'marker';
-
-        const inner = document.createElement('div');
-        inner.style.width = '30px';
-        inner.style.height = '30px';
-        inner.style.backgroundImage = `url(${story.image})`;
-        inner.style.backgroundSize = 'cover';
-        inner.style.borderRadius = '50%';
-        inner.style.cursor = 'pointer';
-        inner.style.transition = 'all 0.3s ease';
-        
-        // Add visited state visual indicator
-        if (userProgress.visitedIds.includes(story.id)) {
-          inner.style.border = '2px solid rgba(76, 175, 80, 0.3)';
-          inner.style.filter = 'grayscale(80%) brightness(0.8)';
-          inner.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
-        } else {
-          inner.style.border = '2px solid white';
-          inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-        }
-
-        el.appendChild(inner);
-
-        // Create popup content with more information
-        const popupContent = document.createElement('div');
-        popupContent.style.padding = '15px';
-        popupContent.style.maxWidth = '300px';
-        popupContent.style.backgroundColor = 'white';
-        popupContent.style.borderRadius = '8px';
-        popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-
-        // Name and Age
-        const title = document.createElement('h3');
-        title.textContent = `${story.title}, ${mockExpandedContent.age[story.id]}`;
-        title.style.margin = '0 0 8px 0';
-        title.style.color = '#333';
-        title.style.fontSize = '18px';
-        popupContent.appendChild(title);
-
-        // Image
-        const img = document.createElement('img');
-        img.src = story.image;
-        img.style.width = '100%';
-        img.style.height = '200px';
-        img.style.objectFit = 'cover';
-        img.style.borderRadius = '4px';
-        img.style.marginBottom = '10px';
-        popupContent.appendChild(img);
-
-        // Location
-        const location = document.createElement('div');
-        location.style.color = '#666';
-        location.style.fontSize = '13px';
-        location.style.display = 'flex';
-        location.style.alignItems = 'center';
-        location.style.gap = '4px';
-        location.style.marginBottom = '10px';
-        location.innerHTML = `<span>📍</span> ${story.location.name}, ${story.location.country}`;
-        popupContent.appendChild(location);
-
-        // Description
-        const desc = document.createElement('p');
-        desc.textContent = story.description;
-        desc.style.margin = '0 0 10px 0';
-        desc.style.color = '#666';
-        desc.style.fontSize = '14px';
-        desc.style.lineHeight = '1.4';
-        popupContent.appendChild(desc);
-        
-        // Categories
-        const categoriesDiv = document.createElement('div');
-        categoriesDiv.style.display = 'flex';
-        categoriesDiv.style.gap = '5px';
-        categoriesDiv.style.flexWrap = 'wrap';
-
-        story.categories.forEach(cat => {
-          const catSpan = document.createElement('span');
-          catSpan.style.background = '#f0f0f0';
-          catSpan.style.padding = '4px 8px';
-          catSpan.style.borderRadius = '4px';
-          catSpan.style.fontSize = '12px';
-          catSpan.style.display = 'flex';
-          catSpan.style.alignItems = 'center';
-          catSpan.style.gap = '4px';
-          catSpan.innerHTML = `${categories[cat].icon} ${categories[cat].label}`;
-          categoriesDiv.appendChild(catSpan);
-        });
-
-        popupContent.appendChild(categoriesDiv);
-
-        const marker = new mapboxgl.Marker({
-          element: el,
-          anchor: 'center'
-        })
-          .setLngLat(story.location.coordinates)
-          .setPopup(new mapboxgl.Popup({
-            offset: 25,
-            closeButton: false,
-            closeOnClick: false,
-            anchor: 'top',
-            className: 'custom-popup'
-          }).setDOMContent(popupContent))
-          .addTo(map.current);
-
-        // Create click handler with proper state access
-        const handleMarkerClick = () => {
-          // Force sidebar open
-          setIsSidebarOpen(true);
-          
-          // Set location and filter stories
-          setSelectedLocation(story.location.country);
-          setFilteredStories(filterStories(story.location.country, selectedCategories));
-          
-          // Directly show the detailed view
-          setSelectedStory(story);
-        };
-
-        // Add click event listener
-        el.addEventListener('click', handleMarkerClick);
-
-        // Add hover events
-        el.addEventListener('mouseenter', () => {
-          if (userProgress.visitedIds.includes(story.id)) {
-            inner.style.transform = 'scale(1.1)';
-            inner.style.filter = 'grayscale(50%) brightness(0.9)';
-          } else {
-            inner.style.transform = 'scale(1.2)';
-            inner.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
-          }
-          setHoveredMarker(story.id);
-          marker.getPopup().addTo(map.current);
-        });
-
-        el.addEventListener('mouseleave', () => {
-          if (userProgress.visitedIds.includes(story.id)) {
-            inner.style.transform = 'scale(1)';
-            inner.style.filter = 'grayscale(80%) brightness(0.8)';
-          } else {
-            inner.style.transform = 'scale(1)';
-            inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
-          }
-          setHoveredMarker(null);
-          marker.getPopup().remove();
-        });
       });
 
       // Add country labels
@@ -454,8 +383,269 @@ export default function GlobeView() {
         'paint': {
           'text-color': '#000000',
           'text-halo-color': '#ffffff',
-          'text-halo-width': 1
+          'text-halo-width': 1.5
         }
+      });
+
+      // Add country boundaries with thinner lines
+      map.current.addLayer({
+        'id': 'country-boundaries',
+        'type': 'line',
+        'source': 'countries',
+        'source-layer': 'country_boundaries',
+        'layout': {},
+        'paint': {
+          'line-color': '#a0a0a0',
+          'line-width': 0.5
+        }
+      }, 'country-labels');
+
+      sidebarItems.forEach(story => {
+        const el = document.createElement('div');
+        el.className = 'marker';
+
+        const inner = document.createElement('div');
+        inner.style.width = '30px';
+        inner.style.height = '30px';
+        inner.style.backgroundImage = `url(${story.image})`;
+        inner.style.backgroundSize = 'cover';
+        inner.style.borderRadius = '50%';
+        inner.style.cursor = 'pointer';
+        inner.style.transition = 'all 0.3s ease';
+
+        // Add visited state visual indicator
+        if (userProgress.visitedIds.includes(story.id)) {
+          inner.style.border = '2px solid rgba(76, 175, 80, 0.3)';
+          inner.style.filter = 'grayscale(80%) brightness(0.8)';
+          inner.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
+        } else {
+          inner.style.border = '2px solid white';
+          inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        }
+
+        el.appendChild(inner);
+
+        // Create popup content with more information
+        const popupContent = document.createElement('div');
+        popupContent.style.padding = '15px';
+        popupContent.style.maxWidth = '300px';
+        popupContent.style.backgroundColor = 'white';
+        popupContent.style.borderRadius = '8px';
+        popupContent.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        popupContent.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+        popupContent.style.position = 'relative';
+
+        // Name and Age
+        const title = document.createElement('h3');
+        title.textContent = `${story.title}, ${expandedStories[story.id].age}`;
+        title.style.margin = '0 0 8px 0';
+        title.style.color = '#333';
+        title.style.fontSize = '18px';
+        title.style.fontWeight = '600';
+        title.style.fontFamily = 'inherit';
+        popupContent.appendChild(title);
+
+        // Image container with relative positioning
+        const imgContainer = document.createElement('div');
+        imgContainer.style.position = 'relative';
+        imgContainer.style.marginBottom = '12px';
+
+        // Image
+        const img = document.createElement('img');
+        img.src = story.image;
+        img.style.width = '100%';
+        img.style.height = '200px';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = '6px';
+        img.style.display = 'block';
+        
+        // Apply grayscale filter if story has been visited
+        if (userProgress.visitedIds.includes(story.id)) {
+          img.style.filter = 'grayscale(80%) brightness(0.8)';
+        }
+        
+        imgContainer.appendChild(img);
+
+        // Add visited badge over image if story has been visited
+        if (userProgress.visitedIds.includes(story.id)) {
+          const visitedBadge = document.createElement('div');
+          visitedBadge.style.position = 'absolute';
+          visitedBadge.style.top = '10px';
+          visitedBadge.style.right = '10px';
+          visitedBadge.style.background = 'rgba(34, 197, 94, 0.9)';
+          visitedBadge.style.color = 'white';
+          visitedBadge.style.padding = '4px 8px';
+          visitedBadge.style.borderRadius = '12px';
+          visitedBadge.style.fontSize = '11px';
+          visitedBadge.style.fontWeight = '500';
+          visitedBadge.style.fontFamily = 'inherit';
+          visitedBadge.textContent = '✅ Bekeken';
+          imgContainer.appendChild(visitedBadge);
+        }
+
+        popupContent.appendChild(imgContainer);
+
+        // Location with extra spacing and italic
+        const location = document.createElement('div');
+        location.style.color = '#777';
+        location.style.fontSize = '13px';
+        location.style.display = 'flex';
+        location.style.alignItems = 'center';
+        location.style.gap = '4px';
+        location.style.marginBottom = '12px';
+        location.style.marginTop = '8px';
+        location.style.fontFamily = 'inherit';
+        location.style.fontStyle = 'italic';
+        location.innerHTML = `<span>📍</span> ${story.location.name}, ${story.location.country}`;
+        popupContent.appendChild(location);
+
+        // Description with improved typography
+        const desc = document.createElement('p');
+        desc.textContent = story.description;
+        desc.style.margin = '0 0 15px 0';
+        desc.style.color = '#555';
+        desc.style.fontSize = '14px';
+        desc.style.lineHeight = '1.5';
+        desc.style.padding = '0 2px';
+        desc.style.fontFamily = 'inherit';
+        popupContent.appendChild(desc);
+
+        // Call-to-action button (moved above categories)
+        const ctaButton = document.createElement('button');
+        ctaButton.textContent = '👉 Lees verder';
+        ctaButton.style.width = '100%';
+        ctaButton.style.padding = '10px 16px';
+        ctaButton.style.backgroundColor = '#3B82F6';
+        ctaButton.style.color = 'white';
+        ctaButton.style.border = 'none';
+        ctaButton.style.borderRadius = '6px';
+        ctaButton.style.fontSize = '14px';
+        ctaButton.style.fontWeight = '500';
+        ctaButton.style.cursor = 'pointer';
+        ctaButton.style.transition = 'background-color 0.2s ease';
+        ctaButton.style.marginBottom = '15px';
+        ctaButton.style.fontFamily = 'inherit';
+        
+        // Create click handler with proper state access
+        const handleMarkerClick = () => {
+          // Force sidebar open
+          setIsSidebarOpen(true);
+
+          // Set location and filter stories
+          setSelectedLocation(story.location.country);
+          setFilteredStories(filterStories(story.location.country, selectedCategories));
+
+          // Directly show the detailed view
+          setSelectedStory(story);
+          setExpandedStory(story.id);
+          
+          // Mark as visited and update visual state immediately
+          markAsVisited(story.id, userProgress, setUserProgress);
+          
+          // Update marker appearance immediately
+          if (userProgress.visitedIds.includes(story.id)) {
+            inner.style.border = '2px solid rgba(76, 175, 80, 0.3)';
+            inner.style.filter = 'grayscale(80%) brightness(0.8)';
+            inner.style.boxShadow = '0 0 5px rgba(76, 175, 80, 0.2)';
+          }
+        };
+        
+        // Add click event listener to marker
+        el.addEventListener('click', handleMarkerClick);
+        
+        // Add click handler to navigate to full story (popup button)
+        ctaButton.addEventListener('click', () => {
+          handleMarkerClick();
+          // Close the popup
+          marker.getPopup().remove();
+        });
+
+        // Hover effect with consistent color
+        ctaButton.onmouseenter = () => {
+          ctaButton.style.backgroundColor = '#1D4ED8';
+        };
+        ctaButton.onmouseleave = () => {
+          ctaButton.style.backgroundColor = '#3B82F6';
+        };
+
+        popupContent.appendChild(ctaButton);
+
+        // Categories
+        const categoriesDiv = document.createElement('div');
+        categoriesDiv.style.display = 'flex';
+        categoriesDiv.style.gap = '5px';
+        categoriesDiv.style.flexWrap = 'wrap';
+
+        story.categories.forEach(cat => {
+          const catSpan = document.createElement('span');
+          catSpan.style.background = '#f0f0f0';
+          catSpan.style.padding = '4px 8px';
+          catSpan.style.borderRadius = '4px';
+          catSpan.style.fontSize = '12px';
+          catSpan.style.display = 'flex';
+          catSpan.style.alignItems = 'center';
+          catSpan.style.gap = '4px';
+          catSpan.style.fontFamily = 'inherit';
+          catSpan.innerHTML = `${categories[cat].icon} ${categories[cat].label}`;
+          categoriesDiv.appendChild(catSpan);
+        });
+
+        popupContent.appendChild(categoriesDiv);
+
+        const marker = new mapboxgl.Marker({
+          element: el,
+          anchor: 'center'
+        })
+          .setLngLat(story.location.coordinates)
+          .setPopup(new mapboxgl.Popup({
+            offset: 25,
+            closeButton: false,
+            closeOnClick: false,
+            anchor: 'top',
+            className: 'custom-popup'
+          }).setDOMContent(popupContent))
+          .addTo(map.current);
+
+        // Add hover events
+        el.addEventListener('mouseenter', () => {
+          if (userProgress.visitedIds.includes(story.id)) {
+            inner.style.transform = 'scale(1.1)';
+            inner.style.filter = 'grayscale(50%) brightness(0.9)';
+          } else {
+            inner.style.transform = 'scale(1.2)';
+            inner.style.boxShadow = '0 4px 8px rgba(0,0,0,0.3)';
+          }
+          setHoveredMarker(story.id);
+          marker.getPopup().addTo(map.current);
+        });
+
+        el.addEventListener('mouseleave', () => {
+          if (userProgress.visitedIds.includes(story.id)) {
+            inner.style.transform = 'scale(1)';
+            inner.style.filter = 'grayscale(80%) brightness(0.8)';
+          } else {
+            inner.style.transform = 'scale(1)';
+            inner.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+          }
+          setHoveredMarker(null);
+          
+          // Remove popup when leaving marker (unless hovering over popup)
+          setTimeout(() => {
+            if (!popupContent.matches(':hover')) {
+              marker.getPopup().remove();
+            }
+          }, 100);
+        });
+
+        // Add popup hover events
+        popupContent.addEventListener('mouseenter', () => {
+          // Keep popup visible when hovering over it
+        });
+
+        popupContent.addEventListener('mouseleave', () => {
+          // Remove popup when mouse leaves the popup area
+          marker.getPopup().remove();
+        });
       });
 
       // Add territory labels
@@ -501,24 +691,28 @@ export default function GlobeView() {
           const country = e.features[0];
           setSelectedCountry(country);
           setSelectedLocation(country.properties.name_en);
-          setFilteredStories(sidebarItems.filter(item => 
+          setFilteredStories(sidebarItems.filter(item =>
             item.location.country === country.properties.name_en
           ));
-          
-          // Highlight the clicked country or territory
+
+          // Reset all fills first
+          map.current.setPaintProperty('country-fills', 'fill-color', '#ffffff');
+          map.current.setPaintProperty('territory-fills', 'fill-color', '#ffffff');
+
+          // Then highlight the clicked country or territory
           if (country.properties.name_en === 'Taiwan' || country.properties.name_en === 'Hong Kong') {
             map.current.setPaintProperty('territory-fills', 'fill-color', [
               'case',
               ['==', ['get', 'name_en'], country.properties.name_en],
-              '#6495ED',
-              '#e0e0e0'
+              '#ffd700',
+              '#ffffff'
             ]);
           } else {
             map.current.setPaintProperty('country-fills', 'fill-color', [
               'case',
               ['==', ['get', 'name_en'], country.properties.name_en],
-              '#6495ED',
-              '#e0e0e0'
+              '#ffd700',
+              '#ffffff'
             ]);
           }
         }
@@ -530,6 +724,36 @@ export default function GlobeView() {
       });
 
       map.current.on('mouseleave', ['country-fills', 'territory-fills'], () => {
+        map.current.getCanvas().style.cursor = '';
+      });
+
+      // Add click handler for countries
+      map.current.on('click', 'country-fills', (e) => {
+        if (e.features.length > 0) {
+          const countryName = e.features[0].properties.name_en;
+          const countryStories = sidebarItems.filter(story => 
+            story.location.country === countryName
+          );
+          
+          // Always open sidebar, even for countries without stories
+          setIsSidebarOpen(true);
+          
+          // Set location and filter stories
+          setSelectedLocation(countryName);
+          setFilteredStories(filterStories(countryName, selectedCategories));
+          
+          // Clear selected story to show list view
+          setSelectedStory(null);
+          setExpandedStory(null);
+        }
+      });
+
+      // Add cursor pointer for countries
+      map.current.on('mouseenter', 'country-fills', () => {
+        map.current.getCanvas().style.cursor = 'pointer';
+      });
+
+      map.current.on('mouseleave', 'country-fills', () => {
         map.current.getCanvas().style.cursor = '';
       });
     });
@@ -553,33 +777,77 @@ export default function GlobeView() {
   }, [isSidebarOpen]);
 
   return (
-    <div style={{ 
-      position: 'fixed', 
-      top: 0, 
-      left: 0, 
-      right: 0, 
-      bottom: 0, 
-      margin: 0, 
-      padding: 0, 
-      overflow: 'hidden' 
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      margin: 0,
+      padding: 0,
+      overflow: 'hidden'
     }}>
       {/* Map Container */}
-      <div 
-        ref={mapContainer} 
-        style={{ 
+      <div
+        ref={mapContainer}
+        style={{
           position: 'absolute',
           left: 0,
           top: 0,
           width: isSidebarOpen ? 'calc(100% - 30%)' : '100%',
           height: '100%',
-          transition: 'width 0.3s ease-in-out'
-        }} 
+          transition: 'width 0.3s ease-in-out',
+          zIndex: 5
+        }}
       />
+
+      {/* Globe Dimming Overlay */}
+      {isSidebarOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: 'calc(100% - 30%)',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.15)',
+            backdropFilter: 'blur(2px)',
+            pointerEvents: 'none',
+            zIndex: 10,
+            transition: 'all 0.3s ease-in-out'
+          }}
+        />
+      )}
 
       {/* Profile Button */}
       <button
         className="fixed top-4 left-4 z-50 bg-white text-emily-blue w-10 h-10 rounded-full shadow-lg hover:border-emily-blue border-2 border-white transition-colors flex items-center justify-center"
         onClick={() => setIsProfileOpen(!isProfileOpen)}
+        onMouseEnter={(e) => {
+          const tooltip = document.createElement('div');
+          tooltip.textContent = 'Bekijk je voortgang en ontdekkingen';
+          tooltip.style.cssText = `
+            position: fixed;
+            top: ${e.clientY - 40}px;
+            left: ${e.clientX + 10}px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 10000;
+            pointer-events: none;
+            white-space: nowrap;
+          `;
+          tooltip.id = 'progress-tooltip';
+          document.body.appendChild(tooltip);
+        }}
+        onMouseLeave={() => {
+          const tooltip = document.getElementById('progress-tooltip');
+          if (tooltip) {
+            tooltip.remove();
+          }
+        }}
       >
         🥇
       </button>
@@ -588,7 +856,6 @@ export default function GlobeView() {
       {isProfileOpen && (
         <div
           onClick={(e) => {
-            // Close modal when clicking outside
             if (e.target === e.currentTarget) {
               setIsProfileOpen(false);
             }
@@ -606,23 +873,52 @@ export default function GlobeView() {
             zIndex: 1000
           }}
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              backgroundColor: 'white',
-              padding: '20px',
-              borderRadius: '12px',
-              maxWidth: '600px',
-              width: '90%',
-              maxHeight: '90vh',
-              overflowY: 'auto'
-            }}
-          >
-            <ProgressOverview userProgress={userProgress} sidebarItems={sidebarItems} />
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '20px',
+            maxWidth: '90vw',
+            width: '600px',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative'
+          }}>
+            {/* Close button */}
+            <button
+              onClick={() => setIsProfileOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '15px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#666',
+                width: '30px',
+                height: '30px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                transition: 'background-color 0.2s',
+                zIndex: 1
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            >
+              ×
+            </button>
+            
+            <ProgressOverview
+              userProgress={userProgress}
+              sidebarItems={sidebarItems}
+              onResetProgress={handleResetProgress}
+            />
           </div>
         </div>
       )}
-      
+
       {/* Sidebar Container with Integrated Tab */}
       <div style={{
         position: 'absolute',
@@ -684,14 +980,42 @@ export default function GlobeView() {
           backgroundColor: '#ffffff',
           boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
           overflowY: 'auto',
-          padding: '30px'
+          padding: '30px',
+          position: 'relative'
         }}>
+          {/* Close Button */}
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            style={{
+              position: 'absolute',
+              top: '15px',
+              right: '15px',
+              background: 'none',
+              border: 'none',
+              fontSize: '20px',
+              cursor: 'pointer',
+              color: '#666',
+              width: '30px',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
+              transition: 'background-color 0.2s',
+              zIndex: 1
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            title="Sluit zijbalk"
+          >
+            ×
+          </button>
           {selectedStory ? (
             // Expanded Story View
             <div className="story-card">
               {/* Back Button - Moved to top of expanded story */}
               <button
-                className="button-base mb-4"
+                className="text-gray-600 hover:text-gray-800 mb-4 flex items-center gap-2 transition-colors duration-200"
                 onClick={() => {
                   setSelectedStory(null);
                   setExpandedStory(null);
@@ -707,66 +1031,49 @@ export default function GlobeView() {
                   className="w-full h-full object-cover rounded"
                 />
               </div>
-              
-              <h2 className="text-xl font-semibold mb-4">{selectedStory.title}</h2>
-              
-              <div className="prose max-w-none mb-6">
-                {mockExpandedContent.text.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-4">{paragraph}</p>
-                ))}
-              </div>
 
-              {/* Categories in expanded view */}
-              <div className="flex flex-wrap gap-2 mb-4">
+              <h2 className="text-xl font-semibold mb-4">{selectedStory.title}, {expandedStories[selectedStory.id].age}</h2>
+              
+              {/* Location */}
+              <p className="text-sm italic mb-4 flex items-center gap-1" style={{ color: '#777' }}>
+                📍 {selectedStory.location.country === "Hong Kong" 
+                  ? "Hong Kong" 
+                  : `${selectedStory.location.name}, ${selectedStory.location.country}`
+                }
+              </p>
+
+              {/* Chat Button - Moved right under the name */}
+              <button
+                className="button-base w-full mb-6"
+                onClick={() => {
+                  // Handle chat functionality
+                  markAsVisited(selectedStory.id, userProgress, setUserProgress);
+                  
+                  // Force re-render to update visual state
+                  setTimeout(() => {
+                    setFilteredStories([...filteredStories]);
+                  }, 100);
+                }}
+              >
+                Chat met {selectedStory.title}
+              </button>
+
+              {/* Categories in expanded view - Moved under chat button */}
+              <div className="flex flex-wrap gap-2 mb-6">
                 {selectedStory.categories.map((cat) => (
                   <span
                     key={cat}
-                    className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded"
+                    className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded capitalize"
                   >
                     {categories[cat].icon} {categories[cat].label}
                   </span>
                 ))}
               </div>
 
-              {/* Chat Button - Now in Emily Blue */}
-              <button
-                className="button-base w-full"
-                onClick={() => {
-                  // Handle chat functionality
-                  markAsVisited(selectedStory.id, userProgress, setUserProgress);
-                }}
-              >
-                Chat met {selectedStory.title}
-              </button>
-
-              {/* Filter Section - Moved under expanded story */}
-              <div className="filter-section">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Filters</h3>
-                  <button
-                    className="text-emily-blue hover:text-emily-blue/80"
-                    onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  >
-                    {isFilterOpen ? '▼' : '▶'}
-                  </button>
-                </div>
-
-                {isFilterOpen && (
-                  <div className="grid grid-cols-2 gap-2">
-                    {Object.entries(categories).map(([key, { label, icon }]) => (
-                      <button
-                        key={key}
-                        className={`filter-button ${
-                          selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
-                        }`}
-                        onClick={() => toggleCategory(key)}
-                      >
-                        <span className="mr-2">{icon}</span>
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <div className="prose max-w-none mb-6">
+                {expandedStories[selectedStory.id].text.split('\n\n').map((paragraph, index) => (
+                  <p key={index} className="mb-4">{paragraph}</p>
+                ))}
               </div>
             </div>
           ) : (
@@ -809,21 +1116,20 @@ export default function GlobeView() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">Filters</h3>
                   <button
-                    className="text-emily-blue hover:text-emily-blue/80"
+                    className="text-emily-blue hover:text-emily-blue/80 text-sm"
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
                   >
-                    {isFilterOpen ? '▼' : '▶'}
+                    {isFilterOpen ? 'Verberg filters' : 'Toon filters'}
                   </button>
                 </div>
-                
+
                 {isFilterOpen && (
                   <div className="grid grid-cols-2 gap-2">
                     {Object.entries(categories).map(([key, { label, icon }]) => (
                       <button
                         key={key}
-                        className={`filter-button ${
-                          selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
-                        }`}
+                        className={`filter-button ${selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
+                          }`}
                         onClick={() => toggleCategory(key)}
                       >
                         <span className="mr-2">{icon}</span>
@@ -842,43 +1148,90 @@ export default function GlobeView() {
                 maxWidth: '90%',
                 margin: '0 auto'
               }}>
-                {filteredStories.map((story) => (
-                  <div key={story.id} className="story-card">
-                    <div className="relative aspect-w-16 aspect-h-9 mb-4">
-                      <img
-                        src={story.image}
-                        alt={story.title}
-                        className="w-full h-full object-cover rounded"
-                      />
-                    </div>
-                    <h3 className="text-xl font-semibold mb-2">{story.title}</h3>
-                    <p className="text-gray-600 mb-4">{story.description}</p>
-                    
-                    {/* Read More Button - Moved above categories */}
-                    <button
-                      className="read-more-button mb-4"
-                      onClick={() => {
-                        setSelectedStory(story);
-                        setExpandedStory(story.id);
-                        markAsVisited(story.id, userProgress, setUserProgress);
-                      }}
-                    >
-                      Lees meer...
-                    </button>
+                {filteredStories.length > 0 ? (
+                  filteredStories.map((story) => (
+                    <div key={story.id} className="story-card">
+                      <div className="relative aspect-w-16 aspect-h-9 mb-4">
+                        <img
+                          src={story.image}
+                          alt={story.title}
+                          className="w-full h-full object-cover rounded cursor-pointer"
+                          onClick={() => {
+                            setSelectedStory(story);
+                            setExpandedStory(story.id);
+                            markAsVisited(story.id, userProgress, setUserProgress);
+                            
+                            // Force re-render to update visual state
+                            setTimeout(() => {
+                              setFilteredStories([...filteredStories]);
+                            }, 100);
+                          }}
+                        />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">{story.title}, {expandedStories[story.id].age}</h3>
+                      
+                      {/* Location */}
+                      <p className="text-sm italic mb-4 flex items-center gap-1" style={{ color: '#777', fontSize: '13px', marginTop: '6px' }}>
+                        📍 {story.location.country === "Hong Kong" 
+                          ? "Hong Kong" 
+                          : `${story.location.name}, ${story.location.country}`
+                        }
+                      </p>
 
-                    {/* Categories */}
-                    <div className="flex flex-wrap gap-2">
-                      {story.categories.map((cat) => (
-                        <span
-                          key={cat}
-                          className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded"
-                        >
-                          {categories[cat].icon} {categories[cat].label}
-                        </span>
-                      ))}
+                      <p className="text-gray-600 mb-4">{story.description}</p>
+
+                      {/* Read More Button */}
+                      <button
+                        className="read-more-button mb-4"
+                        style={{ fontSize: '16px' }}
+                        onClick={() => {
+                          setSelectedStory(story);
+                          setExpandedStory(story.id);
+                          markAsVisited(story.id, userProgress, setUserProgress);
+                          
+                          // Force re-render to update visual state
+                          setTimeout(() => {
+                            setFilteredStories([...filteredStories]);
+                          }, 100);
+                        }}
+                      >
+                        👉 {story.title === "Sae_byeok" || story.title === "Emily" ? "Lees haar verhaal" : "Lees zijn verhaal"}
+                      </button>
+
+                      {/* Categories */}
+                      <div className="flex flex-wrap gap-2">
+                        {story.categories.map((cat) => (
+                          <span
+                            key={cat}
+                            className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded capitalize"
+                          >
+                            {categories[cat].icon} {categories[cat].label}
+                          </span>
+                        ))}
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 px-4">
+                    <div className="text-4xl mb-4">🔍</div>
+                    <h3 className="text-xl font-semibold mb-2">
+                      {selectedLocation 
+                        ? "Geen verhalen gevonden in dit land..."
+                        : selectedCategories.length > 0 
+                          ? "Geen verhalen gevonden met deze combinatie van filters..."
+                          : "Geen verhalen gevonden..."
+                      }
+                    </h3>
+                    <p className="text-gray-600">
+                      {selectedLocation 
+                        ? "Probeer een ander land te selecteren"
+                        : selectedCategories.length > 0 
+                          ? "Probeer andere filters te selecteren"
+                          : "Probeer andere zoek criteria"
+                      }
+                    </p>
                   </div>
-                ))}
+                )}
               </div>
             </>
           )}

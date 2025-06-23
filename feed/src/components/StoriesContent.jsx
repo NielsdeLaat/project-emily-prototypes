@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 
 // Import images (assuming these will be passed or handled within StoriesContent if dynamic)
-import AbrahamImg from "../img/Abraham.png";
+import KadirImg from "../img/Kadir.png";
 import emilyImg from "../img/Emily.png";
 import carlosImg from "../img/Carlos.png";
-import barryImg from "../img/Barry.png";
+import FrabriceImg from "../img/Frabrice.png";
 import tyroneImg from "../img/Tyrone.png";
-import SaraImg from "../img/Sara.png";
-import MikeImg from "../img/Mike.png";
+import Sae_ByeokImg from "../img/Sae_Byeok.png";
+import MugishaImg from "../img/Mugisha.png";
 
 // Categories for filtering - Moved here
 const categories = {
@@ -23,10 +23,10 @@ const categories = {
 const sidebarItems = [
   {
     id: 1,
-    title: "Abraham, 42",
+    title: "Kadir, 42",
     description:
       "Hij groeide op met gebed, familie en een diepgewortelde traditie. Wat volgde was isolatie, dwangarbeid en stilte — opgelegd in naam van heropvoeding.",
-    image: AbrahamImg,
+    image: KadirImg,
     location: {
       name: "Xinjiang Village",
       coordinates: [87.6177, 43.7928],
@@ -62,10 +62,10 @@ const sidebarItems = [
   },
   {
     id: 4,
-    title: "Barry, 31",
+    title: "Frabrice, 31",
     description:
-      "Barry vluchtte voor zijn leven, maar vond nergens rust. Niet in Burundi, niet in Kenia. Alleen stilte, schaamte en angst die zich bleven herhalen.",
-    image: barryImg,
+      "Frabrice vluchtte voor zijn leven, maar vond nergens rust. Niet in Burundi, niet in Kenia. Alleen stilte, schaamte en angst die zich bleven herhalen.",
+    image: FrabriceImg,
     location: {
       name: "Bujumbura",
       coordinates: [29.3618, -3.3731],
@@ -88,10 +88,10 @@ const sidebarItems = [
   },
   {
     id: 6,
-    title: "Sara, 27",
+    title: "Sae_Byeok, 27",
     description:
       "Ze trotseerde dood, vrieskou en verraad , voor een maaltijd, een stem, en uiteindelijk een leven in vrijheid.",
-    image: SaraImg,
+    image: Sae_ByeokImg,
     location: {
       name: "Eundok",
       coordinates: [129.3274, 41.8142],
@@ -101,10 +101,10 @@ const sidebarItems = [
   },
   {
     id: 7,
-    title: "Mike, 38",
+    title: "Mugisha, 38",
     description:
       "Wat gebeurt er als je wordt uitgesloten door de samenleving die je probeert te helpen, simpelweg omdat je jezelf bent?",
-    image: MikeImg,
+    image: MugishaImg,
     location: {
       name: "Kampala",
       coordinates: [32.5825, 0.3476],

@@ -18,11 +18,11 @@ A modern web application that lets users chat and call with virtual personas who
 
 - **Emily** – Refugee from Hong Kong
 - **Jason** – Journalist and activist from Hong Kong
-- **Abraham** – Uyghur survivor from Xinjiang
-- **Sara** – Refugee from North Korea
-- **Mike** – LGBTQ+ activist from Uganda
+- **Kadir** – Uyghur survivor from Xinjiang
+- **Sae_Byeok** – Refugee from North Korea
+- **Mugisha** – LGBTQ+ activist from Uganda
 - **Tyrone** – LGBTQ+ refugee from Uganda
-- **Barry** – Transgender refugee from Burundi
+- **Frabrice** – Transgender refugee from Burundi
 
 Each persona has a unique story and responds authentically within their lived experience.
 
