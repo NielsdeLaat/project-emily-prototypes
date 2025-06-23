@@ -1,6 +1,10 @@
 # 🌍 Interactive Globe - Human Rights Stories
 
-An immersive web application that tells the stories of people around the world who have faced human rights challenges. Users can explore an interactive 3D globe, discover personal narratives, and track their progress through different categories of human rights issues.
+I have created an immersive web application that tells the stories of people around the world who have faced human rights challenges. Users can explore an interactive 3D globe, discover personal narratives, and track their progress through different categories of human rights issues and regions.
+
+For this project I worked with cursor AI and GPT to create this prototype that you can visit on
+https://hover-cards-emily.vercel.app 
+
 
 ## Features
 
