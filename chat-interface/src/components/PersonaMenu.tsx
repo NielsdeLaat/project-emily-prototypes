@@ -82,12 +82,9 @@ const PersonaMenu = ({ onSelectPersona }: PersonaMenuProps) => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() =>
-                window.open(
-                  "https://project-emily-prototypes-flame.vercel.app/",
-                  "_blank"
-                )
-              }
+              onClick={() => {
+                window.location.href = "https://globe-progress.vercel.app/";
+              }}
               className="text-white hover:bg-white/20 rounded-full w-10 h-10 p-0 mr-2"
             >
               <ArrowLeft className="w-6 h-6" />
@@ -146,7 +143,7 @@ const PersonaMenu = ({ onSelectPersona }: PersonaMenuProps) => {
                     >
                       <Avatar className="h-12 w-12 ring-2 ring-white/20">
                         <AvatarImage
-                          src={PERSONA_AVATARS[persona.name]}
+                          src={PERSONA_AVATARS[persona.id]}
                           alt={persona.name}
                         />
                         <AvatarFallback className="bg-white/20 text-white font-semibold">

@@ -57,7 +57,7 @@ const ChatInterface = ({ persona, onBack }: ChatInterfaceProps) => {
       <ChatMessages
         messages={messages}
         isTyping={isTyping}
-        personaName={persona.name}
+        personaId={persona.id}
         messagesEndRef={messagesEndRef}
       />
 

@@ -16,6 +16,9 @@ interface MessageBubbleProps {
 const MessageBubble = ({ message }: MessageBubbleProps) => {
   const isUser = message.sender === "user";
 
+  const avatarKey = message.personaName?.toLowerCase() ?? "";
+  const avatarSrc = PERSONA_AVATARS[avatarKey] || "/placeholder.svg";
+
   return (
     <div
       className={`flex ${
