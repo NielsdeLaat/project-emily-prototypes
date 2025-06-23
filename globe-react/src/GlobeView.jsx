@@ -5,13 +5,13 @@ import { initializeProgress, markAsVisited } from './utils/progressUtils';
 import ProgressOverview from './components/ProgressOverview';
 
 // Import images
-import ablikimImg from './img/Ablikim.png';
+import KadirImg from './img/Kadir.png';
 import emilyImg from './img/Emily.png';
 import carlosImg from './img/Carlos.png';
-import barryImg from './img/Barry.png';
+import FabriceImg from './img/Fabrice.png';
 import tyroneImg from './img/Tyrone.png';
-import eunjuImg from './img/Eunju_Kim.png';
-import kikonyogoImg from './img/Kikonyogo_Kivumbi.png';
+import Sae_byeokImg from './img/Sae_byeok.png';
+import MugishaImg from './img/Mugisha.png';
 
 // Categories for filtering
 const categories = {
@@ -27,9 +27,9 @@ const categories = {
 const sidebarItems = [
   {
     id: 1,
-    title: "Ablikim",
+    title: "Kadir",
     description: "Zijn geloof werd verboden, zijn arbeid gestolen, zijn identiteit uitgewist , toch wist hij te ontsnappen.",
-    image: ablikimImg,
+    image: KadirImg,
     location: {
       name: "Xinjiang Village",
       coordinates: [87.6177, 43.7928], // Urumqi, Xinjiang
@@ -63,9 +63,9 @@ const sidebarItems = [
   },
   {
     id: 4,
-    title: "Barry",
+    title: "Fabrice",
     description: "Verlaten, verkracht en verguisd, maar nog altijd vechtend voor zichzelf, zijn gezin en zijn waarheid.",
-    image: barryImg,
+    image: FabriceImg,
     location: {
       name: "Bujumbura",
       coordinates: [29.3618, -3.3731], // Bujumbura Center
@@ -87,9 +87,9 @@ const sidebarItems = [
   },
   {
     id: 6,
-    title: "Eunju Kim",
+    title: "Sae-Byeok",
     description: "Ze trotseerde dood, vrieskou en verraad , voor een maaltijd, een stem, en uiteindelijk een leven in vrijheid.",
-    image: eunjuImg,
+    image: Sae_byeokImg,
     location: {
       name: "Eundok",
       coordinates: [129.3274, 41.8142], // Eundok, North Hamgyong
@@ -99,9 +99,9 @@ const sidebarItems = [
   },
   {
     id: 7,
-    title: "Kikonyogo Kivumbi",
+    title: "Mugisha",
     description: "Geverfd als vijand vanwege liefde, verloor hij zijn werk, zijn veiligheid en bijna zijn leven , maar niet zijn stem.",
-    image: kikonyogoImg,
+    image: MugishaImg,
     location: {
       name: "Kampala",
       coordinates: [32.5825, 0.3476], // Kampala Center
@@ -510,14 +510,14 @@ export default function GlobeView() {
             map.current.setPaintProperty('territory-fills', 'fill-color', [
               'case',
               ['==', ['get', 'name_en'], country.properties.name_en],
-              '#ffd700',
+              '#6495ED',
               '#e0e0e0'
             ]);
           } else {
             map.current.setPaintProperty('country-fills', 'fill-color', [
               'case',
               ['==', ['get', 'name_en'], country.properties.name_en],
-              '#ffd700',
+              '#6495ED',
               '#e0e0e0'
             ]);
           }
