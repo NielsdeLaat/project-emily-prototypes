@@ -8,7 +8,7 @@
 
 **Emily** is a virtual AI persona you can talk to about her experience during the Hong Kong protests. This prototype explores how emotionally realistic conversations with AI characters can raise awareness of sensitive topics through interactive storytelling.
 
-![Emily Demo Screenshot](video.mp4)
+![Emily Demo Screenshot](Emily-protortype.png)
 
 ---
 
