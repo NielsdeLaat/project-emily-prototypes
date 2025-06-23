@@ -1,17 +1,31 @@
-# Project Emily Prototype
+# Project Emily Prototypes
 
-Een collectie van prototypes voor het project.
+Dit is een collectie van prototypes voor het Project Emily project.
 
-Op het begin van het project hebben ik en Niels gewerkt aan prototypes om ideeën die we hadden voor het concept alvast te testen. Dit hebben we gedaan voordat de eerste brainstormsessie plaatsvond, zodat we al een duidelijk beeld hadden van hoe het concept er mogelijk uit kon komen te zien. Ook was dit goed voor het presenteren van onze ideeën.
+Gedurende het project hebben we verschillende prototypes gemaakt om onderdelen van ons concept te valideren bij de doelgroep. Deze prototypes staat los van elkaar en focussen op een eigen onderdeel van het concept. Het idee is dat gebruikers een verhaal selecteren op de wereldbol, dan de situatie uitgelegd krijgen met een story en daarna kunnen gaan praten met een AI persona in een Chat Interface.
 
-We hebben 3 prototypes ontwikkeld: 1 hiervan hebben we opgefrist na de hackathon, de Virtual Human. De andere 2 hebben we volledig tijdens het project gemaakt. Dat zijn de Chat Interface en de Wereldbol.
+## Prototypes
 
-Gebruikte Methodes: Rapid Prototyping
+### Interactieve Wereldbol
 
-Samenwerking: Prototypes gemaakt met Niels
+- Folder: [globe-react](https://github.com/NielsdeLaat/project-emily-prototypes/tree/main/globe-react)
+- Gemaakt door: Lin
+- Online: [Link](https://globe-progress.vercel.app/)
 
-MMM-Label: Cyborg
+### Story
 
-Website Links:
-- [Chat Interface](https://project-emily-chat-interface.vercel.app/)
-- [Story](https://project-emily-prototypes-flame.vercel.app/)
+- Folder: [story](https://github.com/NielsdeLaat/project-emily-prototypes/tree/main/story)
+- Gemaakt door: Niels
+- Online: [Link](https://project-emily-prototypes-flame.vercel.app/)
+
+### Chat Interface
+
+- Folder: [chat-interface](https://github.com/NielsdeLaat/project-emily-prototypes/tree/main/chat-interface)
+- Gemaakt door: Niels
+- Online: [Link](https://project-emily-chat-interface.vercel.app/)
+
+### Virtual Human (Emily)
+
+- Folder: [virtual-human](https://github.com/NielsdeLaat/project-emily-prototypes/tree/main/virtual-human)
+- Gemaakt door: Lin & Niels tijdens de hackathon
+- Online: [Link]()
