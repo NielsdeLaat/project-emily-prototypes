@@ -20,7 +20,7 @@ export const PERSONAS: Persona[] = [
     color: "from-green-500 to-emerald-500",
   },
   {
-    id: "Sae_byeok",
+    id: "Sae-byeok",
     name: "Sae-Byeok",
     description: "Start een gesprek",
     color: "from-orange-500 to-red-500",
@@ -52,7 +52,7 @@ export const INITIAL_MESSAGES: Record<string, string> = {
     "Ik ben Jason, 25 jaar, journalist uit Hongkong. Jarenlang hield ik mijn mond over het geweld dat ik zag, uit angst voor mijn familie. Maar op een dag besefte ik: zolang wij zwijgen, schrijven zij de geschiedenis.",
   kadir:
     "Ik ben Kadir, 27 jaar, geboren in een klein dorp in Xinjiang. Mijn geloof, mijn taal, mijn vrijheid — alles werd me afgenomen. In de fabriek waar ik moest werken, voelde ik me geen mens meer. Maar nu ik kan spreken, wil ik dat mijn stem telt, voor mij en voor iedereen die nog gevangen zit in stilte.",
-  Sae_byeok:
+  Saebyeok:
     "Ik ben Sae-Byeok, 39 jaar, geboren in een mijnstad in Noord-Korea. Tijdens de hongersnood verloor ik mijn vader aan de honger en werd ik samen met mijn moeder en zus verkocht in China. Na jaren van angst en uitbuiting zijn we uiteindelijk gevlucht naar Zuid-Korea. Ik leef nu vrij, maar ik blijf mijn verhaal delen voor degenen die nog steeds gevangen zitten — zoals mijn vriendin, die ik nooit ben vergeten.",
   mugisha:
     "Ik ben Mugisha, 40 jaar en geboren in een conservatief christelijk gezin in Oeganda. Toen ik uitkwam voor mijn geaardheid verloor ik mijn baan, werd ik aangevallen in het openbaar, en ontdekte ik hoe diep de afwijzing zit in mijn samenleving. Toch bleef ik vechten als journalist, activist en trainer voor de gezondheid en rechten van mensen zoals ik. Vandaag probeer ik met mijn stem ruimte te maken voor iedereen die in stilte leeft.",

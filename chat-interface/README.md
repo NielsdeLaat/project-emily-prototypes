@@ -19,7 +19,7 @@ A modern web application that lets users chat and call with virtual personas who
 - **Emily** – Refugee from Hong Kong
 - **Jason** – Journalist and activist from Hong Kong
 - **Kadir** – Uyghur survivor from Xinjiang
-- **Sae_Byeok** – Refugee from North Korea
+- **Sae-Byeok** – Refugee from North Korea
 - **Mugisha** – LGBTQ+ activist from Uganda
 - **Tyrone** – LGBTQ+ refugee from Uganda
 - **Frabrice** – Transgender refugee from Burundi

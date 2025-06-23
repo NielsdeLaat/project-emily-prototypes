@@ -88,7 +88,7 @@ const sidebarItems = [
   },
   {
     id: 6,
-    title: "Sae_Byeok, 27",
+    title: "Sae-Byeok, 27",
     description:
       "Ze trotseerde dood, vrieskou en verraad , voor een maaltijd, een stem, en uiteindelijk een leven in vrijheid.",
     image: Sae_ByeokImg,
