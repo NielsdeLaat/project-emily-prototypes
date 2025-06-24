@@ -83,7 +83,7 @@ const PersonaMenu = ({ onSelectPersona }: PersonaMenuProps) => {
               variant="ghost"
               size="icon"
               onClick={() => {
-                window.location.href = "https://globe-progress.vercel.app/";
+                window.location.href = "https://demo-emily-prototype.vercel.app";
               }}
               className="text-white hover:bg-white/20 rounded-full w-10 h-10 p-0 mr-2"
             >
