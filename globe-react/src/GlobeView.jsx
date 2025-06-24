@@ -971,7 +971,6 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
             width: 'calc(100% - 30%)',
             height: '100%',
             backgroundColor: 'rgba(0,0,0,0.15)',
-            backdropFilter: 'blur(2px)',
             pointerEvents: 'none',
             zIndex: 10,
             transition: 'all 0.3s ease-in-out'
@@ -1220,7 +1219,8 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                     onClick={() => {
                       // Handle chat functionality
                       markAsVisited(selectedStory.id, userProgress, setUserProgress);
-                      
+                      window.location.href = "https://project-emily-prototypes-flame.vercel.app/";
+
                       // Force re-render to update visual state
                       setTimeout(() => {
                         setFilteredStories([...filteredStories]);
