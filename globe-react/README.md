@@ -3,7 +3,7 @@
 I have created an immersive web application that tells the stories of people around the world who have faced human rights challenges. Users can explore an interactive 3D globe, discover personal narratives, track their progress through different categories of human rights issues and regions, and engage with a dynamic social feed that simulates real-time community interaction.
 
 For this project I worked with cursor AI and GPT to create this prototype that you can visit on
-https://hover-cards-emily.vercel.app 
+[This Vercel Server ](https://demo-emily-prototype.vercel.app)
 ![overview](readimages/1.png)
 
 
