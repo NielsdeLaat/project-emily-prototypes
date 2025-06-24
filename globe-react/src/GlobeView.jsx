@@ -145,6 +145,12 @@ export default function GlobeView() {
   const [expandedStory, setExpandedStory] = useState(null);
   const [selectedStory, setSelectedStory] = useState(null);
   const [sidebarTab, setSidebarTab] = useState('stories'); // 'stories' or 'feed'
+  
+  // Social Feed State
+  const [feedPosts, setFeedPosts] = useState([]);
+  const [feedAllPosts, setFeedAllPosts] = useState([]);
+  const [feedRecentPostIds, setFeedRecentPostIds] = useState([]);
+  const [feedNextPostIndex, setFeedNextPostIndex] = useState(0);
 
   const expandedStories = {
     1: {
@@ -558,6 +564,9 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
         const handleMarkerClick = () => {
           // Force sidebar open
           setIsSidebarOpen(true);
+          
+          // Switch to stories tab
+          setSidebarTab('stories');
 
           // Set location and filter stories
           setSelectedLocation(story.location.country);
@@ -717,6 +726,10 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
       map.current.on('click', ['country-fills', 'territory-fills'], (e) => {
         if (e.features.length > 0) {
           const country = e.features[0];
+          
+          // Switch to stories tab
+          setSidebarTab('stories');
+          
           setSelectedCountry(country);
           setSelectedLocation(country.properties.name_en);
           setFilteredStories(sidebarItems.filter(item =>
@@ -804,163 +817,281 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
     }
   }, [isSidebarOpen]);
 
+  // Fetch posts from API
+  useEffect(() => {
+    const fetchPosts = async () => {
+      if (feedAllPosts.length > 0) return; // Already have posts
+      
+      try {
+        const response = await fetch('https://social-api-sm1s.onrender.com/posts');
+        const result = await response.json();
+        if (result.success && result.data) {
+          console.log('GlobeView: Fetched posts from API:', result.data.length);
+          setFeedAllPosts(result.data);
+          // Start with first post
+          if (result.data.length > 0) {
+            setFeedPosts([result.data[0]]);
+            setFeedRecentPostIds([result.data[0].id]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, [feedAllPosts.length]);
+
+  // Add new post every 15 seconds
+  useEffect(() => {
+    if (feedAllPosts.length === 0) return;
+
+    console.log('GlobeView: Setting up interval, feedNextPostIndex:', feedNextPostIndex, 'total posts:', feedAllPosts.length);
+    const interval = setInterval(() => {
+      console.log('GlobeView: Adding new post, feedNextPostIndex:', feedNextPostIndex);
+      
+      // Get available posts (not in recent 5)
+      const availablePosts = feedAllPosts.filter(post => !feedRecentPostIds.includes(post.id));
+      
+      if (availablePosts.length > 0) {
+        // Randomly select from available posts
+        const randomIndex = Math.floor(Math.random() * availablePosts.length);
+        const selectedPost = availablePosts[randomIndex];
+        
+        const newPost = {
+          ...selectedPost,
+          id: Date.now(), // Unique ID for each post instance
+          timestamp: "Nu"
+        };
+        
+        setFeedPosts(prevPosts => [newPost, ...prevPosts]);
+        
+        // Update recent post IDs (keep only last 5)
+        setFeedRecentPostIds(prev => {
+          const newRecent = [selectedPost.id, ...prev.slice(0, 4)];
+          return newRecent;
+        });
+      } else {
+        // If all posts have been used recently, reset recent list and continue
+        const randomPost = feedAllPosts[Math.floor(Math.random() * feedAllPosts.length)];
+        const newPost = {
+          ...randomPost,
+          id: Date.now(),
+          timestamp: "Nu"
+        };
+        
+        setFeedPosts(prevPosts => [newPost, ...prevPosts]);
+        setFeedRecentPostIds([randomPost.id]);
+      }
+    }, 15000); // 15 seconds
+
+    return () => clearInterval(interval);
+  }, [feedNextPostIndex, feedAllPosts, feedRecentPostIds]);
+
+  // Handle feed like toggle
+  const handleFeedLike = (postId) => {
+    setFeedPosts(prevPosts => prevPosts.map(post => {
+      if (post.id === postId) {
+        return {
+          ...post,
+          likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+          isLiked: !post.isLiked
+        };
+      }
+      return post;
+    }));
+  };
+
+  // Handle feed comment submission
+  const handleFeedComment = (postId, commentText) => {
+    if (commentText.trim()) {
+      const authorImages = {
+        "Kadir": "Kadir",
+        "Emily": "Emily", 
+        "Carlos": "Carlos",
+        "Fabrice": "Fabrice",
+        "Tyrone": "Tyrone",
+        "Kang Sae-Byeok": "Sae-Byeok",
+        "Mugisha": "Mugisha"
+      };
+      
+      const randomAuthor = Object.keys(authorImages)[Math.floor(Math.random() * Object.keys(authorImages).length)];
+      const newCommentObj = {
+        id: Date.now(),
+        user: randomAuthor,
+        text: commentText,
+        timestamp: new Date().toISOString()
+      };
+
+      setFeedPosts(prevPosts => prevPosts.map(post => {
+        if (post.id === postId) {
+          return {
+            ...post,
+            comments: [...post.comments, newCommentObj]
+          };
+        }
+        return post;
+      }));
+    }
+  };
+
   return (
     <>
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        margin: 0,
-        padding: 0,
-        overflow: 'hidden'
-      }}>
-        {/* Map Container */}
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      margin: 0,
+      padding: 0,
+      overflow: 'hidden'
+    }}>
+      {/* Map Container */}
+      <div
+        ref={mapContainer}
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          width: isSidebarOpen ? 'calc(100% - 30%)' : '100%',
+          height: '100%',
+          transition: 'width 0.3s ease-in-out',
+          zIndex: 5
+        }}
+      />
+
+      {/* Globe Dimming Overlay */}
+      {isSidebarOpen && (
         <div
-          ref={mapContainer}
           style={{
             position: 'absolute',
             left: 0,
             top: 0,
-            width: isSidebarOpen ? 'calc(100% - 30%)' : '100%',
+            width: 'calc(100% - 30%)',
             height: '100%',
-            transition: 'width 0.3s ease-in-out',
-            zIndex: 5
+            backgroundColor: 'rgba(0,0,0,0.15)',
+            backdropFilter: 'blur(2px)',
+            pointerEvents: 'none',
+            zIndex: 10,
+            transition: 'all 0.3s ease-in-out'
           }}
         />
+      )}
 
-        {/* Globe Dimming Overlay */}
-        {isSidebarOpen && (
-          <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              width: 'calc(100% - 30%)',
-              height: '100%',
-              backgroundColor: 'rgba(0,0,0,0.15)',
-              backdropFilter: 'blur(2px)',
-              pointerEvents: 'none',
-              zIndex: 10,
-              transition: 'all 0.3s ease-in-out'
-            }}
-          />
-        )}
+      {/* Profile Button */}
+      <button
+        className="fixed top-4 left-4 z-50 bg-white text-emily-blue w-10 h-10 rounded-full shadow-lg hover:border-emily-blue border-2 border-white transition-colors flex items-center justify-center"
+        onClick={() => setIsProfileOpen(!isProfileOpen)}
+        onMouseEnter={(e) => {
+          const tooltip = document.createElement('div');
+          tooltip.textContent = 'Bekijk je voortgang en ontdekkingen';
+          tooltip.style.cssText = `
+            position: fixed;
+            top: ${e.clientY - 40}px;
+            left: ${e.clientX + 10}px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            z-index: 10000;
+            pointer-events: none;
+            white-space: nowrap;
+          `;
+          tooltip.id = 'progress-tooltip';
+          document.body.appendChild(tooltip);
+        }}
+        onMouseLeave={() => {
+          const tooltip = document.getElementById('progress-tooltip');
+          if (tooltip) {
+            tooltip.remove();
+          }
+        }}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#2563eb" style={{ width: '1.5em', height: '1.5em' }}>
+          <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.25a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.75c1.995 0 3.823.707 5.25 1.886V4.533ZM12.75 20.636A8.214 8.214 0 0 1 18 18.75c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.708V4.262a.75.75 0 0 0-.5-.707A9.735 9.735 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v16.103Z" />
+        </svg>
+      </button>
 
-        {/* Profile Button */}
-        <button
-          className="fixed top-4 left-4 z-50 bg-white text-emily-blue w-10 h-10 rounded-full shadow-lg hover:border-emily-blue border-2 border-white transition-colors flex items-center justify-center"
-          onClick={() => setIsProfileOpen(!isProfileOpen)}
-          onMouseEnter={(e) => {
-            const tooltip = document.createElement('div');
-            tooltip.textContent = 'Bekijk je voortgang en ontdekkingen';
-            tooltip.style.cssText = `
-              position: fixed;
-              top: ${e.clientY - 40}px;
-              left: ${e.clientX + 10}px;
-              background: rgba(0,0,0,0.8);
-              color: white;
-              padding: 8px 12px;
-              border-radius: 6px;
-              font-size: 12px;
-              z-index: 10000;
-              pointer-events: none;
-              white-space: nowrap;
-            `;
-            tooltip.id = 'progress-tooltip';
-            document.body.appendChild(tooltip);
-          }}
-          onMouseLeave={() => {
-            const tooltip = document.getElementById('progress-tooltip');
-            if (tooltip) {
-              tooltip.remove();
+      {/* Profile Modal */}
+      {isProfileOpen && (
+        <div
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsProfileOpen(false);
             }
           }}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000
+          }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#2563eb" style={{ width: '1.5em', height: '1.5em' }}>
-            <path d="M11.25 4.533A9.707 9.707 0 0 0 6 3a9.735 9.735 0 0 0-3.25.555.75.75 0 0 0-.5.707v14.25a.75.75 0 0 0 1 .707A8.237 8.237 0 0 1 6 18.75c1.995 0 3.823.707 5.25 1.886V4.533ZM12.75 20.636A8.214 8.214 0 0 1 18 18.75c.966 0 1.89.166 2.75.47a.75.75 0 0 0 1-.708V4.262a.75.75 0 0 0-.5-.707A9.735 9.735 0 0 0 18 3a9.707 9.707 0 0 0-5.25 1.533v16.103Z" />
-          </svg>
-        </button>
-
-        {/* Profile Modal */}
-        {isProfileOpen && (
-          <div
-            onClick={(e) => {
-              if (e.target === e.currentTarget) {
-                setIsProfileOpen(false);
-              }
-            }}
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1000
-            }}
-          >
-            <div style={{
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              padding: '20px',
-              maxWidth: '90vw',
-              width: '600px',
-              maxHeight: '90vh',
-              overflow: 'auto',
-              position: 'relative'
-            }}>
-              {/* Close button */}
-              <button
-                onClick={() => setIsProfileOpen(false)}
-                style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '15px',
-                  background: 'none',
-                  border: 'none',
-                  fontSize: '24px',
-                  cursor: 'pointer',
-                  color: '#666',
-                  width: '30px',
-                  height: '30px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: '50%',
-                  transition: 'background-color 0.2s',
-                  zIndex: 1
-                }}
-                onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-                onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-              >
-                ×
-              </button>
-              
-              <ProgressOverview
-                userProgress={userProgress}
-                sidebarItems={sidebarItems}
-                onResetProgress={handleResetProgress}
-              />
-            </div>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '20px',
+            maxWidth: '90vw',
+            width: '600px',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            position: 'relative'
+          }}>
+            {/* Close button */}
+            <button
+              onClick={() => setIsProfileOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '15px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: '#666',
+                width: '30px',
+                height: '30px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                transition: 'background-color 0.2s',
+                zIndex: 1
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            >
+              ×
+            </button>
+            
+            <ProgressOverview
+              userProgress={userProgress}
+              sidebarItems={sidebarItems}
+              onResetProgress={handleResetProgress}
+            />
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Sidebar Container with Integrated Tab */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          right: isSidebarOpen ? '0' : '-30%',
-          height: '100%',
-          width: '30%',
-          display: 'flex',
-          transition: 'right 0.3s ease-in-out',
-          zIndex: 999
-        }}>
+      {/* Sidebar Container with Integrated Tab */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        right: isSidebarOpen ? '0' : '-30%',
+        height: '100%',
+        width: '30%',
+        display: 'flex',
+        transition: 'right 0.3s ease-in-out',
+        zIndex: 999
+      }}>
           {/* Tab Bar */}
           <div style={{
             position: 'absolute',
@@ -1008,124 +1139,231 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
               Feed
             </button>
           </div>
-          {/* Sidebar Content */}
-          <div style={{
-            flex: 1,
-            backgroundColor: '#ffffff',
-            boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
-            overflowY: 'auto',
-            padding: '30px',
+        {/* Sidebar Content */}
+        <div style={{
+          flex: 1,
+          backgroundColor: '#ffffff',
+          boxShadow: '-2px 0 5px rgba(0,0,0,0.1)',
+          overflowY: 'auto',
+          padding: '30px',
             position: 'relative',
             paddingTop: '80px' // leave space for tab bar and close button
-          }}>
-            {/* Close Button */}
-            <button
-              onClick={() => setIsSidebarOpen(false)}
-              style={{
-                position: 'absolute',
-                top: '15px',
-                right: '15px',
-                background: 'none',
-                border: 'none',
-                fontSize: '20px',
-                cursor: 'pointer',
-                color: '#666',
-                width: '30px',
-                height: '30px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '50%',
-                transition: 'background-color 0.2s',
-                zIndex: 1
-              }}
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-              title="Sluit zijbalk"
-            >
-              ×
-            </button>
+        }}>
+          {/* Close Button */}
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            style={{
+              position: 'absolute',
+              top: '15px',
+              right: '15px',
+              background: 'none',
+              border: 'none',
+              fontSize: '20px',
+              cursor: 'pointer',
+              color: '#666',
+              width: '30px',
+              height: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '50%',
+              transition: 'background-color 0.2s',
+              zIndex: 1
+            }}
+            onMouseEnter={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+            onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
+            title="Sluit zijbalk"
+          >
+            ×
+          </button>
             {sidebarTab === 'stories' ? (
-              // Stories List View
-              <>
-                {/* Location Header with Back Option */}
-                {selectedLocation && (
-                  <div style={{
-                    marginBottom: '20px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px'
-                  }}>
-                    <button
-                      onClick={() => {
-                        setSelectedLocation(null);
-                        setFilteredStories(sidebarItems);
-                      }}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        color: '#666',
-                        padding: '8px 0'
-                      }}
-                    >
-                      <span>←</span>
-                      <span>Alle verhalen</span>
-                    </button>
-                    <span style={{ color: '#666' }}>|</span>
-                    <span style={{ color: '#333', fontWeight: 'bold' }}>{selectedLocation}</span>
-                  </div>
-                )}
+              selectedStory ? (
+                // Expanded Story View
+                <div className="story-card">
+                  {/* Back Button - Moved to top of expanded story */}
+                  <button
+                    className="text-gray-600 hover:text-gray-800 mb-4 flex items-center gap-2 transition-colors duration-200"
+                    onClick={() => {
+                      setSelectedStory(null);
+                      setExpandedStory(null);
+                    }}
+                  >
+                    ← Terug naar overzicht
+                  </button>
 
-                {/* Filter Section */}
-                <div className="filter-section">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">Filters</h3>
-                    <button
-                      className="text-emily-blue hover:text-emily-blue/80 text-sm"
-                      onClick={() => setIsFilterOpen(!isFilterOpen)}
-                    >
-                      {isFilterOpen ? 'Verberg filters' : 'Toon filters'}
-                    </button>
+                  <div className="relative aspect-w-16 aspect-h-9 mb-4">
+                    <img
+                      src={selectedStory.image}
+                      alt={selectedStory.title}
+                      className="w-full h-full object-cover rounded"
+                    />
                   </div>
 
-                  {isFilterOpen && (
-                    <div className="grid grid-cols-2 gap-2">
-                      {Object.entries(categories).map(([key, { label, icon }]) => (
-                        <button
-                          key={key}
-                          className={`filter-button ${selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
-                            }`}
-                          onClick={() => toggleCategory(key)}
-                        >
-                          <span className="mr-2">{icon}</span>
-                          {label}
-                        </button>
-                      ))}
+                  <h2 className="text-xl font-semibold mb-4">{selectedStory.title}, {expandedStories[selectedStory.id].age}</h2>
+                  
+                  {/* Location */}
+                  <p className="text-sm italic mb-4 flex items-center gap-1" style={{ color: '#777' }}>
+                    <span style={{ display: 'inline-flex', verticalAlign: 'middle', color: '#888' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                        <path fillRule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clipRule="evenodd" />
+                      </svg>
+                    </span>
+                    {selectedStory.title === 'Emily'
+                      ? 'Hong Kong'
+                      : `${placeTranslations[selectedStory.location.name] || selectedStory.location.name}, ${placeTranslations[selectedStory.location.country] || selectedStory.location.country}`
+                    }
+                  </p>
+
+                  {/* Chat Button - Moved right under the name */}
+                  <button
+                    className="button-base w-full mb-6"
+                    onClick={() => {
+                      // Handle chat functionality
+                      markAsVisited(selectedStory.id, userProgress, setUserProgress);
+                      
+                      // Force re-render to update visual state
+                      setTimeout(() => {
+                        setFilteredStories([...filteredStories]);
+                      }, 100);
+                    }}
+                  >
+                    Leer meer over {selectedStory.title}
+                  </button>
+
+                  {/* Categories in expanded view - Moved under chat button */}
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {selectedStory.categories.map((cat) => (
+                      <span
+                        key={cat}
+                        className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded capitalize"
+                      >
+                        {categories[cat].icon} {categories[cat].label}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="prose max-w-none mb-6">
+                    {expandedStories[selectedStory.id].text.split('\n\n').map((paragraph, index) => (
+                      <p key={index} className="mb-4">{paragraph}</p>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                // Stories List View
+                <>
+                  {/* Location Header with Back Option */}
+                  {selectedLocation && (
+                    <div style={{
+                      marginBottom: '20px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px'
+                    }}>
+                      <button
+                        onClick={() => {
+                          setSelectedLocation(null);
+                          setFilteredStories(sidebarItems);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          color: '#666',
+                          padding: '8px 0'
+                        }}
+                      >
+                        <span>←</span>
+                        <span>Alle verhalen</span>
+                      </button>
+                      <span style={{ color: '#666' }}>|</span>
+                      <span style={{ color: '#333', fontWeight: 'bold' }}>{selectedLocation}</span>
                     </div>
                   )}
-                </div>
 
-                {/* Stories List */}
-                <div style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  gap: '30px',
-                  maxWidth: '90%',
-                  margin: '0 auto'
-                }}>
-                  {filteredStories.length > 0 ? (
-                    filteredStories.map((story) => (
-                      <div key={story.id} className="story-card">
-                        <div className="relative aspect-w-16 aspect-h-9 mb-4">
-                          <img
-                            src={story.image}
-                            alt={story.title}
-                            className="w-full h-full object-cover rounded cursor-pointer"
+                  {/* Filter Section */}
+                  <div className="filter-section">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold">Filters</h3>
+                      <button
+                        className="text-emily-blue hover:text-emily-blue/80 text-sm"
+                        onClick={() => setIsFilterOpen(!isFilterOpen)}
+                      >
+                        {isFilterOpen ? 'Verberg filters' : 'Toon filters'}
+                      </button>
+                    </div>
+
+                    {isFilterOpen && (
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.entries(categories).map(([key, { label, icon }]) => (
+                          <button
+                            key={key}
+                            className={`filter-button ${selectedCategories.includes(key) ? 'bg-emily-blue text-white' : ''
+                              }`}
+                            onClick={() => toggleCategory(key)}
+                          >
+                            <span className="mr-2">{icon}</span>
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Stories List */}
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    gap: '30px',
+                    maxWidth: '90%',
+                    margin: '0 auto'
+                  }}>
+                    {filteredStories.length > 0 ? (
+                      filteredStories.map((story) => (
+                        <div key={story.id} className="story-card">
+                          <div className="relative aspect-w-16 aspect-h-9 mb-4">
+                            <img
+                              src={story.image}
+                              alt={story.title}
+                              className="w-full h-full object-cover rounded cursor-pointer"
+                              onClick={() => {
+                                setSidebarTab('stories');
+                                setSelectedStory(story);
+                                setExpandedStory(story.id);
+                                markAsVisited(story.id, userProgress, setUserProgress);
+                                
+                                // Force re-render to update visual state
+                                setTimeout(() => {
+                                  setFilteredStories([...filteredStories]);
+                                }, 100);
+                              }}
+                            />
+                          </div>
+                          <h3 className="text-xl font-semibold mb-2">{story.title}, {expandedStories[story.id].age}</h3>
+                          
+                          {/* Location */}
+                          <p className="text-sm italic mb-4 flex items-center gap-1" style={{ color: '#777', fontSize: '13px', marginTop: '6px' }}>
+                            <span style={{ display: 'inline-flex', verticalAlign: 'middle', color: '#888' }}>
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                                <path fillRule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clipRule="evenodd" />
+                              </svg>
+                            </span>
+                            {story.title === 'Emily'
+                              ? 'Hong Kong'
+                              : `${placeTranslations[story.location.name] || story.location.name}, ${placeTranslations[story.location.country] || story.location.country}`
+                            }
+                          </p>
+
+                          <p className="text-gray-600 mb-4">{story.description}</p>
+
+                          {/* Read More Button */}
+                          <button
+                            className="read-more-button mb-4"
+                            style={{ fontSize: '16px' }}
                             onClick={() => {
+                              setSidebarTab('stories');
                               setSelectedStory(story);
                               setExpandedStory(story.id);
                               markAsVisited(story.id, userProgress, setUserProgress);
@@ -1135,85 +1373,61 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                                 setFilteredStories([...filteredStories]);
                               }, 100);
                             }}
-                          />
+                          >
+                              Lees meer... 
+                          </button>
+
+                          {/* Categories */}
+                          <div className="flex flex-wrap gap-2">
+                            {story.categories.map((cat) => (
+                              <span
+                                key={cat}
+                                className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded capitalize"
+                              >
+                                {categories[cat].icon} {categories[cat].label}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                        <h3 className="text-xl font-semibold mb-2">{story.title}, {expandedStories[story.id].age}</h3>
-                        
-                        {/* Location */}
-                        <p className="text-sm italic mb-4 flex items-center gap-1" style={{ color: '#777', fontSize: '13px', marginTop: '6px' }}>
-                          <span style={{ display: 'inline-flex', verticalAlign: 'middle', color: '#888' }}>
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
-                              <path fillRule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clipRule="evenodd" />
-                            </svg>
-                          </span>
-                          {story.title === 'Emily'
-                            ? 'Hong Kong'
-                            : `${placeTranslations[story.location.name] || story.location.name}, ${placeTranslations[story.location.country] || story.location.country}`
+                      ))
+                    ) : (
+                      <div className="text-center py-8 px-4">
+                        <div className="text-4xl mb-4">🔍</div>
+                        <h3 className="text-xl font-semibold mb-2">
+                          {selectedLocation 
+                            ? "Geen verhalen gevonden in dit land..."
+                            : selectedCategories.length > 0 
+                              ? "Geen verhalen gevonden met deze combinatie van filters..."
+                              : "Geen verhalen gevonden..."
+                          }
+                        </h3>
+                        <p className="text-gray-600">
+                          {selectedLocation 
+                            ? "Probeer een ander land te selecteren"
+                            : selectedCategories.length > 0 
+                              ? "Probeer andere filters te selecteren"
+                              : "Probeer andere zoek criteria"
                           }
                         </p>
-
-                        <p className="text-gray-600 mb-4">{story.description}</p>
-
-                        {/* Read More Button */}
-                        <button
-                          className="read-more-button mb-4"
-                          style={{ fontSize: '16px' }}
-                          onClick={() => {
-                            setSelectedStory(story);
-                            setExpandedStory(story.id);
-                            markAsVisited(story.id, userProgress, setUserProgress);
-                            
-                            // Force re-render to update visual state
-                            setTimeout(() => {
-                              setFilteredStories([...filteredStories]);
-                            }, 100);
-                          }}
-                        >
-                          Lees meer... 
-                        </button>
-
-                        {/* Categories */}
-                        <div className="flex flex-wrap gap-2">
-                          {story.categories.map((cat) => (
-                            <span
-                              key={cat}
-                              className="inline-flex items-center gap-1 text-sm px-2 py-1 bg-gray-100 rounded capitalize"
-                            >
-                              {categories[cat].icon} {categories[cat].label}
-                            </span>
-                          ))}
-                        </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-8 px-4">
-                      <div className="text-4xl mb-4">🔍</div>
-                      <h3 className="text-xl font-semibold mb-2">
-                        {selectedLocation 
-                          ? "Geen verhalen gevonden in dit land..."
-                          : selectedCategories.length > 0 
-                            ? "Geen verhalen gevonden met deze combinatie van filters..."
-                            : "Geen verhalen gevonden..."
-                        }
-                      </h3>
-                      <p className="text-gray-600">
-                        {selectedLocation 
-                          ? "Probeer een ander land te selecteren"
-                          : selectedCategories.length > 0 
-                            ? "Probeer andere filters te selecteren"
-                            : "Probeer andere zoek criteria"
-                        }
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </>
+                    )}
+                  </div>
+                </>
+              )
             ) : (
-              <SocialFeed sidebarItems={sidebarItems} />
+              <SocialFeed
+                sidebarItems={sidebarItems}
+                feedPosts={feedPosts}
+                feedAllPosts={feedAllPosts}
+                feedRecentPostIds={feedRecentPostIds}
+                feedNextPostIndex={feedNextPostIndex}
+                onLike={handleFeedLike}
+                onComment={handleFeedComment}
+              />
             )}
-          </div>
         </div>
       </div>
+    </div>
     </>
   );
 } 
