@@ -1,6 +1,6 @@
 # 🌍 Interactive Globe - Human Rights Stories
 
-I have created an immersive web application that tells the stories of people around the world who have faced human rights challenges. Users can explore an interactive 3D globe, discover personal narratives, and track their progress through different categories of human rights issues and regions.
+I have created an immersive web application that tells the stories of people around the world who have faced human rights challenges. Users can explore an interactive 3D globe, discover personal narratives, track their progress through different categories of human rights issues and regions, and engage with a dynamic social feed that simulates real-time community interaction.
 
 For this project I worked with cursor AI and GPT to create this prototype that you can visit on
 https://hover-cards-emily.vercel.app 
@@ -14,6 +14,8 @@ https://hover-cards-emily.vercel.app
 - **Progress Tracking**: Monitor your exploration progress with a comprehensive tracking system
 ![progress](readimages/2.png)
 - **Category Filtering**: Filter stories by human rights categories (Religious Persecution, LGBTQ+ Rights, Racism, etc.)
+- **Dynamic Social Feed**: Real-time social media feed with posts, likes, comments, and tags
+- **Tab System**: Switch between Stories and Social Feed views
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Dutch Localization**: Fully localized interface in Dutch
 - **Visual Feedback**: Hover cards, visited state indicators, and smooth animations
@@ -26,6 +28,15 @@ https://hover-cards-emily.vercel.app
 - **Politieke Onderdrukking** (Political Oppression) 🗳️
 - **Genderrechten** (Gender Rights) ♀️
 - **Vluchteling** (Refugee Status) 🏃
+
+## Social Feed Features
+
+- **Real-time Posts**: New posts appear every 15 seconds from the Social API
+- **Interactive Engagement**: Like posts and add comments
+- **Smart Tagging**: Posts are tagged as Trending, Urgent, or Unpopular with color-coded styling
+- **Persistent State**: Feed maintains posts when switching between tabs
+- **Randomized Content**: Posts appear in random order without recent repeats
+- **API Integration**: Fetches real content and images from https://social-api-sm1s.onrender.com
 
 ## Quick Start
 
@@ -70,6 +81,12 @@ https://hover-cards-emily.vercel.app
 - **Chat Function**: Access chat functionality after reading stories
 - **Progress Tracking**: View your exploration progress in the top-left corner
 
+### Social Feed Interaction
+- **Tab Navigation**: Switch between "Stories" and "Feed" tabs in the sidebar
+- **Real-time Updates**: Watch new posts appear every 15 seconds
+- **Engage**: Like posts and add comments to interact with the community
+- **Tag System**: Posts are categorized with color-coded tags (Trending/Urgent/Unpopular)
+
 ### Filtering Content
 - **Category Filters**: Use the filter panel to focus on specific human rights issues
 - **Country View**: Click countries to see all stories from that location
@@ -81,6 +98,7 @@ https://hover-cards-emily.vercel.app
 - **Mapbox GL JS**: Interactive 3D globe and mapping 
 - **Tailwind CSS**: Utility-first CSS framework for styling [![TailwindCSS](https://img.shields.io/badge/Tailwind%20CSS-%2338B2AC.svg?logo=tailwind-css&logoColor=white)](#)
 - **Vite**: Fast build tool and development server 	[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=fff)](#)
+- **Social API**: Real-time social feed integration
 - **Local Storage**: Progress tracking and user state persistence
 
 ## Project Structure
@@ -90,7 +108,8 @@ globe-react/
 ├── public/                 # Static assets
 ├── src/
 │   ├── components/         # React components
-│   │   └── ProgressOverview.jsx
+│   │   ├── ProgressOverview.jsx
+│   │   └── SocialFeed.jsx  # Social feed component
 │   ├── utils/             # Utility functions
 │   │   └── progressUtils.js
 │   ├── img/               # Story character images
@@ -108,6 +127,12 @@ globe-react/
 2. Update the `sidebarItems` array in `GlobeView.jsx`
 3. Add expanded story content to the `expandedStories` object
 4. Update progress tracking utilities if needed
+
+### Social Feed Configuration
+- Modify feed update interval in `GlobeView.jsx` (currently 15 seconds)
+- Update tag styling in `SocialFeed.jsx`
+- Customize post types and categories
+- Adjust recent post tracking (currently prevents last 5 posts from repeating)
 
 ### Styling
 - Modify Tailwind classes in components
@@ -127,6 +152,9 @@ Replace the Mapbox access token in `GlobeView.jsx`:
 mapboxgl.accessToken = 'your-mapbox-token-here';
 ```
 
+### Social API
+The application integrates with the Social API at `https://social-api-sm1s.onrender.com`. Ensure the API is accessible for full social feed functionality.
+
 ### Story Data
 Update story locations, categories, and content in the `sidebarItems` and `expandedStories` objects.
 
@@ -144,10 +172,20 @@ Update story locations, categories, and content in the `sidebarItems` and `expan
 - Verify that all image files are present in `src/img/`
 - Ensure story data is properly formatted
 
+**Social Feed not loading**
+- Check internet connection for API access
+- Verify the Social API endpoint is accessible
+- Check browser console for network errors
+
 **Progress not saving**
 - Check if localStorage is enabled in your browser
 - Clear browser cache and try again
 - Verify the progress utility functions
+
+**Tab switching issues**
+- Ensure you're using a modern browser
+- Check for JavaScript errors in the console
+- Verify that all components are properly mounted
 
 ## Contributing
 
@@ -164,6 +202,8 @@ We welcome contributions! Please follow these steps:
 - Use meaningful commit messages
 - Test your changes thoroughly
 - Update documentation as needed
+- Ensure social feed functionality works correctly
+- Test tab switching and state persistence
 
 ## License
 
@@ -174,6 +214,7 @@ This project is open source and licensed under the MIT License
 - **Mapbox** for providing the 3D globe technology
 - **React Team** for the amazing framework
 - **Tailwind CSS** for the utility-first styling approach
+- **Social API** for providing real-time social feed content
 - **All contributors** who help improve this project
 
 
