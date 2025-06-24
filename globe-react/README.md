@@ -4,6 +4,7 @@ I have created an immersive web application that tells the stories of people aro
 
 For this project I worked with cursor AI and GPT to create this prototype that you can visit on
 https://hover-cards-emily.vercel.app 
+![Emily Demo Screenshot](readimages/1.png)
 
 
 ## Features
