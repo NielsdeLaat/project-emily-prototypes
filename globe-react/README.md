@@ -4,6 +4,7 @@ I have created an immersive web application that tells the stories of people aro
 
 For this project I worked with cursor AI and GPT to create this prototype that you can visit on
 https://hover-cards-emily.vercel.app 
+![overview](readimages/1.png)
 
 
 ## Features
@@ -11,6 +12,7 @@ https://hover-cards-emily.vercel.app
 - **Interactive 3D Globe**: Navigate a beautiful 3D globe powered by Mapbox GL
 - **Personal Stories**: Explore detailed narratives from 7 individuals across different countries
 - **Progress Tracking**: Monitor your exploration progress with a comprehensive tracking system
+![progress](readimages/2.png)
 - **Category Filtering**: Filter stories by human rights categories (Religious Persecution, LGBTQ+ Rights, Racism, etc.)
 - **Responsive Design**: Works seamlessly on desktop and mobile devices
 - **Dutch Localization**: Fully localized interface in Dutch
