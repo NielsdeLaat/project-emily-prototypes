@@ -10,7 +10,7 @@ Gedurende het project hebben we verschillende prototypes gemaakt om onderdelen v
 
 - Folder: [globe-react](https://github.com/NielsdeLaat/project-emily-prototypes/tree/main/globe-react)
 - Gemaakt door: Lin
-- Online: [Link](https://globe-progress.vercel.app/)
+- Online: [Link](https://demo-emily-prototype.vercel.app)
 
 ### Story
 
