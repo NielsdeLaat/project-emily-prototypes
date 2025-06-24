@@ -145,6 +145,12 @@ export default function GlobeView() {
   const [expandedStory, setExpandedStory] = useState(null);
   const [selectedStory, setSelectedStory] = useState(null);
   const [sidebarTab, setSidebarTab] = useState('stories'); // 'stories' or 'feed'
+  
+  // Social Feed State
+  const [feedPosts, setFeedPosts] = useState([]);
+  const [feedAllPosts, setFeedAllPosts] = useState([]);
+  const [feedRecentPostIds, setFeedRecentPostIds] = useState([]);
+  const [feedNextPostIndex, setFeedNextPostIndex] = useState(0);
 
   const expandedStories = {
     1: {
@@ -558,6 +564,9 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
         const handleMarkerClick = () => {
           // Force sidebar open
           setIsSidebarOpen(true);
+          
+          // Switch to stories tab
+          setSidebarTab('stories');
 
           // Set location and filter stories
           setSelectedLocation(story.location.country);
@@ -717,6 +726,10 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
       map.current.on('click', ['country-fills', 'territory-fills'], (e) => {
         if (e.features.length > 0) {
           const country = e.features[0];
+          
+          // Switch to stories tab
+          setSidebarTab('stories');
+          
           setSelectedCountry(country);
           setSelectedLocation(country.properties.name_en);
           setFilteredStories(sidebarItems.filter(item =>
@@ -803,6 +816,124 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
       }, 300);
     }
   }, [isSidebarOpen]);
+
+  // Fetch posts from API
+  useEffect(() => {
+    const fetchPosts = async () => {
+      if (feedAllPosts.length > 0) return; // Already have posts
+      
+      try {
+        const response = await fetch('https://social-api-sm1s.onrender.com/posts');
+        const result = await response.json();
+        if (result.success && result.data) {
+          console.log('GlobeView: Fetched posts from API:', result.data.length);
+          setFeedAllPosts(result.data);
+          // Start with first post
+          if (result.data.length > 0) {
+            setFeedPosts([result.data[0]]);
+            setFeedRecentPostIds([result.data[0].id]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    fetchPosts();
+  }, [feedAllPosts.length]);
+
+  // Add new post every 15 seconds
+  useEffect(() => {
+    if (feedAllPosts.length === 0) return;
+
+    console.log('GlobeView: Setting up interval, feedNextPostIndex:', feedNextPostIndex, 'total posts:', feedAllPosts.length);
+    const interval = setInterval(() => {
+      console.log('GlobeView: Adding new post, feedNextPostIndex:', feedNextPostIndex);
+      
+      // Get available posts (not in recent 5)
+      const availablePosts = feedAllPosts.filter(post => !feedRecentPostIds.includes(post.id));
+      
+      if (availablePosts.length > 0) {
+        // Randomly select from available posts
+        const randomIndex = Math.floor(Math.random() * availablePosts.length);
+        const selectedPost = availablePosts[randomIndex];
+        
+        const newPost = {
+          ...selectedPost,
+          id: Date.now(), // Unique ID for each post instance
+          timestamp: "Nu"
+        };
+        
+        setFeedPosts(prevPosts => [newPost, ...prevPosts]);
+        
+        // Update recent post IDs (keep only last 5)
+        setFeedRecentPostIds(prev => {
+          const newRecent = [selectedPost.id, ...prev.slice(0, 4)];
+          return newRecent;
+        });
+      } else {
+        // If all posts have been used recently, reset recent list and continue
+        const randomPost = feedAllPosts[Math.floor(Math.random() * feedAllPosts.length)];
+        const newPost = {
+          ...randomPost,
+          id: Date.now(),
+          timestamp: "Nu"
+        };
+        
+        setFeedPosts(prevPosts => [newPost, ...prevPosts]);
+        setFeedRecentPostIds([randomPost.id]);
+      }
+    }, 15000); // 15 seconds
+
+    return () => clearInterval(interval);
+  }, [feedNextPostIndex, feedAllPosts, feedRecentPostIds]);
+
+  // Handle feed like toggle
+  const handleFeedLike = (postId) => {
+    setFeedPosts(prevPosts => prevPosts.map(post => {
+      if (post.id === postId) {
+        return {
+          ...post,
+          likes: post.isLiked ? post.likes - 1 : post.likes + 1,
+          isLiked: !post.isLiked
+        };
+      }
+      return post;
+    }));
+  };
+
+  // Handle feed comment submission
+  const handleFeedComment = (postId, commentText) => {
+    if (commentText.trim()) {
+      const authorImages = {
+        "Kadir": "Kadir",
+        "Emily": "Emily", 
+        "Carlos": "Carlos",
+        "Fabrice": "Fabrice",
+        "Tyrone": "Tyrone",
+        "Kang Sae-Byeok": "Sae-Byeok",
+        "Mugisha": "Mugisha"
+      };
+      
+      const randomAuthor = Object.keys(authorImages)[Math.floor(Math.random() * Object.keys(authorImages).length)];
+      const newCommentObj = {
+        id: Date.now(),
+        user: randomAuthor,
+        text: commentText,
+        timestamp: new Date().toISOString()
+      };
+
+      setFeedPosts(prevPosts => prevPosts.map(post => {
+        if (post.id === postId) {
+          return {
+            ...post,
+            comments: [...post.comments, newCommentObj]
+          };
+        }
+        return post;
+      }));
+    }
+  };
 
   return (
     <>
@@ -1198,6 +1329,7 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                               alt={story.title}
                               className="w-full h-full object-cover rounded cursor-pointer"
                               onClick={() => {
+                                setSidebarTab('stories');
                                 setSelectedStory(story);
                                 setExpandedStory(story.id);
                                 markAsVisited(story.id, userProgress, setUserProgress);
@@ -1231,6 +1363,7 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                             className="read-more-button mb-4"
                             style={{ fontSize: '16px' }}
                             onClick={() => {
+                              setSidebarTab('stories');
                               setSelectedStory(story);
                               setExpandedStory(story.id);
                               markAsVisited(story.id, userProgress, setUserProgress);
@@ -1282,7 +1415,15 @@ Het is een verhaal over integriteit in een vijandige omgeving. Over kleine stapp
                 </>
               )
             ) : (
-              <SocialFeed sidebarItems={sidebarItems} />
+              <SocialFeed
+                sidebarItems={sidebarItems}
+                feedPosts={feedPosts}
+                feedAllPosts={feedAllPosts}
+                feedRecentPostIds={feedRecentPostIds}
+                feedNextPostIndex={feedNextPostIndex}
+                onLike={handleFeedLike}
+                onComment={handleFeedComment}
+              />
             )}
         </div>
       </div>
